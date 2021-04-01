@@ -188,7 +188,8 @@
 
 (defun minicomp--recompute (input metadata)
   "Preprocess candidates with INPUT string and METADATA."
-  (pcase (while-no-input (minicomp--candidates input metadata))
+  (pcase (let ((while-no-input-ignore-events '(selection-request)))
+           (while-no-input (minicomp--candidates input metadata)))
     (`(,base ,total ,candidates)
      (if-let* ((old (and candidates
                          minicomp--keep
