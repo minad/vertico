@@ -110,6 +110,12 @@
 (defvar-local minicomp--keep nil
   "Keep current candidate index `minicomp--index'.")
 
+(defun minicomp--pred (x y)
+  "Compare X and Y."
+  (or (< (cdr x) (cdr y))
+      (and (= (cdr x) (cdr y))
+           (string< (car x) (car y)))))
+
 (defun minicomp--sort (candidates)
   "Sort CANDIDATES by history position, length and alphabetically."
   ;; History disabled if `minibuffer-history-variable' eq `t'.
@@ -134,12 +140,7 @@
                          (+ (lsh (gethash (car cand) hist hist-len) 13)
                             (length (car cand)))))
       (setq cand (cdr cand)))
-    (setq candidates
-          (sort candidates
-                (lambda (c1 c2)
-                  (or (< (cdr c1) (cdr c2))
-                      (and (= (cdr c1) (cdr c2))
-                           (string< (car c1) (car c2))))))
+    (setq candidates (sort candidates #'minicomp--pred)
           cand candidates)
     ;; Drop decoration from the candidates
     (while cand
