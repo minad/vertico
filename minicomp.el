@@ -37,7 +37,7 @@
   :group 'convenience
   :prefix "minicomp-")
 
-(defcustom minicomp-sort-threshold 10000
+(defcustom minicomp-sort-threshold 20000
   "Candidates will only be sorted if there are fewer than this threshold."
   :type 'integer)
 
