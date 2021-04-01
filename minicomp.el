@@ -353,10 +353,11 @@
 
 (defun minicomp--setup ()
   "Setup completion system."
+  (setq-local truncate-lines nil)
+  (setq-local resize-mini-windows 'grow-only)
   (setq-local max-mini-window-height 1.0)
   (when (boundp 'orderless-skip-highlighting)
     (setq-local orderless-skip-highlighting t))
-  ;;(setq-local truncate-lines t)
   (setq minicomp--input t
         minicomp--candidates-ov (make-overlay (point-max) (point-max))
         minicomp--count-ov (make-overlay (point-min) (point-min)))
