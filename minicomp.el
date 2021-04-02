@@ -272,7 +272,7 @@
             ann-candidates (cdr ann-candidates)
             index (1+ index)))
     (put-text-property 0 1 'cursor t displayed)
-    (if (< minicomp--index 0)
+    (if (and (< minicomp--index 0) (not (minicomp--require-match)))
         (add-text-properties (minibuffer-prompt-end) (point-max) '(face minicomp-current))
       (remove-text-properties (minibuffer-prompt-end) (point-max) '(face nil)))
     (move-overlay minicomp--count-ov (point-min) (point-min))
@@ -291,43 +291,49 @@
       (minicomp--recompute input metadata))
     (minicomp--display input metadata)))
 
+(defun minicomp--require-match ()
+  "Match is required."
+  (not (memq minibuffer--require-match '(nil confirm confirm-after-completion))))
+
+(defun minicomp--goto (index)
+  "Go to INDEX."
+  (setq minicomp--keep t
+        minicomp--index
+        (max
+         (if (and (minicomp--require-match) (> minicomp--total 0))
+             0
+           -1)
+         (min index (- minicomp--total 1)))))
+
 (defun minicomp-beginning-of-buffer ()
   "Go to first candidate."
   (interactive)
-  (setq minicomp--index (if (> minicomp--total 0) 0 -1)
-        minicomp--keep t))
+  (minicomp--goto 0))
 
 (defun minicomp-end-of-buffer ()
   "Go to last candidate."
   (interactive)
-  (setq minicomp--index (- minicomp--total 1)
-        minicomp--keep t))
+  (minicomp--goto (- minicomp--total 1)))
 
 (defun minicomp-scroll-down ()
   "Go back by one page."
   (interactive)
-  (setq minicomp--keep t)
-  (when (>= minicomp--index 0)
-    (setq minicomp--index (max 0 (- minicomp--index minicomp-count)))))
+  (minicomp--goto (max 0 (- minicomp--index minicomp-count))))
 
 (defun minicomp-scroll-up ()
   "Go forward by one page."
   (interactive)
-  (setq minicomp--keep t)
-  (when (>= minicomp--index 0)
-    (setq minicomp--index (min (- minicomp--total 1) (+ minicomp--index minicomp-count)))))
+  (minicomp--goto (+ minicomp--index minicomp-count)))
 
 (defun minicomp-next ()
   "Go to next candidate."
   (interactive)
-  (setq minicomp--index (min (1+ minicomp--index) (- minicomp--total 1))
-        minicomp--keep t))
+  (minicomp--goto (1+ minicomp--index)))
 
 (defun minicomp-previous ()
   "Go to previous candidate."
   (interactive)
-  (setq minicomp--index (max -1 (- minicomp--index 1))
-        minicomp--keep t))
+  (minicomp--goto (- minicomp--index 1)))
 
 (defun minicomp-exit ()
   "Exit minibuffer with current candidate."
@@ -336,13 +342,13 @@
   (cond
    ((let ((input (minibuffer-contents-no-properties)))
       (or (not minibuffer--require-match)
-          (eq minibuffer-completion-confirm 'confirm-after-completion)
+          (eq minibuffer--require-match 'confirm-after-completion)
           (equal "" input)
           (test-completion input
                            minibuffer-completion-table
                            minibuffer-completion-predicate)))
     (exit-minibuffer))
-   ((eq minibuffer-completion-confirm 'confirm)
+   ((eq minibuffer--require-match 'confirm)
     (when (eq (read-char "Confirm") 13)
       (exit-minibuffer)))
    (t (message "Match required"))))
