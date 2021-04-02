@@ -174,21 +174,24 @@
                    (prog1 (cdr last)
                      (setcdr last nil))
                  0))
-         (total (length all))
-         (candidates (if (> total minicomp-sort-threshold)
-                         all
-                       (funcall
-                        (or (completion-metadata-get metadata 'display-sort-function)
-                            #'minicomp--sort)
-                        all))))
+         (total))
+    (when (eq (completion-metadata-get metadata 'category) 'file)
+      (setq all (delete "../" (delete "./" all))))
+    (setq total (length all)
+          all (if (> total minicomp-sort-threshold)
+                  all
+                (funcall
+                 (or (completion-metadata-get metadata 'display-sort-function)
+                     #'minicomp--sort)
+                 all)))
     (when-let* ((def (cond
                       ((stringp (car-safe minibuffer-default)) (car minibuffer-default))
                       ((stringp minibuffer-default) minibuffer-default)))
-                (rest (member def candidates)))
-      (setq candidates (nconc (list (car rest)) (delete def candidates))))
+                (rest (member def all)))
+      (setq all (nconc (list (car rest)) (delete def all))))
     (when-let (group (completion-metadata-get metadata 'x-group-function))
-      (setq candidates (mapcan #'cdr (funcall group candidates))))
-    (list base total candidates)))
+      (setq all (mapcan #'cdr (funcall group all))))
+    (list base total all)))
 
 (defun minicomp--recompute (input metadata)
   "Preprocess candidates with INPUT string and METADATA."
