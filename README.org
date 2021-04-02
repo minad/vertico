@@ -1,0 +1,28 @@
+#+title: minicomp.el - Minimal vertical completion system
+#+author: Daniel Mendler
+#+language: en
+
+* Introduction
+
+This package provides a minimal vertical completion system, which is based on
+the default completion system. By reusing the default system, we achieve full
+compatibility with built-in Emacs commands and completion tables. The completion
+system is pretty bare-bone and only provides a minimal set of commands. The code
+base is less than 500 lines of code. If you are looking for a more full-featured
+package, you may be interested in [[https://github.com/raxod502/selectrum][Selectrum]]. Selectrum supports Avy-style
+selection keys, a horizontal display and a buffer display.
+
+Complementary packages, which are supported:
+
+- [[https://github.com/minad/marginalia][Marginalia]]: Annotations in the Minibuffer
+- [[https://github.com/minad/consult][Consult]]: Many useful search and navigation commands
+- [[https://github.com/oantolin/embark][Embark]]: Minibuffer actions and context menu
+- [[https://github.com/oantolin/orderless][Orderless]]: Advanced completion style
+
+* Configuration
+
+#+begin_src emacs-lisp
+(use-package minicomp
+  :init
+  (minicomp-mode))
+#+end_src
