@@ -232,7 +232,11 @@
          (hl-candidates
           (if (and (memq 'orderless completion-styles)
                    (fboundp 'orderless-highlight-matches))
-              (orderless-highlight-matches input candidates)
+              (orderless-highlight-matches
+               (substring input
+                          (car (completion-boundaries input minibuffer-completion-table
+                                                      minibuffer-completion-predicate "")))
+               candidates)
             candidates))
          (ann-candidates (minicomp--annotate metadata candidates))
          (title nil)
