@@ -198,6 +198,7 @@
   "Preprocess candidates with INPUT string and METADATA."
   (pcase (let ((while-no-input-ignore-events '(selection-request)))
            (while-no-input (minicomp--candidates input metadata)))
+    ('nil (abort-recursive-edit))
     (`(,base ,total ,candidates)
      (unless (and minicomp--keep (< minicomp--index 0))
        (if-let* ((old (and candidates
