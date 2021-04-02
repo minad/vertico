@@ -29,6 +29,7 @@
 
 ;;; Code:
 
+(require 'seq)
 (eval-when-compile
   (require 'subr-x))
 
@@ -228,7 +229,9 @@
   "Display current candidates with INPUT string and METADATA."
   (let* ((index (min (max 0 (- minicomp--index (/ minicomp-count 2)))
                      (max 0 (- minicomp--total minicomp-count))))
-         (candidates (seq-take (nthcdr index minicomp--candidates) minicomp-count))
+         (candidates (seq-subseq minicomp--candidates index
+                                 (min (+ index minicomp-count)
+                                      minicomp--total)))
          (hl-candidates
           (if (and (memq 'orderless completion-styles)
                    (fboundp 'orderless-highlight-matches))
@@ -280,7 +283,7 @@
     (overlay-put minicomp--candidates-ov 'after-string displayed)
     (overlay-put minicomp--count-ov 'before-string
                  (format "%-6s " (format "%s/%s"
-                                         (if (< minicomp--index 0) "*" minicomp--index)
+                                         (if (< minicomp--index 0) "*" (1+ minicomp--index))
                                          minicomp--total)))))
 
 (defun minicomp--exhibit ()
