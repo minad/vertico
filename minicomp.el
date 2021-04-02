@@ -217,7 +217,7 @@
 (defun minicomp--replace-prop (prop fun str)
   "Replace STR parts with PROP using FUN."
   (let ((len (length str)) (pos 0) (chunks))
-    (while (not (= pos len))
+    (while (/= pos len)
       (let ((end (next-single-property-change pos prop str len)))
         (push (if-let (val (get-text-property pos prop str))
                   (funcall fun val)
