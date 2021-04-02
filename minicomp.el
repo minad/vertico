@@ -86,6 +86,9 @@
     map)
   "Minibuffer keymap.")
 
+(defvar-local minicomp--history-hash nil
+  "History hash table.")
+
 (defvar-local minicomp--candidates-ov nil
   "Overlay showing the candidates.")
 
@@ -118,31 +121,31 @@
 
 (defun minicomp--sort (candidates)
   "Sort CANDIDATES by history position, length and alphabetically."
-  ;; History disabled if `minibuffer-history-variable' eq `t'.
-  (let* ((list (and (not (eq minibuffer-history-variable t))
-                    (symbol-value minibuffer-history-variable)))
-         (hist-len (length list))
-         (hist (make-hash-table :test #'equal
-                                :size hist-len))
-         (hist-idx 0)
-         (cand candidates))
-    ;; Store the history position first in a hashtable in order to
-    ;; allow O(1) history lookup.
-    (dolist (elem list)
-      (unless (gethash elem hist)
-        (puthash elem hist-idx hist))
-      (setq hist-idx (1+ hist-idx)))
-    ;; Decorate each candidate with (hist-idx<<13) + length. This
-    ;; way we sort first by hist-idx and then by length. We assume
-    ;; that the candidates are not longer than 2**13 characters.
+  (unless minicomp--history-hash
+    ;; History disabled if `minibuffer-history-variable' eq `t'.
+    (let ((list (and (not (eq minibuffer-history-variable t))
+                     (symbol-value minibuffer-history-variable)))
+          (hist-idx 0))
+      (setq minicomp--history-hash (make-hash-table :test #'equal
+                                                    :size (length list)))
+      ;; Store the history position first in a hashtable in order to
+      ;; allow O(1) history lookup.
+      (dolist (elem list)
+        (unless (gethash elem minicomp--history-hash)
+          (puthash elem hist-idx minicomp--history-hash))
+        (setq hist-idx (1+ hist-idx)))))
+  ;; Decorate each candidate with (hist-idx<<13) + length. This way we sort first by hist-idx and
+  ;; then by length. We assume that the candidates are shorter than 2**13 characters and that the
+  ;; history is shorter than 2**16 entries.
+  (let ((cand candidates))
     (while cand
       (setcar cand (cons (car cand)
-                         (+ (lsh (gethash (car cand) hist hist-len) 13)
+                         (+ (lsh (gethash (car cand) minicomp--history-hash #xFFFF) 13)
                             (length (car cand)))))
-      (setq cand (cdr cand)))
-    (setq candidates (sort candidates #'minicomp--pred)
-          cand candidates)
-    ;; Drop decoration from the candidates
+      (setq cand (cdr cand))))
+  (setq candidates (sort candidates #'minicomp--pred))
+  ;; Drop decoration from the candidates
+  (let ((cand candidates))
     (while cand
       (setcar cand (caar cand))
       (setq cand (cdr cand))))
