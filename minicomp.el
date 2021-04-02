@@ -195,14 +195,15 @@
   (pcase (let ((while-no-input-ignore-events '(selection-request)))
            (while-no-input (minicomp--candidates input metadata)))
     (`(,base ,total ,candidates)
-     (if-let* ((old (and candidates
-                         minicomp--keep
-                         (>= minicomp--index 0)
-                         (nth minicomp--index minicomp--candidates)))
-               (idx (seq-position candidates old)))
-         (setq minicomp--index idx)
-       (setq minicomp--keep nil
-             minicomp--index (if candidates 0 -1)))
+     (unless (and minicomp--keep (< minicomp--index 0))
+       (if-let* ((old (and candidates
+                           minicomp--keep
+                           (>= minicomp--index 0)
+                           (nth minicomp--index minicomp--candidates)))
+                 (idx (seq-position candidates old)))
+           (setq minicomp--index idx)
+         (setq minicomp--keep nil
+               minicomp--index (if candidates 0 -1))))
      (setq minicomp--base base
            minicomp--input input
            minicomp--total total
@@ -277,7 +278,6 @@
 
 (defun minicomp--exhibit ()
   "Exhibit completion UI."
-  (setq minicomp--keep (or minicomp--keep (> minicomp--index 0)))
   (let ((metadata (completion--field-metadata (minibuffer-prompt-end)))
         (input (minibuffer-contents-no-properties)))
     (unless (equal minicomp--input input)
@@ -287,34 +287,40 @@
 (defun minicomp-beginning-of-buffer ()
   "Go to first candidate."
   (interactive)
-  (setq minicomp--index (if (> minicomp--total 0) 0 -1)))
+  (setq minicomp--index (if (> minicomp--total 0) 0 -1)
+        minicomp--keep t))
 
 (defun minicomp-end-of-buffer ()
   "Go to last candidate."
   (interactive)
-  (setq minicomp--index (- minicomp--total 1)))
+  (setq minicomp--index (- minicomp--total 1)
+        minicomp--keep t))
 
 (defun minicomp-scroll-down ()
   "Go back by one page."
   (interactive)
+  (setq minicomp--keep t)
   (when (>= minicomp--index 0)
     (setq minicomp--index (max 0 (- minicomp--index minicomp-count)))))
 
 (defun minicomp-scroll-up ()
   "Go forward by one page."
   (interactive)
+  (setq minicomp--keep t)
   (when (>= minicomp--index 0)
     (setq minicomp--index (min (- minicomp--total 1) (+ minicomp--index minicomp-count)))))
 
 (defun minicomp-next ()
   "Go to next candidate."
   (interactive)
-  (setq minicomp--index (min (1+ minicomp--index) (- minicomp--total 1))))
+  (setq minicomp--index (min (1+ minicomp--index) (- minicomp--total 1))
+        minicomp--keep t))
 
 (defun minicomp-previous ()
   "Go to previous candidate."
   (interactive)
-  (setq minicomp--index (max -1 (- minicomp--index 1))))
+  (setq minicomp--index (max -1 (- minicomp--index 1))
+        minicomp--keep t))
 
 (defun minicomp-exit ()
   "Exit minibuffer with current candidate."
