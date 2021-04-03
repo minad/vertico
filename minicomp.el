@@ -431,6 +431,7 @@
       (concat (substring content 0 minicomp--base)
               (nth minicomp--index minicomp--candidates)))))
 
+(defvar orderless-skip-highlighting)
 (defun minicomp--setup ()
   "Setup completion system."
   (setq-local truncate-lines nil)
