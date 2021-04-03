@@ -42,6 +42,11 @@
   "Candidates will only be sorted if there are fewer than this threshold."
   :type 'integer)
 
+(defcustom minicomp-count-format
+  (cons "%-6s " "%s/%s")
+  "Format string used for the candidate count."
+  :type '(choice (const nil) (cons string string)))
+
 (defcustom minicomp-group-format
   (concat
    #("    " 0 4 (face minicomp-group-separator))
@@ -312,13 +317,15 @@
     (if (and (< minicomp--index 0) (not (minicomp--require-match)))
         (add-text-properties (minibuffer-prompt-end) (point-max) '(face minicomp-current))
       (remove-text-properties (minibuffer-prompt-end) (point-max) '(face nil)))
-    (move-overlay minicomp--count-ov (point-min) (point-min))
     (move-overlay minicomp--candidates-ov (point-max) (point-max))
     (overlay-put minicomp--candidates-ov 'after-string displayed)
-    (overlay-put minicomp--count-ov 'before-string
-                 (format "%-6s " (format "%s/%s"
-                                         (if (< minicomp--index 0) "*" (1+ minicomp--index))
-                                         minicomp--total)))))
+    (when minicomp-count-format
+      (move-overlay minicomp--count-ov (point-min) (point-min))
+      (overlay-put minicomp--count-ov 'before-string
+                   (format (car minicomp-count-format)
+                           (format (cdr minicomp-count-format)
+                                   (if (< minicomp--index 0) "*" (1+ minicomp--index))
+                                   minicomp--total))))))
 
 (defun minicomp--exhibit ()
   "Exhibit completion UI."
