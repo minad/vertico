@@ -400,7 +400,7 @@
                            minibuffer-completion-predicate)))
     (exit-minibuffer))
    ((eq minibuffer--require-match 'confirm)
-    (when (eq (read-char "Confirm") 13)
+    (when (eq (read-char-exclusive "Confirm") 13)
       (exit-minibuffer)))
    (t (message "Match required"))))
 
@@ -452,8 +452,8 @@
                                                  metadata)
                      nil)))))
   (setq minicomp--input t
-        minicomp--candidates-ov (make-overlay (point-max) (point-max))
-        minicomp--count-ov (make-overlay (point-min) (point-min)))
+        minicomp--candidates-ov (make-overlay (point-max) (point-max) nil t t)
+        minicomp--count-ov (make-overlay (point-min) (point-min) nil t t))
   (use-local-map minicomp-map)
   (add-hook 'post-command-hook #'minicomp--exhibit -99 'local))
 
