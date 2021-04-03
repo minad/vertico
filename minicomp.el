@@ -289,12 +289,12 @@
             candidates)))
          (max-width (- (* 2 (window-width)) 5))
          (title)
-         (formatted (propertize " " 'cursor t))
+         (formatted #(" " 0 1 (cursor t)))
          (group (completion-metadata-get metadata 'x-group-function)))
     (dolist (ann-cand ann-candidates formatted)
       (setq formatted (concat formatted
                               (if (= index (1+ minicomp--index))
-                                  (propertize "\n" 'face 'minicomp-current)
+                                  #("\n" 0 1 (face minicomp-current))
                                 "\n")))
       (let ((prefix "") (suffix "") (cand))
         (pcase ann-cand
