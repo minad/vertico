@@ -87,6 +87,9 @@
     map)
   "Minibuffer keymap.")
 
+(defvar minicomp--highlight-function (lambda (_input _metadata cands) cands)
+  "Highlighting function.")
+
 (defvar-local minicomp--history-hash nil
   "History hash table.")
 
@@ -265,14 +268,13 @@
          (ann-candidates
           (minicomp--annotate
            metadata
-           (if (and (memq 'orderless completion-styles)
-                    (fboundp 'orderless-highlight-matches))
-               (orderless-highlight-matches
-                (substring input
-                           (car (completion-boundaries input minibuffer-completion-table
-                                                       minibuffer-completion-predicate "")))
-                candidates)
-             candidates)))
+           (funcall
+            minicomp--highlight-function
+            (substring input
+                       (car (completion-boundaries input minibuffer-completion-table
+                                                   minibuffer-completion-predicate "")))
+            metadata
+            candidates)))
          (title nil)
          (displayed " ")
          (group (completion-metadata-get metadata 'x-group-function)))
@@ -414,8 +416,20 @@
   (setq-local truncate-lines nil)
   (setq-local resize-mini-windows 'grow-only)
   (setq-local max-mini-window-height 1.0)
-  (when (boundp 'orderless-skip-highlighting)
-    (setq-local orderless-skip-highlighting t))
+  ;; Optimize orderless filtering, skip highlighting
+  (when (and (boundp 'orderless-skip-highlighting)
+             (equal (default-value 'completion-styles) '(orderless)))
+    (setq-local orderless-skip-highlighting t)
+    (setq-local minicomp--highlight-function
+                (lambda (input metadata candidates)
+                  (let ((orderless-skip-highlighting nil))
+                    (nconc
+                     (completion-all-completions input
+                                                 candidates
+                                                 nil
+                                                 (length input)
+                                                 metadata)
+                     nil)))))
   (setq minicomp--input t
         minicomp--candidates-ov (make-overlay (point-max) (point-max))
         minicomp--count-ov (make-overlay (point-min) (point-min)))
