@@ -199,14 +199,13 @@
 
 (defun minicomp--annotate (metadata candidates)
   "Annotate CANDIDATES with annotation function specified by METADATA."
-  (let ((aff (or (completion-metadata-get metadata 'affixation-function)
-                 (plist-get completion-extra-properties :affixation-function)))
-        (ann (or (completion-metadata-get metadata 'annotation-function)
-                 (plist-get completion-extra-properties :annotation-function))))
-    (cond
-     (aff (funcall aff candidates))
-     (ann (mapcar (lambda (cand) (list cand (or (funcall ann cand) ""))) candidates))
-     (t candidates))))
+  (if-let (aff (or (completion-metadata-get metadata 'affixation-function)
+                   (plist-get completion-extra-properties :affixation-function)))
+      (funcall aff candidates)
+    (if-let (ann (or (completion-metadata-get metadata 'annotation-function)
+                     (plist-get completion-extra-properties :annotation-function)))
+        (mapcar (lambda (cand) (list cand (or (funcall ann cand) ""))) candidates)
+      candidates)))
 
 (defun minicomp--recompute-candidates (input metadata)
   "Recompute candidates with INPUT string and METADATA."
@@ -289,13 +288,13 @@
             candidates)))
          (max-width (- (* 2 (window-width)) 5))
          (title)
-         (formatted #(" " 0 1 (cursor t)))
+         (chunks (list #(" " 0 1 (cursor t))))
          (group (completion-metadata-get metadata 'x-group-function)))
-    (dolist (ann-cand ann-candidates formatted)
-      (setq formatted (concat formatted
-                              (if (= index (1+ minicomp--index))
-                                  #("\n" 0 1 (face minicomp-current))
-                                "\n")))
+    (dolist (ann-cand ann-candidates)
+      (push (if (= index (1+ minicomp--index))
+                #("\n" 0 1 (face minicomp-current))
+              "\n")
+            chunks)
       (let ((prefix "") (suffix "") (cand))
         (pcase ann-cand
           (`(,c ,s) (setq cand c suffix s))
@@ -303,8 +302,9 @@
           (_ (setq cand ann-cand)))
         (when-let (new-title (and minicomp-group-format group (caar (funcall group (list cand)))))
           (unless (equal title new-title)
-            (setq formatted (concat formatted (format minicomp-group-format new-title) "\n")
-                  title new-title)))
+            (push (format minicomp-group-format new-title) chunks)
+            (push "\n" chunks)
+            (setq title new-title)))
         (setq cand (thread-last cand
                      (replace-regexp-in-string "[\t ]+" " ")
                      (replace-regexp-in-string "\n+" "⤶")
@@ -319,8 +319,9 @@
         (when (= index minicomp--index)
           (setq cand (concat cand))
           (add-face-text-property 0 (length cand) 'minicomp-current 'append cand))
-        (setq formatted (concat formatted cand)
-              index (1+ index))))))
+        (push cand chunks)
+        (setq index (1+ index))))
+    (apply #'concat (nreverse chunks))))
 
 (defun minicomp--display-candidates (str)
   "Update candidates overlay with STR."
