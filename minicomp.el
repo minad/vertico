@@ -1,4 +1,4 @@
-;;; minicomp.el --- Minimal completion system -*- lexical-binding: t -*-
+;;; minicomp.el --- Minimalistic vertical minibuffer completion system -*- lexical-binding: t -*-
 
 ;; Author: Daniel Mendler
 ;; Maintainer: Daniel Mendler
@@ -25,7 +25,11 @@
 
 ;;; Commentary:
 
-;; Minimal completion system.
+;; This package provides a vertical completion system, which is based on the
+;; default completion system. By reusing the default system, we achieve full
+;; compatibility with built-in Emacs commands and completion tables. The
+;; completion system is pretty bare-bone and only provides a minimal set of
+;; commands.
 
 ;;; Code:
 
