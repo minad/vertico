@@ -83,6 +83,7 @@
     (define-key map [remap previous-line-or-history-element] #'minicomp-previous)
     (define-key map [remap exit-minibuffer] #'minicomp-exit)
     (define-key map [remap kill-ring-save] #'minicomp-save)
+    (define-key map [C-return] #'minicomp-exit-input)
     (define-key map "\t" #'minicomp-insert)
     map)
   "Minibuffer keymap.")
@@ -371,10 +372,11 @@
   (interactive)
   (minicomp--goto (- minicomp--index 1)))
 
-(defun minicomp-exit ()
-  "Exit minibuffer with current candidate."
-  (interactive)
-  (minicomp-insert)
+(defun minicomp-exit (&optional arg)
+  "Exit minibuffer with current candidate or input if prefix ARG is given."
+  (interactive "P")
+  (unless arg
+    (minicomp-insert))
   (cond
    ((let ((input (minibuffer-contents-no-properties)))
       (or (not minibuffer--require-match)
@@ -388,6 +390,11 @@
     (when (eq (read-char "Confirm") 13)
       (exit-minibuffer)))
    (t (message "Match required"))))
+
+(defun minicomp-exit-input ()
+  "Exit minibuffer with input."
+  (interactive)
+  (minicomp-exit t))
 
 (defun minicomp-save ()
   "Save current candidate to kill ring."
