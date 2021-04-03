@@ -208,7 +208,7 @@
      (ann (mapcar (lambda (cand) (list cand (or (funcall ann cand) ""))) candidates))
      (t candidates))))
 
-(defun minicomp--candidates (input metadata)
+(defun minicomp--recompute-candidates (input metadata)
   "Recompute candidates with INPUT string and METADATA."
   (let* ((all (completion-all-completions
                input
@@ -238,10 +238,10 @@
       (setq all (mapcan #'cdr (funcall group all))))
     (list base total all)))
 
-(defun minicomp--recompute (input metadata)
+(defun minicomp--update-candidates (input metadata)
   "Preprocess candidates with INPUT string and METADATA."
   (pcase (let ((while-no-input-ignore-events '(selection-request)))
-           (while-no-input (minicomp--candidates input metadata)))
+           (while-no-input (minicomp--recompute-candidates input metadata)))
     ('nil (abort-recursive-edit))
     (`(,base ,total ,candidates)
      (unless (and minicomp--keep (< minicomp--index 0))
@@ -270,8 +270,8 @@
         (setq pos end)))
     (apply #'concat (nreverse chunks))))
 
-(defun minicomp--display (input metadata)
-  "Display current candidates with INPUT string and METADATA."
+(defun minicomp--format-candidates (input metadata)
+  "Format current candidates with INPUT string and METADATA."
   (let* ((index (min (max 0 (- minicomp--index (/ minicomp-count 2)))
                      (max 0 (- minicomp--total minicomp-count))))
          (candidates (seq-subseq minicomp--candidates index
@@ -288,10 +288,10 @@
             metadata
             candidates)))
          (title nil)
-         (displayed " ")
+         (formatted (propertize " " 'cursor t))
          (group (completion-metadata-get metadata 'x-group-function)))
-    (dolist (ann-cand ann-candidates)
-      (setq displayed (concat displayed
+    (dolist (ann-cand ann-candidates formatted)
+      (setq formatted (concat formatted
                               (if (= index (1+ minicomp--index))
                                   (propertize "\n" 'face 'minicomp-current)
                                 "\n")))
@@ -302,7 +302,7 @@
           (_ (setq cand ann-cand)))
         (when-let (new-title (and minicomp-group-format group (caar (funcall group (list cand)))))
           (unless (equal title new-title)
-            (setq displayed (concat displayed (format minicomp-group-format new-title) "\n")
+            (setq formatted (concat formatted (format minicomp-group-format new-title) "\n")
                   title new-title)))
         (setq cand (thread-last cand
                      (replace-regexp-in-string "[\t ]+" " ")
@@ -317,29 +317,35 @@
         (when (= index minicomp--index)
           (setq cand (concat cand))
           (add-face-text-property 0 (length cand) 'minicomp-current 'append cand))
-        (setq displayed (concat displayed cand)
-              index (1+ index))))
-    (put-text-property 0 1 'cursor t displayed)
-    (if (and (< minicomp--index 0) (not (minicomp--require-match)))
-        (add-text-properties (minibuffer-prompt-end) (point-max) '(face minicomp-current))
-      (remove-text-properties (minibuffer-prompt-end) (point-max) '(face nil)))
-    (move-overlay minicomp--candidates-ov (point-max) (point-max))
-    (overlay-put minicomp--candidates-ov 'after-string displayed)
-    (when minicomp-count-format
-      (move-overlay minicomp--count-ov (point-min) (point-min))
-      (overlay-put minicomp--count-ov 'before-string
-                   (format (car minicomp-count-format)
-                           (format (cdr minicomp-count-format)
-                                   (if (< minicomp--index 0) "*" (1+ minicomp--index))
-                                   minicomp--total))))))
+        (setq formatted (concat formatted cand)
+              index (1+ index))))))
+
+(defun minicomp--display-candidates (str)
+  "Update candidates overlay with STR."
+  (move-overlay minicomp--candidates-ov (point-max) (point-max))
+  (overlay-put minicomp--candidates-ov 'after-string str))
+
+(defun minicomp--display-count ()
+  "Update count overlay."
+  (when minicomp-count-format
+    (move-overlay minicomp--count-ov (point-min) (point-min))
+    (overlay-put minicomp--count-ov 'before-string
+                 (format (car minicomp-count-format)
+                         (format (cdr minicomp-count-format)
+                                 (if (< minicomp--index 0) "*" (1+ minicomp--index))
+                                 minicomp--total)))))
 
 (defun minicomp--exhibit ()
   "Exhibit completion UI."
   (let ((metadata (completion--field-metadata (minibuffer-prompt-end)))
         (input (minibuffer-contents-no-properties)))
     (unless (equal minicomp--input input)
-      (minicomp--recompute input metadata))
-    (minicomp--display input metadata)))
+      (minicomp--update-candidates input metadata))
+    (minicomp--display-candidates (minicomp--format-candidates input metadata))
+    (minicomp--display-count)
+    (if (and (< minicomp--index 0) (not (minicomp--require-match)))
+        (add-text-properties (minibuffer-prompt-end) (point-max) '(face minicomp-current))
+      (remove-text-properties (minibuffer-prompt-end) (point-max) '(face nil)))))
 
 (defun minicomp--require-match ()
   "Match is required."
