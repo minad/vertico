@@ -14,10 +14,12 @@ keys, a horizontal display and a buffer display.
 
 Complementary packages, which are supported:
 
-- [[https://github.com/minad/marginalia][Marginalia]]: Annotations in the Minibuffer
+- [[https://github.com/minad/marginalia][Marginalia]]: Rich annotations in the minibuffer
 - [[https://github.com/minad/consult][Consult]]: Many useful search and navigation commands
 - [[https://github.com/oantolin/embark][Embark]]: Minibuffer actions and context menu
 - [[https://github.com/oantolin/orderless][Orderless]]: Advanced completion style
+
+[[https://github.com/minad/minicomp/blob/main/screenshot.svg?raw=true]]
 
 * Configuration
 
