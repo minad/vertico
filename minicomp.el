@@ -262,48 +262,49 @@
          (candidates (seq-subseq minicomp--candidates index
                                  (min (+ index minicomp-count)
                                       minicomp--total)))
-         (hl-candidates
-          (if (and (memq 'orderless completion-styles)
-                   (fboundp 'orderless-highlight-matches))
-              (orderless-highlight-matches
-               (substring input
-                          (car (completion-boundaries input minibuffer-completion-table
-                                                      minibuffer-completion-predicate "")))
-               candidates)
-            candidates))
-         (ann-candidates (minicomp--annotate metadata candidates))
+         (ann-candidates
+          (minicomp--annotate
+           metadata
+           (if (and (memq 'orderless completion-styles)
+                    (fboundp 'orderless-highlight-matches))
+               (orderless-highlight-matches
+                (substring input
+                           (car (completion-boundaries input minibuffer-completion-table
+                                                       minibuffer-completion-predicate "")))
+                candidates)
+             candidates)))
          (title nil)
-         (displayed (concat " " (and hl-candidates "\n")))
+         (displayed " ")
          (group (completion-metadata-get metadata 'x-group-function)))
-    (dolist (cand hl-candidates)
-      (when-let (new-title (and minicomp-group-format group (caar (funcall group (list cand)))))
-        (unless (equal title new-title)
-          (setq displayed (concat displayed (format minicomp-group-format new-title) "\n")
-                title new-title)))
-      (setq cand (thread-last cand
-                   (replace-regexp-in-string "[\t ]+" " ")
-                   (replace-regexp-in-string "\n+" "⤶")
-                   (string-trim)
-                   (minicomp--replace-prop 'display (lambda (x) (if (stringp x) x "")))
-                   (minicomp--replace-prop 'invisible (lambda (_) ""))))
-      (pcase-let ((`(,prefix . ,suffix) (pcase (car ann-candidates)
-                                          (`(,_ ,y) (cons nil y))
-                                          (`(,x ,_ ,y) (cons x y))
-                                          (_ (cons nil "")))))
+    (dolist (ann-cand ann-candidates)
+      (setq displayed (concat displayed
+                              (if (= index (1+ minicomp--index))
+                                  (propertize "\n" 'face 'minicomp-current)
+                                "\n")))
+      (let ((prefix "") (suffix "") (cand))
+        (pcase ann-cand
+          (`(,c ,s) (setq cand c suffix s))
+          (`(,c ,p ,s) (setq cand c prefix p suffix s))
+          (_ (setq cand ann-cand)))
+        (when-let (new-title (and minicomp-group-format group (caar (funcall group (list cand)))))
+          (unless (equal title new-title)
+            (setq displayed (concat displayed (format minicomp-group-format new-title) "\n")
+                  title new-title)))
+        (setq cand (thread-last cand
+                     (replace-regexp-in-string "[\t ]+" " ")
+                     (replace-regexp-in-string "\n+" "⤶")
+                     (string-trim)
+                     (minicomp--replace-prop 'display (lambda (x) (if (stringp x) x "")))
+                     (minicomp--replace-prop 'invisible (lambda (_) ""))))
         (setq cand (concat prefix cand
                            (if (text-property-not-all 0 (length suffix) 'face nil suffix)
                                suffix
-                             (propertize suffix 'face 'completions-annotations)))))
-      (when (= index minicomp--index)
-        (setq cand (concat cand))
-        (add-face-text-property 0 (length cand) 'minicomp-current 'append cand))
-      (setq displayed (concat displayed cand
-                              (when (cdr ann-candidates)
-                                (if (= index minicomp--index)
-                                    (propertize "\n" 'face 'minicomp-current)
-                                  "\n")))
-            ann-candidates (cdr ann-candidates)
-            index (1+ index)))
+                             (propertize suffix 'face 'completions-annotations))))
+        (when (= index minicomp--index)
+          (setq cand (concat cand))
+          (add-face-text-property 0 (length cand) 'minicomp-current 'append cand))
+        (setq displayed (concat displayed cand)
+              index (1+ index))))
     (put-text-property 0 1 'cursor t displayed)
     (if (and (< minicomp--index 0) (not (minicomp--require-match)))
         (add-text-properties (minibuffer-prompt-end) (point-max) '(face minicomp-current))
