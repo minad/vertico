@@ -90,6 +90,9 @@
 (defvar-local minicomp--history-hash nil
   "History hash table.")
 
+(defvar-local minicomp--history-dir nil
+  "Directory of `minicomp--history-hash'.")
+
 (defvar-local minicomp--candidates-ov nil
   "Overlay showing the candidates.")
 
@@ -120,24 +123,41 @@
       (and (= (cdr x) (cdr y))
            (string< (car x) (car y)))))
 
-(defun minicomp--sort (candidates)
-  "Sort CANDIDATES by history position, length and alphabetically."
-  (unless minicomp--history-hash
-    ;; History disabled if `minibuffer-history-variable' eq `t'.
-    (let ((list (and (not (eq minibuffer-history-variable t))
-                     (symbol-value minibuffer-history-variable)))
-          (hist-idx 0))
-      (setq minicomp--history-hash (make-hash-table :test #'equal
-                                                    :size (length list)))
-      ;; Store the history position first in a hashtable in order to
-      ;; allow O(1) history lookup.
-      (dolist (elem list)
-        (unless (gethash elem minicomp--history-hash)
-          (puthash elem hist-idx minicomp--history-hash))
-        (setq hist-idx (1+ hist-idx)))))
-  ;; Decorate each candidate with (hist-idx<<13) + length. This way we sort first by hist-idx and
-  ;; then by length. We assume that the candidates are shorter than 2**13 characters and that the
-  ;; history is shorter than 2**16 entries.
+(defun minicomp--sort (input candidates)
+  "Sort CANDIDATES by history position, length and alphabetically, given current INPUT."
+  ;; Store the history position first in a hashtable in order to allow O(1) history lookup. File
+  ;; names get special treatment. In principle, completion tables with boundaries should also get
+  ;; special treatment, but files are the most important.
+  (let ((index 0)
+        ;; History disabled if `minibuffer-history-variable' eq `t'.
+        (hist (and (not (eq minibuffer-history-variable t))
+                   (symbol-value minibuffer-history-variable))))
+    (if (eq minibuffer-history-variable 'file-name-history)
+      (let* ((dir (expand-file-name (substitute-in-file-name
+                                     (or (file-name-directory input)
+                                         default-directory))))
+             (adir (abbreviate-file-name dir)))
+        (unless (equal minicomp--history-dir dir)
+          (setq minicomp--history-hash (make-hash-table :test #'equal :size (length hist))
+                minicomp--history-dir dir)
+          (dolist (elem hist)
+            (when-let (file (cond
+                             ((string-prefix-p dir elem) (substring elem (length dir)))
+                             ((string-prefix-p adir elem) (substring elem (length adir)))))
+              (when-let (slash (string-match-p "/" file))
+                (setq file (substring file 0 (1+ slash))))
+              (unless (gethash file minicomp--history-hash)
+                (puthash file index minicomp--history-hash)))
+            (setq index (1+ index)))))
+      (unless minicomp--history-hash
+        (setq minicomp--history-hash (make-hash-table :test #'equal :size (length hist)))
+        (dolist (elem hist)
+          (unless (gethash elem minicomp--history-hash)
+            (puthash elem index minicomp--history-hash))
+          (setq index (1+ index))))))
+  ;; Decorate each candidate with (index<<13) + length. This way we sort first by index and then by
+  ;; length. We assume that the candidates are shorter than 2**13 characters and that the history is
+  ;; shorter than 2**16 entries.
   (let ((cand candidates))
     (while cand
       (setcar cand (cons (car cand)
@@ -181,10 +201,9 @@
     (setq total (length all)
           all (if (> total minicomp-sort-threshold)
                   all
-                (funcall
-                 (or (completion-metadata-get metadata 'display-sort-function)
-                     #'minicomp--sort)
-                 all)))
+                (if-let (sort (completion-metadata-get metadata 'display-sort-function))
+                    (funcall sort all)
+                  (minicomp--sort input all))))
     (when-let* ((def (cond
                       ((stringp (car-safe minibuffer-default)) (car minibuffer-default))
                       ((stringp minibuffer-default) minibuffer-default)))
