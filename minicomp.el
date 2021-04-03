@@ -287,7 +287,8 @@
                                                    minibuffer-completion-predicate "")))
             metadata
             candidates)))
-         (title nil)
+         (max-width (- (* 2 (window-width)) 5))
+         (title)
          (formatted (propertize " " 'cursor t))
          (group (completion-metadata-get metadata 'x-group-function)))
     (dolist (ann-cand ann-candidates formatted)
@@ -309,8 +310,9 @@
                      (replace-regexp-in-string "\n+" "⤶")
                      (string-trim)
                      (minicomp--replace-prop 'display (lambda (x) (if (stringp x) x "")))
-                     (minicomp--replace-prop 'invisible (lambda (_) ""))))
-        (setq cand (concat prefix cand
+                     (minicomp--replace-prop 'invisible (lambda (_) "")))
+              cand (truncate-string-to-width cand max-width 0 nil "…")
+              cand (concat prefix cand
                            (if (text-property-not-all 0 (length suffix) 'face nil suffix)
                                suffix
                              (propertize suffix 'face 'completions-annotations))))
