@@ -409,7 +409,7 @@
                            minibuffer-completion-predicate)))
     (exit-minibuffer))
    ((eq minibuffer--require-match 'confirm)
-    (when (eq (read-char-exclusive "Confirm") 13)
+    (when (eq (ignore-errors (read-char "Confirm")) 13)
       (exit-minibuffer)))
    (t (message "Match required"))))
 
