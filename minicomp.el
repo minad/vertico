@@ -84,6 +84,8 @@
     (define-key map [remap end-of-buffer] #'minicomp-end-of-buffer)
     (define-key map [remap scroll-down-command] #'minicomp-scroll-down)
     (define-key map [remap scroll-up-command] #'minicomp-scroll-up)
+    (define-key map [remap next-line] #'minicomp-next)
+    (define-key map [remap previous-line] #'minicomp-previous)
     (define-key map [remap next-line-or-history-element] #'minicomp-next)
     (define-key map [remap previous-line-or-history-element] #'minicomp-previous)
     (define-key map [remap exit-minibuffer] #'minicomp-exit)
