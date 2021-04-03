@@ -114,7 +114,7 @@
 (defvar-local minicomp--count-ov nil
   "Overlay showing the number of candidates.")
 
-(defvar-local minicomp--index 0
+(defvar-local minicomp--index -1
   "Index of current candidate or negative for prompt selection.")
 
 (defvar-local minicomp--input nil
