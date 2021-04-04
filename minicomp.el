@@ -5,7 +5,7 @@
 ;; Created: 2021
 ;; License: GPL-3.0-or-later
 ;; Version: 0.1
-;; Package-Requires: ((emacs "27"))
+;; Package-Requires: ((emacs "27.1"))
 ;; Homepage: https://github.com/minad/minicomp
 
 ;; This file is not part of GNU Emacs.
@@ -38,7 +38,7 @@
   (require 'subr-x))
 
 (defgroup minicomp nil
-  "Minimal completion system."
+  "Minimalistic vertical minibuffer completion system."
   :group 'convenience
   :prefix "minicomp-")
 
