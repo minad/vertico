@@ -476,14 +476,18 @@
     (setq-local orderless-skip-highlighting t
                 minicomp--highlight-function
                 (lambda (input metadata candidates)
-                  (let ((orderless-skip-highlighting nil))
-                    (nconc
-                     (completion-all-completions input
-                                                 candidates
-                                                 nil
-                                                 (length input)
-                                                 metadata)
-                     nil)))))
+                  ;; Pass once again through the completion style for highlighting
+                  (let* ((orderless-skip-highlighting nil)
+                         (highlighted (nconc
+                                       (completion-all-completions input
+                                                                   candidates
+                                                                   nil
+                                                                   (length input)
+                                                                   metadata)
+                                       nil)))
+                    ;; Check if everything went alright, all the candidates should still be present.
+                    (if (= (length highlighted) (length candidates))
+                        highlighted candidates)))))
   (use-local-map minicomp-map)
   (add-hook 'post-command-hook #'minicomp--exhibit -99 'local))
 
