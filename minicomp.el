@@ -289,8 +289,7 @@
   (let* ((index (min (max 0 (- minicomp--index (/ minicomp-count 2)))
                      (max 0 (- minicomp--total minicomp-count))))
          (candidates (seq-subseq minicomp--candidates index
-                                 (min (+ index minicomp-count)
-                                      minicomp--total)))
+                                 (min (+ index minicomp-count) minicomp--total)))
          (ann-candidates
           (minicomp--annotate
            metadata
@@ -349,7 +348,10 @@
     (overlay-put minicomp--count-ov 'before-string
                  (format (car minicomp-count-format)
                          (format (cdr minicomp-count-format)
-                                 (if (< minicomp--index 0) "*" (1+ minicomp--index))
+                                 (cond
+                                  ((>= minicomp--index 0) (1+ minicomp--index))
+                                  ((minicomp--require-match) "!")
+                                  (t "*"))
                                  minicomp--total)))))
 
 (defun minicomp--tidy-shadowed-file ()
@@ -384,10 +386,8 @@
   "Go to INDEX."
   (setq minicomp--keep t
         minicomp--index
-        (max
-         (if (and (minicomp--require-match) (> minicomp--total 0))
-             0
-           -1)
+        (max (if (and (minicomp--require-match) minicomp--candidates)
+                 0 -1)
          (min index (- minicomp--total 1)))))
 
 (defun minicomp-beginning-of-buffer ()
