@@ -174,12 +174,12 @@
                           ((and (> len alen)
                                 (eq t (compare-strings adir 0 alen elem 0 alen)))
                            (substring elem alen)))))
-            (when file
-              (when-let (slash (string-match-p "/" file))
-                (setq file (substring file 0 (1+ slash))))
-              (unless (gethash file minicomp--history-hash)
-                (puthash file index minicomp--history-hash)))
-            (setq index (1+ index))))))))
+              (when file
+                (when-let (slash (string-match-p "/" file))
+                  (setq file (substring file 0 (1+ slash))))
+                (unless (gethash file minicomp--history-hash)
+                  (puthash file index minicomp--history-hash)))
+              (setq index (1+ index))))))))
    ((not minicomp--history-hash)
     (let ((index 0)
           ;; History disabled if `minibuffer-history-variable' eq `t'.
@@ -236,11 +236,9 @@
                    (prog1 (cdr last)
                      (setcdr last nil))
                  0))
-         (total))
-    (setq total (length all)
-          all (if (> total minicomp-sort-threshold)
-                  all
-                (if-let (sort (completion-metadata-get metadata 'display-sort-function))
+         (total (length all)))
+    (when (<= total minicomp-sort-threshold)
+      (setq all (if-let (sort (completion-metadata-get metadata 'display-sort-function))
                     (funcall sort all)
                   (minicomp--sort input all))))
     (when-let* ((def (cond
@@ -388,7 +386,7 @@
         minicomp--index
         (max (if (and (minicomp--require-match) minicomp--candidates)
                  0 -1)
-         (min index (- minicomp--total 1)))))
+             (min index (- minicomp--total 1)))))
 
 (defun minicomp-beginning-of-buffer ()
   "Go to first candidate."
@@ -512,8 +510,7 @@
 
 (defun minicomp--consult-candidate ()
   "Current candidate."
-  (when minicomp--input
-    (minicomp--candidate)))
+  (and minicomp--input (minicomp--candidate)))
 
 (defun minicomp--consult-refresh ()
   "Refresh ui."
@@ -523,20 +520,20 @@
 
 (defun minicomp--embark-target ()
   "Return embark target."
-  (when minicomp--input
-    (cons (completion-metadata-get (completion--field-metadata
-                                    (minibuffer-prompt-end))
-                                   'category)
-	  (minicomp--candidate))))
+  (and minicomp--input
+       (cons (completion-metadata-get (completion--field-metadata
+                                       (minibuffer-prompt-end))
+                                      'category)
+	     (minicomp--candidate))))
 
 (defun minicomp--embark-candidates ()
   "Return embark candidates."
-  (when minicomp--input
-    (cons (completion-metadata-get (completion--field-metadata
-                                    (minibuffer-prompt-end))
-                                   'category)
-          ;; full candidates?
-          minicomp--candidates)))
+  (and minicomp--input
+       (cons (completion-metadata-get (completion--field-metadata
+                                       (minibuffer-prompt-end))
+                                      'category)
+             ;; full candidates?
+             minicomp--candidates)))
 
 (with-eval-after-load 'consult
   (add-hook 'consult--completion-candidate-hook #'minicomp--consult-candidate)
