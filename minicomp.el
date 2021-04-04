@@ -63,10 +63,20 @@
   "Maximal number of candidates to show."
   :type 'integer)
 
+(defcustom minicomp-truncation
+  '(#("⤶" 0 1 (face minicomp-truncation))
+    #("…" 0 1 (face minicomp-truncation)))
+  "Truncation replacement strings."
+  :type '(list string string))
+
 (defgroup minicomp-faces nil
   "Faces used by Minicomp."
   :group 'minicomp
   :group 'faces)
+
+(defface minicomp-truncation
+  '((t :inherit shadow))
+  "Face used to highlight truncation characters.")
 
 (defface minicomp-group-title
   '((t :inherit shadow :slant italic))
@@ -307,17 +317,16 @@
             (setq title new-title)))
         (setq cand (thread-last cand
                      (replace-regexp-in-string "[\t ]+" " ")
-                     (replace-regexp-in-string "\n+" "⤶")
+                     (replace-regexp-in-string "[\t\n ]*\n[\t\n ]*" (car minicomp-truncation))
                      (string-trim)
                      (minicomp--replace-prop 'display (lambda (x) (if (stringp x) x "")))
                      (minicomp--replace-prop 'invisible (lambda (_) "")))
-              cand (truncate-string-to-width cand max-width 0 nil "…")
+              cand (truncate-string-to-width cand max-width 0 nil (cadr minicomp-truncation))
               cand (concat prefix cand
                            (if (text-property-not-all 0 (length suffix) 'face nil suffix)
                                suffix
                              (propertize suffix 'face 'completions-annotations))))
         (when (= index minicomp--index)
-          (setq cand (concat cand))
           (add-face-text-property 0 (length cand) 'minicomp-current 'append cand))
         (push cand chunks)
         (setq index (1+ index))))
@@ -346,9 +355,9 @@
       (minicomp--update-candidates input metadata))
     (minicomp--display-candidates (minicomp--format-candidates input metadata))
     (minicomp--display-count)
-    (if (and (< minicomp--index 0) (not (minicomp--require-match)))
-        (add-text-properties (minibuffer-prompt-end) (point-max) '(face minicomp-current))
-      (remove-text-properties (minibuffer-prompt-end) (point-max) '(face nil)))))
+    (if (or (>= minicomp--index 0) (minicomp--require-match))
+        (remove-text-properties (minibuffer-prompt-end) (point-max) '(face nil))
+      (add-text-properties (minibuffer-prompt-end) (point-max) '(face minicomp-current)))))
 
 (defun minicomp--require-match ()
   "Match is required."
@@ -401,8 +410,7 @@
     (minicomp-insert))
   (cond
    ((let ((input (minibuffer-contents-no-properties)))
-      (or (not minibuffer--require-match)
-          (eq minibuffer--require-match 'confirm-after-completion)
+      (or (memq minibuffer--require-match '(nil confirm-after-completion))
           (equal "" input)
           (test-completion input
                            minibuffer-completion-table
@@ -443,14 +451,17 @@
 (defvar orderless-skip-highlighting)
 (defun minicomp--setup ()
   "Setup completion system."
-  (setq-local truncate-lines nil)
-  (setq-local resize-mini-windows 'grow-only)
-  (setq-local max-mini-window-height 1.0)
+  (setq minicomp--input t
+        minicomp--candidates-ov (make-overlay (point-max) (point-max) nil t t)
+        minicomp--count-ov (make-overlay (point-min) (point-min) nil t t))
+  (setq-local truncate-lines nil
+              resize-mini-windows 'grow-only
+              max-mini-window-height 1.0)
   ;; Optimize orderless filtering, skip highlighting
   (when (and (boundp 'orderless-skip-highlighting)
              (equal (default-value 'completion-styles) '(orderless)))
-    (setq-local orderless-skip-highlighting t)
-    (setq-local minicomp--highlight-function
+    (setq-local orderless-skip-highlighting t
+                minicomp--highlight-function
                 (lambda (input metadata candidates)
                   (let ((orderless-skip-highlighting nil))
                     (nconc
@@ -460,9 +471,6 @@
                                                  (length input)
                                                  metadata)
                      nil)))))
-  (setq minicomp--input t
-        minicomp--candidates-ov (make-overlay (point-max) (point-max) nil t t)
-        minicomp--count-ov (make-overlay (point-min) (point-min) nil t t))
   (use-local-map minicomp-map)
   (add-hook 'post-command-hook #'minicomp--exhibit -99 'local))
 
