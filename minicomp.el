@@ -33,8 +33,8 @@
 
 ;;; Code:
 
-(require 'seq)
 (require 'cl-lib)
+(require 'seq)
 (eval-when-compile
   (require 'subr-x))
 
@@ -231,7 +231,7 @@
                      (setcdr last nil))
                  0))
          (total))
-    (when (eq (completion-metadata-get metadata 'category) 'file)
+    (when minibuffer-completing-file-name
       (setq all (cl-delete-if (apply-partially #'string-match-p "\\(\\`\\|/\\)\\.?\\./\\'") all)))
     (setq total (length all)
           all (if (> total minicomp-sort-threshold)
@@ -348,8 +348,20 @@
                                  (if (< minicomp--index 0) "*" (1+ minicomp--index))
                                  minicomp--total)))))
 
+(defun minicomp--tidy-shadowed-file ()
+  "Tidy shadowed file name."
+  (when (and minibuffer-completing-file-name
+             (eq this-command #'self-insert-command)
+             (bound-and-true-p rfn-eshadow-overlay)
+             (overlay-buffer rfn-eshadow-overlay)
+             (= (point) (point-max))
+             (or (>= (- (point) (overlay-end rfn-eshadow-overlay)) 2)
+                 (eq ?/ (char-before (- (point) 2)))))
+    (delete-region (overlay-start rfn-eshadow-overlay) (overlay-end rfn-eshadow-overlay))))
+
 (defun minicomp--exhibit ()
   "Exhibit completion UI."
+  (minicomp--tidy-shadowed-file)
   (let ((metadata (completion--field-metadata (minibuffer-prompt-end)))
         (input (minibuffer-contents-no-properties)))
     (unless (equal minicomp--input input)
