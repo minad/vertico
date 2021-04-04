@@ -34,6 +34,7 @@
 ;;; Code:
 
 (require 'seq)
+(require 'cl-lib)
 (eval-when-compile
   (require 'subr-x))
 
@@ -231,7 +232,7 @@
                  0))
          (total))
     (when (eq (completion-metadata-get metadata 'category) 'file)
-      (setq all (delete "../" (delete "./" all))))
+      (setq all (cl-delete-if (apply-partially #'string-match-p "\\(\\`\\|/\\)\\.?\\./\\'") all)))
     (setq total (length all)
           all (if (> total minicomp-sort-threshold)
                   all

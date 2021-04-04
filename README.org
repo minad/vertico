@@ -24,7 +24,13 @@ Complementary packages, which are supported:
 * Configuration
 
 #+begin_src emacs-lisp
-(use-package minicomp
-  :init
-  (minicomp-mode))
+  (use-package minicomp
+    :init
+    (minicomp-mode))
+
+  (use-package orderless
+    :init
+    (setq completion-styles '(orderless)
+          completion-category-defaults nil
+          completion-category-overrides '((file (styles . (partial-completion))))))
 #+end_src
