@@ -33,7 +33,6 @@
 
 ;;; Code:
 
-(require 'cl-lib)
 (require 'seq)
 (eval-when-compile
   (require 'subr-x))
@@ -220,10 +219,17 @@
 
 (defun minicomp--recompute-candidates (input metadata)
   "Recompute candidates with INPUT string and METADATA."
-  (let* ((all (completion-all-completions
+  (let* ((ignore-re (concat "\\(?:\\`\\|/\\)\\.?\\./\\'"
+                            (and completion-ignored-extensions
+                                 (concat "\\|" (regexp-opt completion-ignored-extensions) "\\'"))))
+         (all (completion-all-completions
                input
                minibuffer-completion-table
-               minibuffer-completion-predicate
+               (if minibuffer-completing-file-name
+                   (if-let (pred minibuffer-completion-predicate)
+                       (lambda (x) (and (not (string-match-p ignore-re x)) (funcall pred x)))
+                     (lambda (x) (not (string-match-p ignore-re x))))
+                 minibuffer-completion-predicate)
                (- (point) (minibuffer-prompt-end))
                metadata))
          (base (if-let (last (last all))
@@ -231,8 +237,6 @@
                      (setcdr last nil))
                  0))
          (total))
-    (when minibuffer-completing-file-name
-      (setq all (cl-delete-if (apply-partially #'string-match-p "\\(\\`\\|/\\)\\.?\\./\\'") all)))
     (setq total (length all)
           all (if (> total minicomp-sort-threshold)
                   all
