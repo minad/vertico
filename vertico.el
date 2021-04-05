@@ -46,8 +46,7 @@
   "Candidates will only be sorted if there are fewer than this threshold."
   :type 'integer)
 
-(defcustom vertico-count-format
-  (cons "%-6s " "%s/%s")
+(defcustom vertico-count-format (cons "%-6s " "%s/%s")
   "Format string used for the candidate count."
   :type '(choice (const nil) (cons string string)))
 
@@ -64,30 +63,26 @@
   :type 'integer)
 
 (defcustom vertico-truncation
-  '(#("⤶" 0 1 (face vertico-truncation))
-    #("…" 0 1 (face vertico-truncation)))
+  (cons #("⤶" 0 1 (face vertico-truncation))
+        #("…" 0 1 (face vertico-truncation)))
   "Truncation replacement strings."
-  :type '(list string string))
+  :type '(cons string string))
 
 (defgroup vertico-faces nil
   "Faces used by Vertico."
   :group 'vertico
   :group 'faces)
 
-(defface vertico-truncation
-  '((t :inherit shadow))
+(defface vertico-truncation '((t :inherit shadow))
   "Face used to highlight truncation characters.")
 
-(defface vertico-group-title
-  '((t :inherit shadow :slant italic))
+(defface vertico-group-title '((t :inherit shadow :slant italic))
   "Face used for the title text of the candidate group headlines.")
 
-(defface vertico-group-separator
-  '((t :inherit shadow :strike-through t))
+(defface vertico-group-separator '((t :inherit shadow :strike-through t))
   "Face used for the separator lines of the candidate groups.")
 
-(defface vertico-current
-  '((t :inherit highlight :extend t))
+(defface vertico-current '((t :inherit highlight :extend t))
   "Face used to highlight the currently selected candidate.")
 
 (defvar vertico-map
@@ -140,16 +135,17 @@
   "Keep current candidate index `vertico--index'.")
 
 (defun vertico--pred (x y)
-  "Compare X and Y."
+  "Sorting predicate which compares X and Y."
   (or (< (cdr x) (cdr y))
       (and (= (cdr x) (cdr y))
            (string< (car x) (car y)))))
 
 (defun vertico--sort (input candidates)
-  "Sort CANDIDATES by history position, length and alphabetically, given current INPUT."
-  ;; Store the history position first in a hashtable in order to allow O(1) history lookup. File
-  ;; names get special treatment. In principle, completion tables with boundaries should also get
-  ;; special treatment, but files are the most important.
+  "Sort CANDIDATES by history, length and alphabetically, given current INPUT."
+  ;; Store the history position first in a hashtable in order to allow O(1)
+  ;; history lookup. File names get special treatment. In principle, completion
+  ;; tables with boundaries should also get special treatment, but files are
+  ;; the most important.
   (cond
    ((eq minibuffer-history-variable 'file-name-history)
     (let ((dir (expand-file-name (substitute-in-file-name
@@ -216,7 +212,7 @@
 
 (defvar orderless-skip-highlighting)
 (defun vertico--highlight (input metadata candidates)
-  "Pass CANDIDATES through the completion style specified by METADATA for highlighting with INPUT string."
+  "Highlight CANDIDATES with INPUT using the completion style specified by METADATA."
   (let* ((orderless-skip-highlighting)
          (highlighted (nconc
                        (completion-all-completions input
@@ -334,7 +330,7 @@
                      (string-trim)
                      (vertico--flatten-prop 'display 'insert)
                      (vertico--flatten-prop 'invisible nil))
-              cand (truncate-string-to-width cand max-width 0 nil (cadr vertico-truncation))
+              cand (truncate-string-to-width cand max-width 0 nil (cdr vertico-truncation))
               cand (concat prefix cand
                            (if (text-property-not-all 0 (length suffix) 'face nil suffix)
                                suffix
@@ -388,11 +384,11 @@
       (add-text-properties (minibuffer-prompt-end) (point-max) '(face vertico-current)))))
 
 (defun vertico--require-match ()
-  "Match is required."
+  "Return t if match is required."
   (not (memq minibuffer--require-match '(nil confirm confirm-after-completion))))
 
 (defun vertico--goto (index)
-  "Go to INDEX."
+  "Go to candidate with INDEX."
   (setq vertico--keep t
         vertico--index
         (max (if (and (vertico--require-match) vertico--candidates)
@@ -432,8 +428,7 @@
 (defun vertico-exit (&optional arg)
   "Exit minibuffer with current candidate or input if prefix ARG is given."
   (interactive "P")
-  (unless arg
-    (vertico-insert))
+  (unless arg (vertico-insert))
   (let ((input (minibuffer-contents-no-properties)))
     (if (or (memq minibuffer--require-match '(nil confirm-after-completion))
             (equal "" input)
@@ -500,11 +495,11 @@
     (advice-remove #'completing-read-multiple #'vertico--advice)))
 
 (defun vertico--consult-candidate ()
-  "Current candidate."
+  "Return current candidate."
   (and vertico--input (vertico--candidate)))
 
 (defun vertico--consult-refresh ()
-  "Refresh ui."
+  "Refresh completion UI."
   (when vertico--input
     (setq vertico--input t)
     (vertico--exhibit)))
