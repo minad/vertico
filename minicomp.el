@@ -282,15 +282,15 @@
            minicomp--total total
            minicomp--candidates candidates))))
 
-(defun minicomp--replace-prop (prop fun str)
-  "Replace STR parts with PROP using FUN."
+(defun minicomp--flatten-prop (prop insert str)
+  "Flatten STR with PROP, INSERT or remove."
   (let ((len (length str)) (pos 0) (chunks))
     (while (/= pos len)
       (let ((end (next-single-property-change pos prop str len)))
-        (push (if-let (val (get-text-property pos prop str))
-                  (funcall fun val)
-                (substring str pos end))
-              chunks)
+        (if-let (val (get-text-property pos prop str))
+            (when (and insert (stringp val))
+              (push val chunks))
+          (push (substring str pos end) chunks))
         (setq pos end)))
     (apply #'concat (nreverse chunks))))
 
@@ -332,8 +332,8 @@
                      (replace-regexp-in-string "[\t ]+" " ")
                      (replace-regexp-in-string "[\t\n ]*\n[\t\n ]*" (car minicomp-truncation))
                      (string-trim)
-                     (minicomp--replace-prop 'display (lambda (x) (if (stringp x) x "")))
-                     (minicomp--replace-prop 'invisible (lambda (_) "")))
+                     (minicomp--flatten-prop 'display 'insert)
+                     (minicomp--flatten-prop 'invisible nil))
               cand (truncate-string-to-width cand max-width 0 nil (cadr minicomp-truncation))
               cand (concat prefix cand
                            (if (text-property-not-all 0 (length suffix) 'face nil suffix)
