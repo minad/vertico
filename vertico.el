@@ -64,10 +64,10 @@
   "Maximal number of candidates to show."
   :type 'integer)
 
-(defcustom vertico-truncation
-  (cons #("⤶" 0 1 (face vertico-truncation))
-        #("…" 0 1 (face vertico-truncation)))
-  "Truncation replacement strings."
+(defcustom vertico-multiline
+  (cons #("⤶" 0 1 (face vertico-multiline))
+        #("…" 0 1 (face vertico-multiline)))
+  "Replacements for multiline strings."
   :type '(cons string string))
 
 (defgroup vertico-faces nil
@@ -75,8 +75,8 @@
   :group 'vertico
   :group 'faces)
 
-(defface vertico-truncation '((t :inherit shadow))
-  "Face used to highlight truncation characters.")
+(defface vertico-multiline '((t :inherit shadow))
+  "Face used to highlight multiline replacement characters.")
 
 (defface vertico-group-title '((t :inherit shadow :slant italic))
   "Face used for the title text of the candidate group headlines.")
@@ -280,13 +280,13 @@
            vertico--total total
            vertico--candidates candidates))))
 
-(defun vertico--flatten-prop (prop insert str)
-  "Flatten STR with PROP, INSERT or remove."
+(defun vertico--flatten-string (prop str)
+  "Flatten STR with display or invisible PROP."
   (let ((len (length str)) (pos 0) (chunks))
     (while (/= pos len)
       (let ((end (next-single-property-change pos prop str len)))
         (if-let (val (get-text-property pos prop str))
-            (when (and insert (stringp val))
+            (when (and (eq prop 'display) (stringp val))
               (push val chunks))
           (push (substring str pos end) chunks))
         (setq pos end)))
@@ -326,13 +326,13 @@
             (push (format vertico-group-format new-title) chunks)
             (push "\n" chunks)
             (setq title new-title)))
-        (setq cand (thread-last cand
-                     (replace-regexp-in-string "[\t ]+" " ")
-                     (replace-regexp-in-string "[\t\n ]*\n[\t\n ]*" (car vertico-truncation))
-                     (string-trim)
-                     (vertico--flatten-prop 'display 'insert)
-                     (vertico--flatten-prop 'invisible nil))
-              cand (truncate-string-to-width cand max-width 0 nil (cdr vertico-truncation))
+        (when (string-match-p "\n" cand)
+          (setq cand (thread-last cand
+                       (replace-regexp-in-string "[\t ]+" " ")
+                       (replace-regexp-in-string "[\t\n ]*\n[\t\n ]*" (car vertico-multiline))
+                       (replace-regexp-in-string "\\`[\t\n ]+\\|[\t\n ]+\\'" ""))
+                cand (truncate-string-to-width cand max-width 0 nil (cdr vertico-multiline))))
+        (setq cand (vertico--flatten-string 'invisible (vertico--flatten-string 'display cand))
               cand (concat prefix cand
                            (if (text-property-not-all 0 (length suffix) 'face nil suffix)
                                suffix
