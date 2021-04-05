@@ -296,22 +296,20 @@
   "Format current candidates with INPUT string and METADATA."
   (let* ((index (min (max 0 (- vertico--index (/ vertico-count 2)))
                      (max 0 (- vertico--total vertico-count))))
-         (candidates (seq-subseq vertico--candidates index
-                                 (min (+ index vertico-count) vertico--total)))
-         (ann-candidates
-          (vertico--annotate
-           metadata
-           (vertico--highlight
-            (substring input
-                       (car (completion-boundaries input minibuffer-completion-table
-                                                   minibuffer-completion-predicate "")))
-            metadata
-            candidates)))
+         (candidates
+          (thread-last (seq-subseq vertico--candidates index
+                                   (min (+ index vertico-count) vertico--total))
+            (vertico--highlight
+             (substring input
+                        (car (completion-boundaries input minibuffer-completion-table
+                                                    minibuffer-completion-predicate "")))
+             metadata)
+            (vertico--annotate metadata)))
          (max-width (- (* 2 (window-width)) 5))
          (title)
          (chunks (list #(" " 0 1 (cursor t))))
          (group (completion-metadata-get metadata 'x-group-function)))
-    (dolist (ann-cand ann-candidates)
+    (dolist (ann-cand candidates)
       (push (if (= index (1+ vertico--index))
                 #("\n" 0 1 (face vertico-current))
               "\n")
@@ -344,12 +342,12 @@
     (apply #'concat (nreverse chunks))))
 
 (defun vertico--display-candidates (str)
-  "Update candidates overlay with STR."
+  "Update candidates overlay `vertico--candidates-ov' with STR."
   (move-overlay vertico--candidates-ov (point-max) (point-max))
   (overlay-put vertico--candidates-ov 'after-string str))
 
 (defun vertico--display-count ()
-  "Update count overlay."
+  "Update count overlay `vertico--count-ov'."
   (when vertico-count-format
     (move-overlay vertico--count-ov (point-min) (point-min))
     (overlay-put vertico--count-ov 'before-string
@@ -362,7 +360,7 @@
                                  vertico--total)))))
 
 (defun vertico--tidy-shadowed-file ()
-  "Tidy shadowed file name."
+  "Tidy shadowed file name, see `rfn-eshadow-overlay'."
   (when (and minibuffer-completing-file-name
              (eq this-command #'self-insert-command)
              (bound-and-true-p rfn-eshadow-overlay)
@@ -497,17 +495,17 @@
     (advice-remove #'completing-read-multiple #'vertico--advice)))
 
 (defun vertico--consult-candidate ()
-  "Return current candidate."
+  "Return current candidate for Consult preview."
   (and vertico--input (vertico--candidate)))
 
 (defun vertico--consult-refresh ()
-  "Refresh completion UI."
+  "Refresh completion UI, used by Consult async/narrowing."
   (when vertico--input
     (setq vertico--input t)
     (vertico--exhibit)))
 
 (defun vertico--embark-target ()
-  "Return embark target."
+  "Return Embark target."
   (and vertico--input
        (cons (completion-metadata-get (completion--field-metadata
                                        (minibuffer-prompt-end))
@@ -515,13 +513,12 @@
 	     (vertico--candidate))))
 
 (defun vertico--embark-candidates ()
-  "Return embark candidates."
+  "Return Embark candidates."
   (and vertico--input
        (cons (completion-metadata-get (completion--field-metadata
                                        (minibuffer-prompt-end))
                                       'category)
-             ;; full candidates?
-             vertico--candidates)))
+             vertico--candidates))) ;; TODO: full candidates?
 
 (with-eval-after-load 'consult
   (add-hook 'consult--completion-candidate-hook #'vertico--consult-candidate)
