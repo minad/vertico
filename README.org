@@ -5,23 +5,28 @@
 * Introduction
 
 This package provides a minimalistic vertical completion system, which is based
-on the default completion system. By reusing the default system, we achieve full
-compatibility with built-in Emacs commands and completion tables. Vertico is
-pretty bare-bone and only provides a minimal set of commands. The code base is
-less than 500 lines of code. If you are looking for a more full-featured
-package, you may be interested in [[https://github.com/raxod502/selectrum][Selectrum]]. Selectrum supports Avy-style quick
-keys, a horizontal display and a buffer display.
-
-Complementary packages, which are fully supported:
-
-- [[https://github.com/minad/marginalia][Marginalia]]: Rich annotations in the minibuffer
-- [[https://github.com/minad/consult][Consult]]: Many useful search and navigation commands
-- [[https://github.com/oantolin/embark][Embark]]: Minibuffer actions and context menu
-- [[https://github.com/oantolin/orderless][Orderless]]: Advanced completion style
+on the default completion system. By reusing the default system, Vertico
+achieves full compatibility with built-in Emacs commands and completion tables.
+Vertico is pretty bare-bone and only provides a minimal set of commands. The
+code base is less than 500 lines of code.
 
 [[https://github.com/minad/vertico/blob/main/screenshot.svg?raw=true]]
 
+* Features
+
+- Vertical display, which can be navigated with the arrow keys
+- Shows the index of the current candidate and the total number of candidates
+- Current candidate can be inserted with =TAB= and selected with =RET=
+- Non-existing candidates can be entered by moving the point to the prompt line
+- Candidates are sorted by history, string length and alphabetically
+- Long candidates with newlines are formatted to take up less space
+- Support for =annotation-function=, =affixation-function= and =x-group-function=
+
 * Configuration
+
+After installation, Vertico can be enabled with =M-x vertico-mode=. In order to
+configure Vertico and other packages in your init.el, you may want to use
+=use-package=. Here is an example configuration:
 
 #+begin_src emacs-lisp
   ;; Enable vertico
@@ -42,3 +47,23 @@ Complementary packages, which are fully supported:
     (cons (concat "[CRM] " (car args)) (cdr args)))
   (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 #+end_src
+
+* Complementary packages
+
+Vertico works well together with a few complementary packages, which enrich the
+completion UI. These packages are fully supported:
+
+- [[https://github.com/minad/marginalia][Marginalia]]: Rich annotations in the minibuffer
+- [[https://github.com/minad/consult][Consult]]: Many useful search and navigation commands
+- [[https://github.com/oantolin/embark][Embark]]: Minibuffer actions and context menu
+- [[https://github.com/oantolin/orderless][Orderless]]: Advanced completion style
+
+* Alternatives
+
+- [[https://github.com/raxod502/selectrum][Selectrum]]: If you are looking for a more full-featured package, you may be
+  interested in Selectrum, which provides a similar UI as Vertico. Additionally
+  Selectrum supports Avy-style quick keys, a horizontal display and a
+  configurable buffer display.
+- [[https://github.com/oantolin/icomplete-vertical][Icomplete-vertical]]: This package enhances the Emacs builtin Icomplete with a
+  vertical display. In contrast to Vertico, the candidates are rotated such that
+  the current candidate always appears at the top.
