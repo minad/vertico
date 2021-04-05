@@ -27,11 +27,11 @@
 
 ;;; Commentary:
 
-;; This package provides a minimalistic vertical completion system, which is
-;; based on the default completion system. By reusing the default system,
-;; Vertico achieve full compatibility with built-in Emacs commands and
-;; completion tables. Vertico is pretty bare-bone and only provides a minimal
-;; set of commands.
+;; This package provides a minimalistic vertical completion UI, which is based
+;; on the default completion system. By reusing the default system, Vertico
+;; achieve full compatibility with built-in Emacs commands and completion
+;; tables. Vertico is pretty bare-bone and only provides a minimal set of
+;; commands.
 
 ;;; Code:
 
@@ -470,7 +470,7 @@
               (nth vertico--index vertico--candidates)))))
 
 (defun vertico--setup ()
-  "Setup completion system."
+  "Setup completion UI."
   (setq vertico--input t
         vertico--candidates-ov (make-overlay (point-max) (point-max) nil t t)
         vertico--count-ov (make-overlay (point-min) (point-min) nil t t))
@@ -487,7 +487,7 @@
 
 ;;;###autoload
 (define-minor-mode vertico-mode
-  "Minimal completion system."
+  "VERTical Interactive COmpletion."
   :global t
   (if vertico-mode
       (progn

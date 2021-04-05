@@ -4,29 +4,31 @@
 
 * Introduction
 
-This package provides a minimalistic vertical completion system, which is based
-on the default completion system. By reusing the default system, Vertico
-achieves full compatibility with built-in Emacs commands and completion tables.
-Vertico is pretty bare-bone and only provides a minimal set of commands. The
-code base is less than 500 lines of code.
+This package provides a minimalistic vertical completion UI, which is based on
+the default completion system. By reusing the default system, Vertico achieves
+full compatibility with built-in Emacs commands and completion tables. Vertico
+is pretty bare-bone and only provides a minimal set of commands. The code base
+is less than 500 lines of code. Additional optional enhancements can be provided
+externally by complementary packages.
 
 [[https://github.com/minad/vertico/blob/main/screenshot.svg?raw=true]]
 
 * Features
 
-- Vertical display, which can be navigated with the arrow keys
+- Vertical display with arrow key navigation
 - Shows the index of the current candidate and the total number of candidates
-- Current candidate can be inserted with =TAB= and selected with =RET=
-- Non-existing candidates can be entered by moving the point to the prompt line
+- The current candidate is inserted with =TAB= and selected with =RET=
+- Non-existing candidates are entered by moving the point to the prompt line
 - Candidates are sorted by history, string length and alphabetically
 - Long candidates with newlines are formatted to take up less space
 - Support for =annotation-function=, =affixation-function= and =x-group-function=
 
 * Configuration
 
-After installation, Vertico can be enabled with =M-x vertico-mode=. In order to
-configure Vertico and other packages in your init.el, you may want to use
-=use-package=. Here is an example configuration:
+Vertico is available from [[http://elpa.gnu.org/packages/vertico.html][GNU ELPA]], such that it can be installed directly via
+=package-install=. After installation, the global minor mode can be enabled with
+=M-x vertico-mode=. In order to configure Vertico and other packages in your
+init.el, you may want to use =use-package=. Here is an example configuration:
 
 #+begin_src emacs-lisp
   ;; Enable vertico
@@ -60,10 +62,28 @@ completion UI. These packages are fully supported:
 
 * Alternatives
 
-- [[https://github.com/raxod502/selectrum][Selectrum]]: If you are looking for a more full-featured package, you may be
-  interested in Selectrum, which provides a similar UI as Vertico. Additionally
-  Selectrum supports Avy-style quick keys, a horizontal display and a
-  configurable buffer display.
+There are many alternative completion UIs, each UI with its own advantages and
+disadvantages. The [[https://github.com/raxod502/selectrum][Selectrum readme]] provides an extensive comparison of many
+available completion systems from the perspective of Selectrum.
+
+Vertico aims to be fully compliant with all Emacs commands and achieves that
+with a minimal code base, relying purely on =completing-read= while avoiding to
+invent its own APIs. Inventing a custom API as Helm or Ivy is explicitly avoided
+in order to increase flexibility and package reuse.
+
+Since Vertico only provides the UI, you may want to combine it with some of the
+complementary packages, to give a full-featured completion experience similar to
+Ivy. Vertico is targeted at users interested in crafting their Emacs precisely
+to their liking - completion plays an integral part in how the users interacts
+with Emacs. There are at least two other interactive completion UIs, which
+follow a similar philosophy:
+
+- [[https://github.com/raxod502/selectrum][Selectrum]]: If you are looking for a less minimalistic and more full-featured
+  (but also more complex) package, you may be interested in Selectrum, which
+  provides a similar UI as Vertico. Additionally Selectrum supports Avy-style
+  quick keys, a horizontal display and a configurable buffer display.
 - [[https://github.com/oantolin/icomplete-vertical][Icomplete-vertical]]: This package enhances the Emacs builtin Icomplete with a
   vertical display. In contrast to Vertico, the candidates are rotated such that
-  the current candidate always appears at the top.
+  the current candidate always appears at the top. From my perspective,
+  candidate rotation feels a bit less intuitive than the UI provided by Vertico
+  or Selectrum.
