@@ -423,18 +423,16 @@
   (interactive "P")
   (unless arg
     (minicomp-insert))
-  (cond
-   ((let ((input (minibuffer-contents-no-properties)))
-      (or (memq minibuffer--require-match '(nil confirm-after-completion))
-          (equal "" input)
-          (test-completion input
-                           minibuffer-completion-table
-                           minibuffer-completion-predicate)))
-    (exit-minibuffer))
-   ((eq minibuffer--require-match 'confirm)
-    (when (eq (ignore-errors (read-char "Confirm")) 13)
-      (exit-minibuffer)))
-   (t (message "Match required"))))
+  (let ((input (minibuffer-contents-no-properties)))
+    (if (or (memq minibuffer--require-match '(nil confirm-after-completion))
+            (equal "" input)
+            (test-completion input
+                             minibuffer-completion-table
+                             minibuffer-completion-predicate)
+            (and (eq minibuffer--require-match 'confirm)
+                 (eq (ignore-errors (read-char "Confirm")) 13)))
+        (exit-minibuffer)
+      (message "Match required"))))
 
 (defun minicomp-exit-input ()
   "Exit minibuffer with input."
