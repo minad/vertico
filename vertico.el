@@ -460,7 +460,7 @@
 (defun vertico-insert ()
   "Insert current candidate in minibuffer."
   (interactive)
-  (let ((cand (vertico--candidate)))
+  (when-let (cand (and (>= vertico--index 0) (vertico--candidate)))
     (delete-minibuffer-contents)
     (insert cand)))
 
