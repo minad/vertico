@@ -109,9 +109,6 @@
     map)
   "Minibuffer keymap.")
 
-(defvar minicomp--highlight-function (lambda (_input _metadata cands) cands)
-  "Highlighting function.")
-
 (defvar-local minicomp--history-hash nil
   "History hash table.")
 
@@ -217,6 +214,21 @@
         (mapcar (lambda (cand) (list cand (or (funcall ann cand) ""))) candidates)
       candidates)))
 
+(defvar orderless-skip-highlighting)
+(defun minicomp--highlight (input metadata candidates)
+  "Pass CANDIDATES through the completion style specified by METADATA for highlighting with INPUT string."
+  (let* ((orderless-skip-highlighting)
+         (highlighted (nconc
+                       (completion-all-completions input
+                                                   candidates
+                                                   nil
+                                                   (length input)
+                                                   metadata)
+                       nil)))
+    ;; Check if everything went alright, all the candidates should still be present.
+    (if (= (length highlighted) (length candidates))
+        highlighted candidates)))
+
 (defun minicomp--recompute-candidates (input metadata)
   "Recompute candidates with INPUT string and METADATA."
   (let* ((ignore-re (concat "\\(?:\\`\\|/\\)\\.?\\./\\'"
@@ -291,8 +303,7 @@
          (ann-candidates
           (minicomp--annotate
            metadata
-           (funcall
-            minicomp--highlight-function
+           (minicomp--highlight
             (substring input
                        (car (completion-boundaries input minibuffer-completion-table
                                                    minibuffer-completion-predicate "")))
@@ -461,33 +472,15 @@
       (concat (substring content 0 minicomp--base)
               (nth minicomp--index minicomp--candidates)))))
 
-(defvar orderless-skip-highlighting)
 (defun minicomp--setup ()
   "Setup completion system."
   (setq minicomp--input t
         minicomp--candidates-ov (make-overlay (point-max) (point-max) nil t t)
         minicomp--count-ov (make-overlay (point-min) (point-min) nil t t))
-  (setq-local truncate-lines nil
+  (setq-local orderless-skip-highlighting t ;; Orderless optimization
+              truncate-lines nil
               resize-mini-windows 'grow-only
               max-mini-window-height 1.0)
-  ;; Optimize orderless filtering, skip highlighting
-  (when (and (boundp 'orderless-skip-highlighting)
-             (equal (default-value 'completion-styles) '(orderless)))
-    (setq-local orderless-skip-highlighting t
-                minicomp--highlight-function
-                (lambda (input metadata candidates)
-                  ;; Pass once again through the completion style for highlighting
-                  (let* ((orderless-skip-highlighting nil)
-                         (highlighted (nconc
-                                       (completion-all-completions input
-                                                                   candidates
-                                                                   nil
-                                                                   (length input)
-                                                                   metadata)
-                                       nil)))
-                    ;; Check if everything went alright, all the candidates should still be present.
-                    (if (= (length highlighted) (length candidates))
-                        highlighted candidates)))))
   (use-local-map minicomp-map)
   (add-hook 'post-command-hook #'minicomp--exhibit -99 'local))
 
