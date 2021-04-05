@@ -1,4 +1,4 @@
-;;; minicomp.el --- Minimalistic vertical minibuffer completion system -*- lexical-binding: t -*-
+;;; vertico.el --- VERTical Interactive COmpletion -*- lexical-binding: t -*-
 
 ;; Author: Daniel Mendler
 ;; Maintainer: Daniel Mendler
@@ -6,7 +6,7 @@
 ;; License: GPL-3.0-or-later
 ;; Version: 0.1
 ;; Package-Requires: ((emacs "27.1"))
-;; Homepage: https://github.com/minad/minicomp
+;; Homepage: https://github.com/minad/vertico
 
 ;; This file is not part of GNU Emacs.
 
@@ -25,10 +25,10 @@
 
 ;;; Commentary:
 
-;; This package provides a vertical completion system, which is based on the
-;; default completion system. By reusing the default system, we achieve full
-;; compatibility with built-in Emacs commands and completion tables. The
-;; completion system is pretty bare-bone and only provides a minimal set of
+;; This package provides a minimalistic vertical completion system, which is
+;; based on the default completion system. By reusing the default system, we
+;; achieve full compatibility with built-in Emacs commands and completion
+;; tables. Vertico is pretty bare-bone and only provides a minimal set of
 ;; commands.
 
 ;;; Code:
@@ -37,115 +37,115 @@
 (eval-when-compile
   (require 'subr-x))
 
-(defgroup minicomp nil
-  "Minimalistic vertical minibuffer completion system."
+(defgroup vertico nil
+  "VERTical Interactive COmpletion."
   :group 'convenience
-  :prefix "minicomp-")
+  :prefix "vertico-")
 
-(defcustom minicomp-sort-threshold 20000
+(defcustom vertico-sort-threshold 20000
   "Candidates will only be sorted if there are fewer than this threshold."
   :type 'integer)
 
-(defcustom minicomp-count-format
+(defcustom vertico-count-format
   (cons "%-6s " "%s/%s")
   "Format string used for the candidate count."
   :type '(choice (const nil) (cons string string)))
 
-(defcustom minicomp-group-format
+(defcustom vertico-group-format
   (concat
-   #("    " 0 4 (face minicomp-group-separator))
-   #(" %s " 0 4 (face minicomp-group-title))
-   #(" " 0 1 (face minicomp-group-separator display (space :align-to right))))
+   #("    " 0 4 (face vertico-group-separator))
+   #(" %s " 0 4 (face vertico-group-title))
+   #(" " 0 1 (face vertico-group-separator display (space :align-to right))))
   "Format string used for the group title."
   :type '(choice (const nil) string))
 
-(defcustom minicomp-count 10
+(defcustom vertico-count 10
   "Maximal number of candidates to show."
   :type 'integer)
 
-(defcustom minicomp-truncation
-  '(#("⤶" 0 1 (face minicomp-truncation))
-    #("…" 0 1 (face minicomp-truncation)))
+(defcustom vertico-truncation
+  '(#("⤶" 0 1 (face vertico-truncation))
+    #("…" 0 1 (face vertico-truncation)))
   "Truncation replacement strings."
   :type '(list string string))
 
-(defgroup minicomp-faces nil
-  "Faces used by Minicomp."
-  :group 'minicomp
+(defgroup vertico-faces nil
+  "Faces used by Vertico."
+  :group 'vertico
   :group 'faces)
 
-(defface minicomp-truncation
+(defface vertico-truncation
   '((t :inherit shadow))
   "Face used to highlight truncation characters.")
 
-(defface minicomp-group-title
+(defface vertico-group-title
   '((t :inherit shadow :slant italic))
   "Face used for the title text of the candidate group headlines.")
 
-(defface minicomp-group-separator
+(defface vertico-group-separator
   '((t :inherit shadow :strike-through t))
   "Face used for the separator lines of the candidate groups.")
 
-(defface minicomp-current
+(defface vertico-current
   '((t :inherit highlight :extend t))
   "Face used to highlight the currently selected candidate.")
 
-(defvar minicomp-map
+(defvar vertico-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map minibuffer-local-map)
-    (define-key map [remap beginning-of-buffer] #'minicomp-beginning-of-buffer)
-    (define-key map [remap minibuffer-beginning-of-buffer] #'minicomp-beginning-of-buffer)
-    (define-key map [remap end-of-buffer] #'minicomp-end-of-buffer)
-    (define-key map [remap scroll-down-command] #'minicomp-scroll-down)
-    (define-key map [remap scroll-up-command] #'minicomp-scroll-up)
-    (define-key map [remap next-line] #'minicomp-next)
-    (define-key map [remap previous-line] #'minicomp-previous)
-    (define-key map [remap next-line-or-history-element] #'minicomp-next)
-    (define-key map [remap previous-line-or-history-element] #'minicomp-previous)
-    (define-key map [remap exit-minibuffer] #'minicomp-exit)
-    (define-key map [remap kill-ring-save] #'minicomp-save)
-    (define-key map [C-return] #'minicomp-exit-input)
-    (define-key map "\t" #'minicomp-insert)
+    (define-key map [remap beginning-of-buffer] #'vertico-beginning-of-buffer)
+    (define-key map [remap minibuffer-beginning-of-buffer] #'vertico-beginning-of-buffer)
+    (define-key map [remap end-of-buffer] #'vertico-end-of-buffer)
+    (define-key map [remap scroll-down-command] #'vertico-scroll-down)
+    (define-key map [remap scroll-up-command] #'vertico-scroll-up)
+    (define-key map [remap next-line] #'vertico-next)
+    (define-key map [remap previous-line] #'vertico-previous)
+    (define-key map [remap next-line-or-history-element] #'vertico-next)
+    (define-key map [remap previous-line-or-history-element] #'vertico-previous)
+    (define-key map [remap exit-minibuffer] #'vertico-exit)
+    (define-key map [remap kill-ring-save] #'vertico-save)
+    (define-key map [C-return] #'vertico-exit-input)
+    (define-key map "\t" #'vertico-insert)
     map)
   "Minibuffer keymap.")
 
-(defvar-local minicomp--history-hash nil
+(defvar-local vertico--history-hash nil
   "History hash table.")
 
-(defvar-local minicomp--history-dir nil
-  "Directory of `minicomp--history-hash'.")
+(defvar-local vertico--history-dir nil
+  "Directory of `vertico--history-hash'.")
 
-(defvar-local minicomp--candidates-ov nil
+(defvar-local vertico--candidates-ov nil
   "Overlay showing the candidates.")
 
-(defvar-local minicomp--count-ov nil
+(defvar-local vertico--count-ov nil
   "Overlay showing the number of candidates.")
 
-(defvar-local minicomp--index -1
+(defvar-local vertico--index -1
   "Index of current candidate or negative for prompt selection.")
 
-(defvar-local minicomp--input nil
+(defvar-local vertico--input nil
   "Current input string or t.")
 
-(defvar-local minicomp--candidates nil
+(defvar-local vertico--candidates nil
   "List of candidates.")
 
-(defvar-local minicomp--base 0
+(defvar-local vertico--base 0
   "Size of the base string, which is concatenated with the candidate.")
 
-(defvar-local minicomp--total 0
-  "Length of the candidate list `minicomp--candidates'.")
+(defvar-local vertico--total 0
+  "Length of the candidate list `vertico--candidates'.")
 
-(defvar-local minicomp--keep nil
-  "Keep current candidate index `minicomp--index'.")
+(defvar-local vertico--keep nil
+  "Keep current candidate index `vertico--index'.")
 
-(defun minicomp--pred (x y)
+(defun vertico--pred (x y)
   "Compare X and Y."
   (or (< (cdr x) (cdr y))
       (and (= (cdr x) (cdr y))
            (string< (car x) (car y)))))
 
-(defun minicomp--sort (input candidates)
+(defun vertico--sort (input candidates)
   "Sort CANDIDATES by history position, length and alphabetically, given current INPUT."
   ;; Store the history position first in a hashtable in order to allow O(1) history lookup. File
   ;; names get special treatment. In principle, completion tables with boundaries should also get
@@ -155,9 +155,9 @@
     (let ((dir (expand-file-name (substitute-in-file-name
                                   (or (file-name-directory input)
                                       default-directory)))))
-      (unless (equal minicomp--history-dir dir)
-        (setq minicomp--history-hash (make-hash-table :test #'equal :size (length file-name-history))
-              minicomp--history-dir dir)
+      (unless (equal vertico--history-dir dir)
+        (setq vertico--history-hash (make-hash-table :test #'equal :size (length file-name-history))
+              vertico--history-dir dir)
         (let* ((index 0)
                (adir (abbreviate-file-name dir))
                (dlen (length dir))
@@ -174,18 +174,18 @@
               (when file
                 (when-let (slash (string-match-p "/" file))
                   (setq file (substring file 0 (1+ slash))))
-                (unless (gethash file minicomp--history-hash)
-                  (puthash file index minicomp--history-hash)))
+                (unless (gethash file vertico--history-hash)
+                  (puthash file index vertico--history-hash)))
               (setq index (1+ index))))))))
-   ((not minicomp--history-hash)
+   ((not vertico--history-hash)
     (let ((index 0)
           ;; History disabled if `minibuffer-history-variable' eq `t'.
           (hist (and (not (eq minibuffer-history-variable t))
                      (symbol-value minibuffer-history-variable))))
-      (setq minicomp--history-hash (make-hash-table :test #'equal :size (length hist)))
+      (setq vertico--history-hash (make-hash-table :test #'equal :size (length hist)))
       (dolist (elem hist)
-        (unless (gethash elem minicomp--history-hash)
-          (puthash elem index minicomp--history-hash))
+        (unless (gethash elem vertico--history-hash)
+          (puthash elem index vertico--history-hash))
         (setq index (1+ index))))))
   ;; Decorate each candidate with (index<<13) + length. This way we sort first by index and then by
   ;; length. We assume that the candidates are shorter than 2**13 characters and that the history is
@@ -193,10 +193,10 @@
   (let ((cand candidates))
     (while cand
       (setcar cand (cons (car cand)
-                         (+ (lsh (gethash (car cand) minicomp--history-hash #xFFFF) 13)
+                         (+ (lsh (gethash (car cand) vertico--history-hash #xFFFF) 13)
                             (length (car cand)))))
       (setq cand (cdr cand))))
-  (setq candidates (sort candidates #'minicomp--pred))
+  (setq candidates (sort candidates #'vertico--pred))
   ;; Drop decoration from the candidates
   (let ((cand candidates))
     (while cand
@@ -204,7 +204,7 @@
       (setq cand (cdr cand))))
   candidates)
 
-(defun minicomp--annotate (metadata candidates)
+(defun vertico--annotate (metadata candidates)
   "Annotate CANDIDATES with annotation function specified by METADATA."
   (if-let (aff (or (completion-metadata-get metadata 'affixation-function)
                    (plist-get completion-extra-properties :affixation-function)))
@@ -215,7 +215,7 @@
       candidates)))
 
 (defvar orderless-skip-highlighting)
-(defun minicomp--highlight (input metadata candidates)
+(defun vertico--highlight (input metadata candidates)
   "Pass CANDIDATES through the completion style specified by METADATA for highlighting with INPUT string."
   (let* ((orderless-skip-highlighting)
          (highlighted (nconc
@@ -229,7 +229,7 @@
     (if (= (length highlighted) (length candidates))
         highlighted candidates)))
 
-(defun minicomp--recompute-candidates (input metadata)
+(defun vertico--recompute-candidates (input metadata)
   "Recompute candidates with INPUT string and METADATA."
   (let* ((ignore-re (concat "\\(?:\\`\\|/\\)\\.?\\./\\'"
                             (and completion-ignored-extensions
@@ -249,10 +249,10 @@
                      (setcdr last nil))
                  0))
          (total (length all)))
-    (when (<= total minicomp-sort-threshold)
+    (when (<= total vertico-sort-threshold)
       (setq all (if-let (sort (completion-metadata-get metadata 'display-sort-function))
                     (funcall sort all)
-                  (minicomp--sort input all))))
+                  (vertico--sort input all))))
     (when-let* ((def (cond
                       ((stringp (car-safe minibuffer-default)) (car minibuffer-default))
                       ((stringp minibuffer-default) minibuffer-default)))
@@ -262,27 +262,27 @@
       (setq all (mapcan #'cdr (funcall group all))))
     (list base total all)))
 
-(defun minicomp--update-candidates (input metadata)
+(defun vertico--update-candidates (input metadata)
   "Preprocess candidates with INPUT string and METADATA."
   (pcase (let ((while-no-input-ignore-events '(selection-request)))
-           (while-no-input (minicomp--recompute-candidates input metadata)))
+           (while-no-input (vertico--recompute-candidates input metadata)))
     ('nil (abort-recursive-edit))
     (`(,base ,total ,candidates)
-     (unless (and minicomp--keep (< minicomp--index 0))
+     (unless (and vertico--keep (< vertico--index 0))
        (if-let* ((old (and candidates
-                           minicomp--keep
-                           (>= minicomp--index 0)
-                           (nth minicomp--index minicomp--candidates)))
+                           vertico--keep
+                           (>= vertico--index 0)
+                           (nth vertico--index vertico--candidates)))
                  (idx (seq-position candidates old)))
-           (setq minicomp--index idx)
-         (setq minicomp--keep nil
-               minicomp--index (if candidates 0 -1))))
-     (setq minicomp--base base
-           minicomp--input input
-           minicomp--total total
-           minicomp--candidates candidates))))
+           (setq vertico--index idx)
+         (setq vertico--keep nil
+               vertico--index (if candidates 0 -1))))
+     (setq vertico--base base
+           vertico--input input
+           vertico--total total
+           vertico--candidates candidates))))
 
-(defun minicomp--flatten-prop (prop insert str)
+(defun vertico--flatten-prop (prop insert str)
   "Flatten STR with PROP, INSERT or remove."
   (let ((len (length str)) (pos 0) (chunks))
     (while (/= pos len)
@@ -294,16 +294,16 @@
         (setq pos end)))
     (apply #'concat (nreverse chunks))))
 
-(defun minicomp--format-candidates (input metadata)
+(defun vertico--format-candidates (input metadata)
   "Format current candidates with INPUT string and METADATA."
-  (let* ((index (min (max 0 (- minicomp--index (/ minicomp-count 2)))
-                     (max 0 (- minicomp--total minicomp-count))))
-         (candidates (seq-subseq minicomp--candidates index
-                                 (min (+ index minicomp-count) minicomp--total)))
+  (let* ((index (min (max 0 (- vertico--index (/ vertico-count 2)))
+                     (max 0 (- vertico--total vertico-count))))
+         (candidates (seq-subseq vertico--candidates index
+                                 (min (+ index vertico-count) vertico--total)))
          (ann-candidates
-          (minicomp--annotate
+          (vertico--annotate
            metadata
-           (minicomp--highlight
+           (vertico--highlight
             (substring input
                        (car (completion-boundaries input minibuffer-completion-table
                                                    minibuffer-completion-predicate "")))
@@ -314,8 +314,8 @@
          (chunks (list #(" " 0 1 (cursor t))))
          (group (completion-metadata-get metadata 'x-group-function)))
     (dolist (ann-cand ann-candidates)
-      (push (if (= index (1+ minicomp--index))
-                #("\n" 0 1 (face minicomp-current))
+      (push (if (= index (1+ vertico--index))
+                #("\n" 0 1 (face vertico-current))
               "\n")
             chunks)
       (let ((prefix "") (suffix "") (cand))
@@ -323,47 +323,47 @@
           (`(,c ,s) (setq cand c suffix s))
           (`(,c ,p ,s) (setq cand c prefix p suffix s))
           (_ (setq cand ann-cand)))
-        (when-let (new-title (and minicomp-group-format group (caar (funcall group (list cand)))))
+        (when-let (new-title (and vertico-group-format group (caar (funcall group (list cand)))))
           (unless (equal title new-title)
-            (push (format minicomp-group-format new-title) chunks)
+            (push (format vertico-group-format new-title) chunks)
             (push "\n" chunks)
             (setq title new-title)))
         (setq cand (thread-last cand
                      (replace-regexp-in-string "[\t ]+" " ")
-                     (replace-regexp-in-string "[\t\n ]*\n[\t\n ]*" (car minicomp-truncation))
+                     (replace-regexp-in-string "[\t\n ]*\n[\t\n ]*" (car vertico-truncation))
                      (string-trim)
-                     (minicomp--flatten-prop 'display 'insert)
-                     (minicomp--flatten-prop 'invisible nil))
-              cand (truncate-string-to-width cand max-width 0 nil (cadr minicomp-truncation))
+                     (vertico--flatten-prop 'display 'insert)
+                     (vertico--flatten-prop 'invisible nil))
+              cand (truncate-string-to-width cand max-width 0 nil (cadr vertico-truncation))
               cand (concat prefix cand
                            (if (text-property-not-all 0 (length suffix) 'face nil suffix)
                                suffix
                              (propertize suffix 'face 'completions-annotations))))
-        (when (= index minicomp--index)
-          (add-face-text-property 0 (length cand) 'minicomp-current 'append cand))
+        (when (= index vertico--index)
+          (add-face-text-property 0 (length cand) 'vertico-current 'append cand))
         (push cand chunks)
         (setq index (1+ index))))
     (apply #'concat (nreverse chunks))))
 
-(defun minicomp--display-candidates (str)
+(defun vertico--display-candidates (str)
   "Update candidates overlay with STR."
-  (move-overlay minicomp--candidates-ov (point-max) (point-max))
-  (overlay-put minicomp--candidates-ov 'after-string str))
+  (move-overlay vertico--candidates-ov (point-max) (point-max))
+  (overlay-put vertico--candidates-ov 'after-string str))
 
-(defun minicomp--display-count ()
+(defun vertico--display-count ()
   "Update count overlay."
-  (when minicomp-count-format
-    (move-overlay minicomp--count-ov (point-min) (point-min))
-    (overlay-put minicomp--count-ov 'before-string
-                 (format (car minicomp-count-format)
-                         (format (cdr minicomp-count-format)
+  (when vertico-count-format
+    (move-overlay vertico--count-ov (point-min) (point-min))
+    (overlay-put vertico--count-ov 'before-string
+                 (format (car vertico-count-format)
+                         (format (cdr vertico-count-format)
                                  (cond
-                                  ((>= minicomp--index 0) (1+ minicomp--index))
-                                  ((minicomp--require-match) "!")
+                                  ((>= vertico--index 0) (1+ vertico--index))
+                                  ((vertico--require-match) "!")
                                   (t "*"))
-                                 minicomp--total)))))
+                                 vertico--total)))))
 
-(defun minicomp--tidy-shadowed-file ()
+(defun vertico--tidy-shadowed-file ()
   "Tidy shadowed file name."
   (when (and minibuffer-completing-file-name
              (eq this-command #'self-insert-command)
@@ -374,66 +374,66 @@
                  (eq ?/ (char-before (- (point) 2)))))
     (delete-region (overlay-start rfn-eshadow-overlay) (overlay-end rfn-eshadow-overlay))))
 
-(defun minicomp--exhibit ()
+(defun vertico--exhibit ()
   "Exhibit completion UI."
-  (minicomp--tidy-shadowed-file)
+  (vertico--tidy-shadowed-file)
   (let ((metadata (completion--field-metadata (minibuffer-prompt-end)))
         (input (minibuffer-contents-no-properties)))
-    (unless (equal minicomp--input input)
-      (minicomp--update-candidates input metadata))
-    (minicomp--display-candidates (minicomp--format-candidates input metadata))
-    (minicomp--display-count)
-    (if (or (>= minicomp--index 0) (minicomp--require-match))
+    (unless (equal vertico--input input)
+      (vertico--update-candidates input metadata))
+    (vertico--display-candidates (vertico--format-candidates input metadata))
+    (vertico--display-count)
+    (if (or (>= vertico--index 0) (vertico--require-match))
         (remove-text-properties (minibuffer-prompt-end) (point-max) '(face nil))
-      (add-text-properties (minibuffer-prompt-end) (point-max) '(face minicomp-current)))))
+      (add-text-properties (minibuffer-prompt-end) (point-max) '(face vertico-current)))))
 
-(defun minicomp--require-match ()
+(defun vertico--require-match ()
   "Match is required."
   (not (memq minibuffer--require-match '(nil confirm confirm-after-completion))))
 
-(defun minicomp--goto (index)
+(defun vertico--goto (index)
   "Go to INDEX."
-  (setq minicomp--keep t
-        minicomp--index
-        (max (if (and (minicomp--require-match) minicomp--candidates)
+  (setq vertico--keep t
+        vertico--index
+        (max (if (and (vertico--require-match) vertico--candidates)
                  0 -1)
-             (min index (- minicomp--total 1)))))
+             (min index (- vertico--total 1)))))
 
-(defun minicomp-beginning-of-buffer ()
+(defun vertico-beginning-of-buffer ()
   "Go to first candidate."
   (interactive)
-  (minicomp--goto 0))
+  (vertico--goto 0))
 
-(defun minicomp-end-of-buffer ()
+(defun vertico-end-of-buffer ()
   "Go to last candidate."
   (interactive)
-  (minicomp--goto (- minicomp--total 1)))
+  (vertico--goto (- vertico--total 1)))
 
-(defun minicomp-scroll-down ()
+(defun vertico-scroll-down ()
   "Go back by one page."
   (interactive)
-  (minicomp--goto (max 0 (- minicomp--index minicomp-count))))
+  (vertico--goto (max 0 (- vertico--index vertico-count))))
 
-(defun minicomp-scroll-up ()
+(defun vertico-scroll-up ()
   "Go forward by one page."
   (interactive)
-  (minicomp--goto (+ minicomp--index minicomp-count)))
+  (vertico--goto (+ vertico--index vertico-count)))
 
-(defun minicomp-next ()
+(defun vertico-next ()
   "Go to next candidate."
   (interactive)
-  (minicomp--goto (1+ minicomp--index)))
+  (vertico--goto (1+ vertico--index)))
 
-(defun minicomp-previous ()
+(defun vertico-previous ()
   "Go to previous candidate."
   (interactive)
-  (minicomp--goto (- minicomp--index 1)))
+  (vertico--goto (- vertico--index 1)))
 
-(defun minicomp-exit (&optional arg)
+(defun vertico-exit (&optional arg)
   "Exit minibuffer with current candidate or input if prefix ARG is given."
   (interactive "P")
   (unless arg
-    (minicomp-insert))
+    (vertico-insert))
   (let ((input (minibuffer-contents-no-properties)))
     (if (or (memq minibuffer--require-match '(nil confirm-after-completion))
             (equal "" input)
@@ -445,94 +445,94 @@
         (exit-minibuffer)
       (message "Match required"))))
 
-(defun minicomp-exit-input ()
+(defun vertico-exit-input ()
   "Exit minibuffer with input."
   (interactive)
-  (minicomp-exit t))
+  (vertico-exit t))
 
-(defun minicomp-save ()
+(defun vertico-save ()
   "Save current candidate to kill ring."
   (interactive)
   (if (or (use-region-p) (not transient-mark-mode))
       (call-interactively #'kill-ring-save)
-    (kill-new (minicomp--candidate))))
+    (kill-new (vertico--candidate))))
 
-(defun minicomp-insert ()
+(defun vertico-insert ()
   "Insert current candidate in minibuffer."
   (interactive)
-  (let ((cand (minicomp--candidate)))
+  (let ((cand (vertico--candidate)))
     (delete-minibuffer-contents)
     (insert cand)))
 
-(defun minicomp--candidate ()
+(defun vertico--candidate ()
   "Return current candidate string."
   (let ((content (minibuffer-contents-no-properties)))
-    (if (< minicomp--index 0)
+    (if (< vertico--index 0)
         content
-      (concat (substring content 0 minicomp--base)
-              (nth minicomp--index minicomp--candidates)))))
+      (concat (substring content 0 vertico--base)
+              (nth vertico--index vertico--candidates)))))
 
-(defun minicomp--setup ()
+(defun vertico--setup ()
   "Setup completion system."
-  (setq minicomp--input t
-        minicomp--candidates-ov (make-overlay (point-max) (point-max) nil t t)
-        minicomp--count-ov (make-overlay (point-min) (point-min) nil t t))
+  (setq vertico--input t
+        vertico--candidates-ov (make-overlay (point-max) (point-max) nil t t)
+        vertico--count-ov (make-overlay (point-min) (point-min) nil t t))
   (setq-local orderless-skip-highlighting t ;; Orderless optimization
               truncate-lines nil
               resize-mini-windows 'grow-only
               max-mini-window-height 1.0)
-  (use-local-map minicomp-map)
-  (add-hook 'post-command-hook #'minicomp--exhibit -99 'local))
+  (use-local-map vertico-map)
+  (add-hook 'post-command-hook #'vertico--exhibit -99 'local))
 
-(defun minicomp--advice (orig &rest args)
+(defun vertico--advice (orig &rest args)
   "Advice for ORIG completion function, receiving ARGS."
-  (minibuffer-with-setup-hook #'minicomp--setup (apply orig args)))
+  (minibuffer-with-setup-hook #'vertico--setup (apply orig args)))
 
 ;;;###autoload
-(define-minor-mode minicomp-mode
+(define-minor-mode vertico-mode
   "Minimal completion system."
   :global t
-  (if minicomp-mode
+  (if vertico-mode
       (progn
-        (advice-add #'completing-read-default :around #'minicomp--advice)
-        (advice-add #'completing-read-multiple :around #'minicomp--advice))
-    (advice-remove #'completing-read-default #'minicomp--advice)
-    (advice-remove #'completing-read-multiple #'minicomp--advice)))
+        (advice-add #'completing-read-default :around #'vertico--advice)
+        (advice-add #'completing-read-multiple :around #'vertico--advice))
+    (advice-remove #'completing-read-default #'vertico--advice)
+    (advice-remove #'completing-read-multiple #'vertico--advice)))
 
-(defun minicomp--consult-candidate ()
+(defun vertico--consult-candidate ()
   "Current candidate."
-  (and minicomp--input (minicomp--candidate)))
+  (and vertico--input (vertico--candidate)))
 
-(defun minicomp--consult-refresh ()
+(defun vertico--consult-refresh ()
   "Refresh ui."
-  (when minicomp--input
-    (setq minicomp--input t)
-    (minicomp--exhibit)))
+  (when vertico--input
+    (setq vertico--input t)
+    (vertico--exhibit)))
 
-(defun minicomp--embark-target ()
+(defun vertico--embark-target ()
   "Return embark target."
-  (and minicomp--input
+  (and vertico--input
        (cons (completion-metadata-get (completion--field-metadata
                                        (minibuffer-prompt-end))
                                       'category)
-	     (minicomp--candidate))))
+	     (vertico--candidate))))
 
-(defun minicomp--embark-candidates ()
+(defun vertico--embark-candidates ()
   "Return embark candidates."
-  (and minicomp--input
+  (and vertico--input
        (cons (completion-metadata-get (completion--field-metadata
                                        (minibuffer-prompt-end))
                                       'category)
              ;; full candidates?
-             minicomp--candidates)))
+             vertico--candidates)))
 
 (with-eval-after-load 'consult
-  (add-hook 'consult--completion-candidate-hook #'minicomp--consult-candidate)
-  (add-hook 'consult--completion-refresh-hook #'minicomp--consult-refresh))
+  (add-hook 'consult--completion-candidate-hook #'vertico--consult-candidate)
+  (add-hook 'consult--completion-refresh-hook #'vertico--consult-refresh))
 
 (with-eval-after-load 'embark
-  (add-hook 'embark-target-finders #'minicomp--embark-target)
-  (add-hook 'embark-candidate-collectors #'minicomp--embark-candidates))
+  (add-hook 'embark-target-finders #'vertico--embark-target)
+  (add-hook 'embark-candidate-collectors #'vertico--embark-candidates))
 
-(provide 'minicomp)
-;;; minicomp.el ends here
+(provide 'vertico)
+;;; vertico.el ends here
