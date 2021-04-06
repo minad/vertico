@@ -136,7 +136,7 @@
 (defvar-local vertico--keep nil
   "Keep current candidate index `vertico--index'.")
 
-(defun vertico--pred (x y)
+(defun vertico--sort-predicate (x y)
   "Sorting predicate which compares X and Y."
   (or (< (cdr x) (cdr y))
       (and (= (cdr x) (cdr y))
@@ -194,7 +194,7 @@
                          (+ (lsh (gethash (car cand) vertico--history-hash #xFFFF) 13)
                             (length (car cand)))))
       (setq cand (cdr cand))))
-  (setq candidates (sort candidates #'vertico--pred))
+  (setq candidates (sort candidates #'vertico--sort-predicate))
   ;; Drop decoration from the candidates
   (let ((cand candidates))
     (while cand
