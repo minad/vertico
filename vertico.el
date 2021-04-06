@@ -307,7 +307,7 @@
             (vertico--annotate metadata)))
          (max-width (- (* 2 (window-width)) 5))
          (title)
-         (chunks (list #(" " 0 1 (cursor t))))
+         (chunks (and (eobp) (list #(" " 0 1 (cursor t)))))
          (group (completion-metadata-get metadata 'x-group-function)))
     (dolist (ann-cand candidates)
       (push (if (= index (1+ vertico--index))
