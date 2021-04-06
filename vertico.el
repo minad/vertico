@@ -227,6 +227,12 @@
     (if (= (length highlighted) (length candidates))
         highlighted candidates)))
 
+(defun vertico--move-to-front (elem list)
+  "Move ELEM to front of LIST."
+  (if-let (head (car (member elem list)))
+      (nconc (list head) (delq head list))
+    list))
+
 (defun vertico--recompute-candidates (input metadata)
   "Recompute candidates with INPUT string and METADATA."
   (let* ((ignore-re (concat "\\(?:\\`\\|/\\)\\.?\\./\\'"
@@ -246,16 +252,15 @@
                    (prog1 (cdr last)
                      (setcdr last nil))
                  0))
+         (def (or (car-safe minibuffer-default) minibuffer-default))
          (total (length all)))
     (when (<= total vertico-sort-threshold)
       (setq all (if-let (sort (completion-metadata-get metadata 'display-sort-function))
                     (funcall sort all)
                   (vertico--sort input all))))
-    (when-let* ((def (cond
-                      ((stringp (car-safe minibuffer-default)) (car minibuffer-default))
-                      ((stringp minibuffer-default) minibuffer-default)))
-                (rest (member def all)))
-      (setq all (nconc (list (car rest)) (delete def all))))
+    (when (stringp def)
+      (setq all (vertico--move-to-front def all)))
+    (setq all (vertico--move-to-front (vertico--input-after-boundary input) all))
     (when-let (group (completion-metadata-get metadata 'x-group-function))
       (setq all (mapcan #'cdr (funcall group all))))
     (list base total all)))
@@ -292,6 +297,11 @@
         (setq pos end)))
     (apply #'concat (nreverse chunks))))
 
+(defun vertico--input-after-boundary (input)
+  "Compute INPUT string after completion boundary."
+  (substring input (car (completion-boundaries input minibuffer-completion-table
+                                               minibuffer-completion-predicate ""))))
+
 (defun vertico--format-candidates (input metadata)
   "Format current candidates with INPUT string and METADATA."
   (let* ((index (min (max 0 (- vertico--index (/ vertico-count 2)))
@@ -299,11 +309,7 @@
          (candidates
           (thread-last (seq-subseq vertico--candidates index
                                    (min (+ index vertico-count) vertico--total))
-            (vertico--highlight
-             (substring input
-                        (car (completion-boundaries input minibuffer-completion-table
-                                                    minibuffer-completion-predicate "")))
-             metadata)
+            (vertico--highlight (vertico--input-after-boundary input) metadata)
             (vertico--annotate metadata)))
          (max-width (- (* 2 (window-width)) 5))
          (title)
