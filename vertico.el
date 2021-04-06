@@ -257,8 +257,11 @@
                      (setcdr last nil))
                  0))
          (def (or (car-safe minibuffer-default) minibuffer-default))
-         (total (length all)))
-    (when (<= total vertico-sort-threshold)
+         (total))
+    (when (eq minibuffer-completion-table #'crm--collection-fn)
+      (let ((selected (split-string (substring input 0 base) crm-separator t)))
+        (setq all (cl-delete-if (lambda (x) (member x selected)) all))))
+    (when (<= (setq total (length all)) vertico-sort-threshold)
       (setq all (if-let (sort (completion-metadata-get metadata 'display-sort-function))
                     (funcall sort all)
                   (vertico--sort input all))))
@@ -467,7 +470,8 @@
   (interactive)
   (when-let (cand (and (>= vertico--index 0) (vertico--candidate)))
     (delete-minibuffer-contents)
-    (insert cand)))
+    (insert cand
+            (if (eq minibuffer-completion-table #'crm--collection-fn) "," ""))))
 
 (defun vertico--candidate ()
   "Return current candidate string."
