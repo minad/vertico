@@ -233,18 +233,22 @@
       (nconc (list head) (delq head list))
     list))
 
+(defun vertico--file-predicate ()
+  "Filter predicate for files."
+  (let ((ignore (concat "\\(?:\\`\\|/\\)\\.?\\./\\'"
+                        (and completion-ignored-extensions
+                             (concat "\\|" (regexp-opt completion-ignored-extensions) "\\'")))))
+    (if-let (pred minibuffer-completion-predicate)
+        (lambda (x) (and (not (string-match-p ignore x)) (funcall pred x)))
+      (lambda (x) (not (string-match-p ignore x))))))
+
 (defun vertico--recompute-candidates (input metadata)
   "Recompute candidates with INPUT string and METADATA."
-  (let* ((ignore-re (concat "\\(?:\\`\\|/\\)\\.?\\./\\'"
-                            (and completion-ignored-extensions
-                                 (concat "\\|" (regexp-opt completion-ignored-extensions) "\\'"))))
-         (all (completion-all-completions
+  (let* ((all (completion-all-completions
                input
                minibuffer-completion-table
                (if minibuffer-completing-file-name
-                   (if-let (pred minibuffer-completion-predicate)
-                       (lambda (x) (and (not (string-match-p ignore-re x)) (funcall pred x)))
-                     (lambda (x) (not (string-match-p ignore-re x))))
+                   (vertico--file-predicate)
                  minibuffer-completion-predicate)
                (- (point) (minibuffer-prompt-end))
                metadata))
