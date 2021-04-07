@@ -482,9 +482,9 @@
   (setq vertico--input t
         vertico--candidates-ov (make-overlay (point-max) (point-max) nil t t)
         vertico--count-ov (make-overlay (point-min) (point-min) nil t t))
-  (setq-local orderless-skip-highlighting t ;; Orderless optimization
+  (setq-local resize-mini-windows (or resize-mini-windows 'grow-only) ;; Must be non-nil
+              orderless-skip-highlighting t ;; Orderless optimization
               truncate-lines nil
-              resize-mini-windows 'grow-only
               max-mini-window-height 1.0)
   (use-local-map vertico-map)
   (add-hook 'post-command-hook #'vertico--exhibit -99 'local))
