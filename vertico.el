@@ -255,15 +255,19 @@
                    (prog1 (cdr last)
                      (setcdr last nil))
                  0))
+         (iab (vertico--input-after-boundary input))
          (def (or (car-safe minibuffer-default) minibuffer-default))
          (total (length all)))
     (when (<= total vertico-sort-threshold)
       (setq all (if-let (sort (completion-metadata-get metadata 'display-sort-function))
                     (funcall sort all)
                   (vertico--sort input all))))
+    ;; Move special candidates: "input" appears at the top, before "input/", before default value
     (when (stringp def)
       (setq all (vertico--move-to-front def all)))
-    (setq all (vertico--move-to-front (vertico--input-after-boundary input) all))
+    (when (and minibuffer-completing-file-name (not (string-suffix-p "/" iab)))
+      (setq all (vertico--move-to-front (concat iab "/") all)))
+    (setq all (vertico--move-to-front iab all))
     (when-let (group (completion-metadata-get metadata 'x-group-function))
       (setq all (mapcan #'cdr (funcall group all))))
     (list base total all)))
@@ -453,7 +457,7 @@
   (unless arg (vertico-insert))
   (let ((input (minibuffer-contents-no-properties)))
     (if (or (memq minibuffer--require-match '(nil confirm-after-completion))
-            (equal "" input)
+            (equal "" input) ;; The questionable null completion
             (test-completion input
                              minibuffer-completion-table
                              minibuffer-completion-predicate)
