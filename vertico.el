@@ -5,7 +5,7 @@
 ;; Author: Daniel Mendler
 ;; Maintainer: Daniel Mendler
 ;; Created: 2021
-;; Version: 0.1
+;; Version: 0.2
 ;; Package-Requires: ((emacs "27.1"))
 ;; Homepage: https://github.com/minad/vertico
 
