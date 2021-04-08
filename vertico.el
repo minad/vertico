@@ -282,12 +282,14 @@
                  (idx (seq-position candidates old)))
            ;; Update index, when kept candidate is found in new candidates list.
            (setq vertico--index idx)
-         ;; Otherwise select the prompt for matching inputs or missing candidates.
+         ;; Otherwise select the prompt for missing candidates or matching inputs,
+         ;; except if the input matches the first candidate.
          (setq vertico--keep nil
                vertico--index
                (if (or (not candidates)
-                       (test-completion input minibuffer-completion-table
-                                        minibuffer-completion-predicate))
+                       (and (not (equal (vertico--input-after-boundary input) (car candidates)))
+                            (test-completion input minibuffer-completion-table
+                                             minibuffer-completion-predicate)))
                    -1 0))))
      (setq vertico--base base
            vertico--input input
