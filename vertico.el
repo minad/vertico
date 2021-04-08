@@ -280,9 +280,15 @@
                            (>= vertico--index 0)
                            (nth vertico--index vertico--candidates)))
                  (idx (seq-position candidates old)))
+           ;; Update index, when kept candidate is found in new candidates list.
            (setq vertico--index idx)
+         ;; Otherwise select the prompt for matching inputs or missing candidates.
          (setq vertico--keep nil
-               vertico--index (if candidates 0 -1))))
+               vertico--index
+               (if (or (not candidates)
+                       (test-completion input minibuffer-completion-table
+                                        minibuffer-completion-predicate))
+                   -1 0))))
      (setq vertico--base base
            vertico--input input
            vertico--total total
