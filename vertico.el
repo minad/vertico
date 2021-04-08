@@ -322,7 +322,7 @@
                                    (min (+ index vertico-count) vertico--total))
             (vertico--highlight (vertico--input-after-boundary input) metadata)
             (vertico--annotate metadata)))
-         (max-width (- (* 2 (window-width)) 5))
+         (max-width (- (window-width) 4))
          (title)
          (chunks (and (eobp) (list #(" " 0 1 (cursor t)))))
          (group (completion-metadata-get metadata 'x-group-function)))
