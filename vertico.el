@@ -121,7 +121,7 @@
   "Index of current candidate or negative for prompt selection.")
 
 (defvar-local vertico--input nil
-  "Current input string or t.")
+  "Last minibuffer contents and point position or t.")
 
 (defvar-local vertico--candidates nil
   "List of candidates.")
@@ -296,7 +296,7 @@
                                              minibuffer-completion-predicate)))
                    -1 0))))
      (setq vertico--base base
-           vertico--input input
+           vertico--input (cons input (point))
            vertico--total total
            vertico--candidates candidates))))
 
@@ -314,8 +314,11 @@
 
 (defun vertico--input-after-boundary (input)
   "Compute INPUT string after completion boundary."
-  (substring input (car (completion-boundaries input minibuffer-completion-table
-                                               minibuffer-completion-predicate ""))))
+  (let ((pt (- (point) (minibuffer-prompt-end))))
+    (substring input (car (completion-boundaries (substring input 0 pt)
+                                                 minibuffer-completion-table
+                                                 minibuffer-completion-predicate
+                                                 (substring input pt))))))
 
 (defun vertico--format-candidates (input metadata)
   "Format current candidates with INPUT string and METADATA."
@@ -408,7 +411,7 @@
   (vertico--tidy-shadowed-file)
   (let ((metadata (completion--field-metadata (minibuffer-prompt-end)))
         (input (minibuffer-contents-no-properties)))
-    (unless (equal vertico--input input)
+    (unless (equal vertico--input (cons input (point)))
       (vertico--update-candidates input metadata))
     (vertico--display-candidates (vertico--format-candidates input metadata))
     (vertico--display-count)
