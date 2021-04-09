@@ -400,11 +400,13 @@
 (defun vertico--exhibit ()
   "Exhibit completion UI."
   (vertico--tidy-shadowed-file)
-  (let* ((content (minibuffer-contents-no-properties))
-         (metadata (completion-metadata content
+  (let* ((pt (max 0 (- (point) (minibuffer-prompt-end))))
+         (metadata (completion-metadata (buffer-substring-no-properties
+                                         (minibuffer-prompt-end)
+                                         (+ (minibuffer-prompt-end) pt))
                                         minibuffer-completion-table
                                         minibuffer-completion-predicate))
-         (pt (max 0 (- (point) (minibuffer-prompt-end))))
+         (content (minibuffer-contents-no-properties))
          (before (substring content 0 pt))
          (after (substring content pt))
          ;; BUG: `completion-boundaries` fails for `partial-completion`
