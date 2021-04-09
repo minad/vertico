@@ -79,8 +79,9 @@ init.el, you may want to use @code{use-package}. Here is an example configuratio
   :init
   (vertico-mode))
 
-;; Use the orderless completion style.
-;; Enable partial-completion for files to allow path expansion.
+;; Use the `orderless' completion style.
+;; Enable `partial-completion' for files to allow path expansion.
+;; You may prefer to use `initials' instead of `partial-completion'.
 (use-package orderless
   :init
   (setq completion-styles '(orderless)
