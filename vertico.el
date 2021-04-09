@@ -241,10 +241,9 @@
         (lambda (x) (and (not (string-match-p ignore x)) (funcall pred x)))
       (lambda (x) (not (string-match-p ignore x))))))
 
-(defun vertico--recompute-candidates (content bounds metadata)
-  "Recompute candidates with CONTENT string, BOUNDS and METADATA."
-  (let* ((pt (- (point) (minibuffer-prompt-end)))
-         (field (substring content (car bounds) (+ pt (cdr bounds))))
+(defun vertico--recompute-candidates (pt content bounds metadata)
+  "Recompute candidates given PT, CONTENT, BOUNDS and METADATA."
+  (let* ((field (substring content (car bounds) (+ pt (cdr bounds))))
          (all (completion-all-completions
                content
                minibuffer-completion-table
@@ -272,10 +271,10 @@
       (setq all (mapcan #'cdr (funcall group all))))
     (list base total all)))
 
-(defun vertico--update-candidates (content bounds metadata)
-  "Preprocess candidates with CONTENT string, BOUNDS and METADATA."
+(defun vertico--update-candidates (pt content bounds metadata)
+  "Preprocess candidates given PT, CONTENT, BOUNDS and METADATA."
   (pcase (let ((while-no-input-ignore-events '(selection-request)))
-           (while-no-input (vertico--recompute-candidates content bounds metadata)))
+           (while-no-input (vertico--recompute-candidates pt content bounds metadata)))
     ('nil (abort-recursive-edit))
     (`(,base ,total ,candidates)
      (unless (and vertico--keep (< vertico--index 0))
@@ -295,8 +294,8 @@
                             (test-completion content minibuffer-completion-table
                                              minibuffer-completion-predicate)))
                    -1 0))))
-     (setq vertico--base base
-           vertico--input (cons content bounds)
+     (setq vertico--input (cons content pt)
+           vertico--base base
            vertico--total total
            vertico--candidates candidates))))
 
@@ -401,9 +400,11 @@
 (defun vertico--exhibit ()
   "Exhibit completion UI."
   (vertico--tidy-shadowed-file)
-  (let* ((metadata (completion--field-metadata (minibuffer-prompt-end)))
-         (content (minibuffer-contents-no-properties))
-         (pt (- (point) (minibuffer-prompt-end)))
+  (let* ((content (minibuffer-contents-no-properties))
+         (metadata (completion-metadata content
+                                        minibuffer-completion-table
+                                        minibuffer-completion-predicate))
+         (pt (max 0 (- (point) (minibuffer-prompt-end))))
          (before (substring content 0 pt))
          (after (substring content pt))
          ;; BUG: `completion-boundaries` fails for `partial-completion`
@@ -415,8 +416,8 @@
                                                 minibuffer-completion-predicate
                                                 after)
                        (t (cons 0 (length after)))))))
-    (unless (equal vertico--input (cons content bounds))
-      (vertico--update-candidates content bounds metadata))
+    (unless (equal vertico--input (cons content pt))
+      (vertico--update-candidates pt content bounds metadata))
     (vertico--display-candidates (vertico--format-candidates content bounds metadata))
     (vertico--display-count)
     (vertico--prompt-selection)))
