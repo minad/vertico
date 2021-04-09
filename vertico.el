@@ -410,12 +410,19 @@
          ;; BUG: `completion-boundaries` fails for `partial-completion`
          ;; if the cursor is moved between the slashes of "~//".
          ;; See also marginalia.el
+         (def-bounds (cons 0 (length after)))
          (bounds (or (condition-case nil
                          (completion-boundaries before
                                                 minibuffer-completion-table
                                                 minibuffer-completion-predicate
                                                 after)
-                       (t (cons 0 (length after)))))))
+                       (t def-bounds)))))
+    ;; Normalize bounds for simple completion tables, for those tables the
+    ;; point position should not matter when computing the candidates.
+    ;; NOTE: This is actually not true for partial-completion and flex,
+    ;; where the highlighting and the sorting changes.
+    (when (equal bounds def-bounds)
+      (setq bounds (cons 0 0) pt (length content)))
     (unless (equal vertico--input (cons content pt))
       (vertico--update-candidates pt content bounds metadata))
     (vertico--display-candidates (vertico--format-candidates content bounds metadata))
