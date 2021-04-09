@@ -525,19 +525,5 @@
     (advice-remove #'completing-read-default #'vertico--advice)
     (advice-remove #'completing-read-multiple #'vertico--advice)))
 
-(defun vertico--consult-candidate ()
-  "Return current candidate for Consult preview."
-  (and vertico--input (vertico--candidate)))
-
-(defun vertico--consult-refresh ()
-  "Refresh completion UI, used by Consult async/narrowing."
-  (when vertico--input
-    (setq vertico--input t)
-    (vertico--exhibit)))
-
-(with-eval-after-load 'consult
-  (add-hook 'consult--completion-candidate-hook #'vertico--consult-candidate)
-  (add-hook 'consult--completion-refresh-hook #'vertico--consult-refresh))
-
 (provide 'vertico)
 ;;; vertico.el ends here
