@@ -535,29 +535,9 @@
     (setq vertico--input t)
     (vertico--exhibit)))
 
-(defun vertico--embark-target ()
-  "Return Embark target."
-  (and vertico--input
-       (cons (completion-metadata-get (completion--field-metadata
-                                       (minibuffer-prompt-end))
-                                      'category)
-	     (vertico--candidate))))
-
-(defun vertico--embark-candidates ()
-  "Return Embark candidates."
-  (and vertico--input
-       (cons (completion-metadata-get (completion--field-metadata
-                                       (minibuffer-prompt-end))
-                                      'category)
-             vertico--candidates))) ;; TODO: full candidates?
-
 (with-eval-after-load 'consult
   (add-hook 'consult--completion-candidate-hook #'vertico--consult-candidate)
   (add-hook 'consult--completion-refresh-hook #'vertico--consult-refresh))
-
-(with-eval-after-load 'embark
-  (add-hook 'embark-target-finders #'vertico--embark-target)
-  (add-hook 'embark-candidate-collectors #'vertico--embark-candidates))
 
 (provide 'vertico)
 ;;; vertico.el ends here
