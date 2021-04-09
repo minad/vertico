@@ -23,24 +23,6 @@ externally by complementary packages.
 - Long candidates with newlines are formatted to take up less space
 - Support for ~annotation-function~, ~affixation-function~ and ~x-group-function~
 
-* Keymap
-
-Vertico defines its own local keymap in the minibuffer which is derived from
-~minibuffer-local-map~. The keymap mostly keeps the ~fundamental-mode~
-keybindings intact, but rebinds a few commands. Note in particular the binding
-of =TAB= to ~vertico-insert~ and the bindings of ~vertico-exit/exit-input~.
-
-- ~beginning-of-buffer~, ~minibuffer-beginning-of-buffer~ -> ~vertico-beginning-of-buffer~
-- ~end-of-buffer~ -> ~vertico-end-of-buffer~
-- ~scroll-down-command~ -> ~vertico-scroll-down~
-- ~scroll-up-command~ -> ~vertico-scroll-up~
-- ~next-line~, ~next-line-or-history-element~ -> ~vertico-next~
-- ~previous-line~, ~previous-line-or-history-element~ -> ~vertico-previous~
-- ~exit-minibuffer~ -> ~vertico-exit~
-- ~kill-ring-save~ -> ~vertico-save~
-- =<C-return>= -> ~vertico-exit-input~
-- =TAB= -> ~vertico-insert~
-
 * Configuration
 
 Vertico is available from [[http://elpa.gnu.org/packages/vertico.html][GNU ELPA]], such that it can be installed directly via
@@ -80,6 +62,47 @@ init.el, you may want to use ~use-package~. Here is an example configuration:
 
     ;; Enable recursive minibuffers
     (setq enable-recursive-minibuffers t))
+#+end_src
+
+* Keymap
+
+Vertico defines its own local keymap in the minibuffer which is derived from
+~minibuffer-local-map~. The keymap mostly keeps the ~fundamental-mode~
+keybindings intact, but rebinds a few commands. Note in particular the binding
+of =TAB= to ~vertico-insert~ and the bindings of ~vertico-exit/exit-input~.
+
+- ~beginning-of-buffer~, ~minibuffer-beginning-of-buffer~ -> ~vertico-beginning-of-buffer~
+- ~end-of-buffer~ -> ~vertico-end-of-buffer~
+- ~scroll-down-command~ -> ~vertico-scroll-down~
+- ~scroll-up-command~ -> ~vertico-scroll-up~
+- ~next-line~, ~next-line-or-history-element~ -> ~vertico-next~
+- ~previous-line~, ~previous-line-or-history-element~ -> ~vertico-previous~
+- ~exit-minibuffer~ -> ~vertico-exit~
+- ~kill-ring-save~ -> ~vertico-save~
+- =<C-return>= -> ~vertico-exit-input~
+- =TAB= -> ~vertico-insert~
+
+Note that none of the bindings of the ~minibuffer-local-completion-map~ are
+bound by default. If you prefer to have the default completion commands a key
+press away you may want to add a few bindings. Then the default completion
+commands will work as usual. For example you can use =M-TAB= to cycle between
+candidates if you have set ~completion-cycle-threshold~.
+
+#+begin_src emacs-lisp
+  (define-key vertico-map "?" #'minibuffer-completion-help)
+  (define-key vertico-map "\M-\r" #'minibuffer-force-complete-and-exit)
+  (define-key vertico-map "\M-\t" #'minibuffer-complete)
+#+end_src
+
+If Vertico is active, you may want to disable the automatic =*Completions*=
+buffer by setting ~completion-auto-help~ to ~nil~ and make TAB-completion less
+noisy by setting ~completion-show-inline-help~ to ~nil~.
+
+#+begin_src emacs-lisp
+  (advice-add #'vertico--setup :after
+              (lambda (&rest _)
+                (setq-local completion-auto-help nil
+                            completion-show-inline-help nil)))
 #+end_src
 
 * Complementary packages
