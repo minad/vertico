@@ -404,10 +404,17 @@
   (let* ((metadata (completion--field-metadata (minibuffer-prompt-end)))
          (content (minibuffer-contents-no-properties))
          (pt (- (point) (minibuffer-prompt-end)))
-         (bounds (completion-boundaries (substring content 0 pt)
-                                        minibuffer-completion-table
-                                        minibuffer-completion-predicate
-                                        (substring content pt))))
+         (before (substring content 0 pt))
+         (after (substring content pt))
+         ;; BUG: `completion-boundaries` fails for `partial-completion`
+         ;; if the cursor is moved between the slashes of "~//".
+         ;; See also marginalia.el
+         (bounds (or (condition-case nil
+                         (completion-boundaries before
+                                                minibuffer-completion-table
+                                                minibuffer-completion-predicate
+                                                after)
+                       (t (cons 0 (length after)))))))
     (unless (equal vertico--input (cons content bounds))
       (vertico--update-candidates content bounds metadata))
     (vertico--display-candidates (vertico--format-candidates content bounds metadata))
