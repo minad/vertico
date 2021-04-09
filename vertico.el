@@ -364,7 +364,7 @@
       (setcar lines (substring (car lines) 0 -1)))
     (apply #'concat
            (and (eobp) #(" " 0 1 (cursor t)))
-           (and lines (if (< vertico--index 0) #("\n" 0 1 (face vertico-current)) "\n"))
+           (and lines "\n")
            (nreverse lines))))
 
 (defun vertico--display-candidates (str)
