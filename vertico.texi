@@ -1,0 +1,214 @@
+\input texinfo    @c -*- texinfo -*-
+@c %**start of header
+@setfilename vertico.info
+@settitle vertico.el - VERTical Interactive COmpletion
+@documentencoding UTF-8
+@documentlanguage en
+@c %**end of header
+
+@dircategory Emacs
+@direntry
+* Vertico: (vertico).   VERTical Interactive COmpletion.
+@end direntry
+
+@finalout
+@titlepage
+@title vertico.el - VERTical Interactive COmpletion
+@author Daniel Mendler
+@end titlepage
+
+@contents
+
+@ifnottex
+@node Top
+@top vertico.el - VERTical Interactive COmpletion
+@end ifnottex
+
+@menu
+* Introduction::
+* Features::
+* Configuration::
+* Keymap::
+* Complementary packages::
+* Alternatives::
+@end menu
+
+@node Introduction
+@chapter Introduction
+
+This package provides a minimalistic vertical completion UI, which is based on
+the default completion system. By reusing the default system, Vertico achieves
+full compatibility with built-in Emacs commands and completion tables. Vertico
+is pretty bare-bone and only provides a minimal set of commands. The code base
+is less than 500 lines of code. Additional optional enhancements can be provided
+externally by complementary packages.
+
+@uref{https://github.com/minad/vertico/blob/main/screenshot.svg?raw=true}
+
+@node Features
+@chapter Features
+
+@itemize
+@item
+Vertical display with arrow key navigation
+@item
+Shows the index of the current candidate and the total number of candidates
+@item
+The current candidate is inserted with @samp{TAB} and selected with @samp{RET}
+@item
+Non-existing candidates are entered by moving the point to the prompt line
+@item
+Candidates are sorted by history, string length and alphabetically
+@item
+Long candidates with newlines are formatted to take up less space
+@item
+Support for @code{annotation-function}, @code{affixation-function} and @code{x-group-function}
+@end itemize
+
+@node Configuration
+@chapter Configuration
+
+Vertico is available from @uref{http://elpa.gnu.org/packages/vertico.html, GNU ELPA}, such that it can be installed directly via
+@code{package-install}. After installation, the global minor mode can be enabled with
+@samp{M-x vertico-mode}. In order to configure Vertico and other packages in your
+init.el, you may want to use @code{use-package}. Here is an example configuration:
+
+@lisp
+;; Enable vertico
+(use-package vertico
+  :init
+  (vertico-mode))
+
+;; Use the orderless completion style.
+;; Enable partial-completion for files to allow path expansion.
+(use-package orderless
+  :init
+  (setq completion-styles '(orderless)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles . (partial-completion))))))
+
+;; A few more useful configurations...
+(use-package emacs
+  :init
+  ;; Add prompt indicator to `completing-read-multiple'.
+  (defun crm-indicator (args)
+    (cons (concat "[CRM] " (car args)) (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+  ;; Grow and shrink minibuffer
+  ;;(setq resize-mini-windows t)
+
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setq minibuffer-prompt-properties
+        '(read-only t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+  ;; Enable recursive minibuffers
+  (setq enable-recursive-minibuffers t))
+@end lisp
+
+@node Keymap
+@chapter Keymap
+
+Vertico defines its own local keymap in the minibuffer which is derived from
+@code{minibuffer-local-map}. The keymap mostly keeps the @code{fundamental-mode}
+keybindings intact, but rebinds a few commands. Note in particular the binding
+of @samp{TAB} to @code{vertico-insert} and the bindings of @code{vertico-exit/exit-input}.
+
+@itemize
+@item
+@code{beginning-of-buffer}, @code{minibuffer-beginning-of-buffer} -> @code{vertico-beginning-of-buffer}
+@item
+@code{end-of-buffer} -> @code{vertico-end-of-buffer}
+@item
+@code{scroll-down-command} -> @code{vertico-scroll-down}
+@item
+@code{scroll-up-command} -> @code{vertico-scroll-up}
+@item
+@code{next-line}, @code{next-line-or-history-element} -> @code{vertico-next}
+@item
+@code{previous-line}, @code{previous-line-or-history-element} -> @code{vertico-previous}
+@item
+@code{exit-minibuffer} -> @code{vertico-exit}
+@item
+@code{kill-ring-save} -> @code{vertico-save}
+@item
+@samp{<C-return>} -> @code{vertico-exit-input}
+@item
+@samp{TAB} -> @code{vertico-insert}
+@end itemize
+
+Note that none of the bindings of the @code{minibuffer-local-completion-map} are
+bound by default. If you prefer to have the default completion commands a key
+press away you may want to add a few bindings. Then the default completion
+commands will work as usual. For example you can use @samp{M-TAB} to cycle between
+candidates if you have set @code{completion-cycle-threshold}.
+
+@lisp
+(define-key vertico-map "?" #'minibuffer-completion-help)
+(define-key vertico-map "\M-\r" #'minibuffer-force-complete-and-exit)
+(define-key vertico-map "\M-\t" #'minibuffer-complete)
+@end lisp
+
+If Vertico is active, you may want to disable the automatic @samp{*Completions*}
+buffer by setting @code{completion-auto-help} to @code{nil} and make TAB-completion less
+noisy by setting @code{completion-show-inline-help} to @code{nil}.
+
+@lisp
+(advice-add #'vertico--setup :after
+            (lambda (&rest _)
+              (setq-local completion-auto-help nil
+                          completion-show-inline-help nil)))
+@end lisp
+
+@node Complementary packages
+@chapter Complementary packages
+
+Vertico works well together with a few complementary packages, which enrich the
+completion UI@. These packages are fully supported:
+
+@itemize
+@item
+@uref{https://github.com/minad/marginalia, Marginalia}: Rich annotations in the minibuffer
+@item
+@uref{https://github.com/minad/consult, Consult}: Many useful search and navigation commands
+@item
+@uref{https://github.com/oantolin/embark, Embark}: Minibuffer actions and context menu
+@item
+@uref{https://github.com/oantolin/orderless, Orderless}: Advanced completion style
+@end itemize
+
+@node Alternatives
+@chapter Alternatives
+
+There are many alternative completion UIs, each UI with its own advantages and
+disadvantages. The @uref{https://github.com/raxod502/selectrum, Selectrum readme} provides an extensive comparison of many
+available completion systems from the perspective of Selectrum.
+
+Vertico aims to be fully compliant with all Emacs commands and achieves that
+with a minimal code base, relying purely on @code{completing-read} while avoiding to
+invent its own APIs. Inventing a custom API as Helm or Ivy is explicitly avoided
+in order to increase flexibility and package reuse.
+
+Since Vertico only provides the UI, you may want to combine it with some of the
+complementary packages, to give a full-featured completion experience similar to
+Ivy. Vertico is targeted at users interested in crafting their Emacs precisely
+to their liking - completion plays an integral part in how the users interacts
+with Emacs. There are at least two other interactive completion UIs, which
+follow a similar philosophy:
+
+@itemize
+@item
+@uref{https://github.com/raxod502/selectrum, Selectrum}: If you are looking for a less minimalistic and more full-featured
+(but also more complex) package, you may be interested in Selectrum, which
+provides a similar UI as Vertico. Additionally Selectrum supports Avy-style
+quick keys, a horizontal display and a configurable buffer display.
+@item
+@uref{https://github.com/oantolin/icomplete-vertical, Icomplete-vertical}: This package enhances the Emacs builtin Icomplete with a
+vertical display. In contrast to Vertico, the candidates are rotated such that
+the current candidate always appears at the top. From my perspective,
+candidate rotation feels a bit less intuitive than the UI provided by Vertico
+or Selectrum.
+@end itemize
+
+@bye
