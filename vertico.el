@@ -396,6 +396,13 @@
                  (eq ?/ (char-before (- (point) 2)))))
     (delete-region (overlay-start rfn-eshadow-overlay) (overlay-end rfn-eshadow-overlay))))
 
+(defun vertico--prompt-selection ()
+  "Highlight the prompt if selected."
+  (let ((inhibit-modification-hooks t))
+    (if (or (>= vertico--index 0) (vertico--require-match))
+        (remove-text-properties (minibuffer-prompt-end) (point-max) '(face nil))
+      (add-text-properties (minibuffer-prompt-end) (point-max) '(face vertico-current)))))
+
 (defun vertico--exhibit ()
   "Exhibit completion UI."
   (vertico--tidy-shadowed-file)
@@ -405,9 +412,7 @@
       (vertico--update-candidates input metadata))
     (vertico--display-candidates (vertico--format-candidates input metadata))
     (vertico--display-count)
-    (if (or (>= vertico--index 0) (vertico--require-match))
-        (remove-text-properties (minibuffer-prompt-end) (point-max) '(face nil))
-      (add-text-properties (minibuffer-prompt-end) (point-max) '(face vertico-current)))))
+    (vertico--prompt-selection)))
 
 (defun vertico--require-match ()
   "Return t if match is required."
