@@ -356,15 +356,15 @@
         (setcdr (nthcdr (- vertico-count 1) lines) nil)))
     (when lines
       (setcar lines (substring (car lines) 0 -1)))
-    (apply #'concat
-           (and (eobp) #(" " 0 1 (cursor t)))
-           (and lines "\n")
-           (nreverse lines))))
+    (nreverse lines)))
 
-(defun vertico--display-candidates (str)
-  "Update candidates overlay `vertico--candidates-ov' with STR."
+(defun vertico--display-candidates (lines)
+  "Update candidates overlay `vertico--candidates-ov' with LINES."
   (move-overlay vertico--candidates-ov (point-max) (point-max))
-  (overlay-put vertico--candidates-ov 'after-string str))
+  (overlay-put vertico--candidates-ov 'after-string
+               (apply #'concat
+                      (and (eobp) #(" " 0 1 (cursor t)))
+                      (and lines "\n") lines)))
 
 (defun vertico--display-count ()
   "Update count overlay `vertico--count-ov'."
