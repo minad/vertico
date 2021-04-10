@@ -364,7 +364,10 @@
   (overlay-put vertico--candidates-ov 'after-string
                (apply #'concat
                       (and (eobp) #(" " 0 1 (cursor t)))
-                      (and lines "\n") lines)))
+                      (and lines "\n") lines))
+  (let ((delta (- (length lines) (window-height) -1)))
+    (when (or (> delta 0) (eq (default-value 'resize-mini-windows) t))
+      (window-resize nil delta))))
 
 (defun vertico--display-count ()
   "Update count overlay `vertico--count-ov'."
@@ -421,9 +424,9 @@
                        (t (cons 0 (length after)))))))
     (unless (equal vertico--input (cons content pt))
       (vertico--update-candidates pt content bounds metadata))
-    (vertico--display-candidates (vertico--format-candidates content bounds metadata))
+    (vertico--prompt-selection)
     (vertico--display-count)
-    (vertico--prompt-selection)))
+    (vertico--display-candidates (vertico--format-candidates content bounds metadata))))
 
 (defun vertico--require-match ()
   "Return t if match is required."
@@ -514,9 +517,9 @@
   (setq vertico--input t
         vertico--candidates-ov (make-overlay (point-max) (point-max) nil t t)
         vertico--count-ov (make-overlay (point-min) (point-min) nil t t))
-  (setq-local resize-mini-windows (or resize-mini-windows 'grow-only) ;; Must be non-nil
-              orderless-skip-highlighting t ;; Orderless optimization
-              truncate-lines nil
+  (setq-local orderless-skip-highlighting t ;; Orderless optimization
+              resize-mini-windows 'grow-only
+              truncate-lines t
               max-mini-window-height 1.0)
   (use-local-map vertico-map)
   (add-hook 'post-command-hook #'vertico--exhibit -99 'local))
