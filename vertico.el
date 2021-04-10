@@ -301,14 +301,14 @@
 
 (defun vertico--flatten-string (prop str)
   "Flatten STR with display or invisible PROP."
-  (let ((len (length str)) (pos 0) (chunks))
-    (while (/= pos len)
-      (let ((end (next-single-property-change pos prop str len)))
+  (let ((end (length str)) (pos 0) (chunks))
+    (while (< pos end)
+      (let ((next (next-single-property-change pos prop str end)))
         (if-let (val (get-text-property pos prop str))
             (when (and (eq prop 'display) (stringp val))
               (push val chunks))
-          (push (substring str pos end) chunks))
-        (setq pos end)))
+          (push (substring str pos next) chunks))
+        (setq pos next)))
     (apply #'concat (nreverse chunks))))
 
 (defun vertico--format-candidates (content bounds metadata)
@@ -397,9 +397,17 @@
 (defun vertico--prompt-selection ()
   "Highlight the prompt if selected."
   (let ((inhibit-modification-hooks t))
-    (if (or (>= vertico--index 0) (vertico--require-match))
-        (remove-text-properties (minibuffer-prompt-end) (point-max) '(face nil))
-      (add-text-properties (minibuffer-prompt-end) (point-max) '(face vertico-current)))))
+    (vertico--add-face 'vertico-current (minibuffer-prompt-end) (point-max)
+                       (and (< vertico--index 0) (not (vertico--require-match))))))
+
+(defun vertico--add-face (face beg end add)
+  "Add FACE between BEG and END depending if ADD is t, otherwise remove."
+  (while (< beg end)
+    (let* ((val (get-text-property beg 'face))
+           (faces (remq face (if (listp val) val (list val))))
+           (next (next-single-property-change beg 'face nil end)))
+      (add-text-properties beg next `(face ,(if add (cons face faces) faces)))
+      (setq beg next))))
 
 (defun vertico--exhibit ()
   "Exhibit completion UI."
