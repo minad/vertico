@@ -362,9 +362,7 @@
   "Update candidates overlay `vertico--candidates-ov' with LINES."
   (move-overlay vertico--candidates-ov (point-max) (point-max))
   (overlay-put vertico--candidates-ov 'after-string
-               (apply #'concat
-                      (and (eobp) #(" " 0 1 (cursor t)))
-                      (and lines "\n") lines))
+               (apply #'concat #(" " 0 1 (cursor t)) (and lines "\n") lines))
   (let* ((resize (default-value 'resize-mini-windows))
          (delta (- (max (length lines) (if resize 0 vertico-count)) (window-height) -1)))
     (when (or (> delta 0) (eq resize t))
