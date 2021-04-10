@@ -147,3 +147,8 @@ follow a similar philosophy:
   the current candidate always appears at the top. From my perspective,
   candidate rotation feels a bit less intuitive than the UI provided by Vertico
   or Selectrum.
+
+* Contributions
+
+Since this package is part of GNU ELPA, contributions require copyright
+assignment to the FSF.
