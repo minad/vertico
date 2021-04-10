@@ -365,8 +365,9 @@
                (apply #'concat
                       (and (eobp) #(" " 0 1 (cursor t)))
                       (and lines "\n") lines))
-  (let ((delta (- (length lines) (window-height) -1)))
-    (when (or (> delta 0) (eq (default-value 'resize-mini-windows) t))
+  (let* ((resize (default-value 'resize-mini-windows))
+         (delta (- (max (length lines) (if resize 0 vertico-count)) (window-height) -1)))
+    (when (or (> delta 0) (eq resize t))
       (window-resize nil delta))))
 
 (defun vertico--display-count ()
