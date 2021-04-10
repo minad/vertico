@@ -95,8 +95,8 @@ candidates if you have set ~completion-cycle-threshold~.
 
 #+begin_src emacs-lisp
   (define-key vertico-map "?" #'minibuffer-completion-help)
-  (define-key vertico-map "\M-\r" #'minibuffer-force-complete-and-exit)
-  (define-key vertico-map "\M-\t" #'minibuffer-complete)
+  (define-key vertico-map (kbd "M-RET") #'minibuffer-force-complete-and-exit)
+  (define-key vertico-map (kbd "M-TAB") #'minibuffer-complete)
 #+end_src
 
 If Vertico is active, you may want to disable the automatic =*Completions*=

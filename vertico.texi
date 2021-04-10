@@ -148,8 +148,8 @@ candidates if you have set @code{completion-cycle-threshold}.
 
 @lisp
 (define-key vertico-map "?" #'minibuffer-completion-help)
-(define-key vertico-map "\M-\r" #'minibuffer-force-complete-and-exit)
-(define-key vertico-map "\M-\t" #'minibuffer-complete)
+(define-key vertico-map (kbd "M-RET") #'minibuffer-force-complete-and-exit)
+(define-key vertico-map (kbd "M-TAB") #'minibuffer-complete)
 @end lisp
 
 If Vertico is active, you may want to disable the automatic @samp{*Completions*}
