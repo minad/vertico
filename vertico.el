@@ -328,14 +328,16 @@
 (defun vertico--format-candidates (metadata)
   "Format current candidates with METADATA."
   (let* ((group (completion-metadata-get metadata 'x-group-function))
-         (group-format (and group vertico-group-format (concat vertico-group-format "\n")))
-         (index (min (max 0 (- vertico--index (/ vertico-count 2) (if group-format -1 0)))
-                     (max 0 (- vertico--total vertico-count))))
+         (group-format (and nil group vertico-group-format (concat vertico-group-format "\n")))
+         ;;(index (min (max 0 (- vertico--index (/ vertico-count 2) (if group-format -1 0)))
+         ;;            (max 0 (- vertico--total vertico-count))))
+         (index (max 0 vertico--index))
          (candidates
           (thread-last (seq-subseq vertico--candidates index
                                    (min (+ index vertico-count) vertico--total))
             (funcall vertico--highlight)
-            (vertico--annotate metadata)))
+            ;;(vertico--annotate metadata)
+            ))
          (max-width (- (window-width) 4))
          (current-line 0) (title) (lines))
     (dolist (ann-cand candidates)
@@ -358,7 +360,7 @@
                            (if (text-property-not-all 0 (length suffix) 'face nil suffix)
                                suffix
                              (propertize suffix 'face 'completions-annotations))
-                           "\n"))
+                           " "))
         (when (= index vertico--index)
           (setq current-line (length lines))
           (add-face-text-property 0 (length cand) 'vertico-current 'append cand))
@@ -376,11 +378,15 @@
   "Update candidates overlay `vertico--candidates-ov' with LINES."
   (move-overlay vertico--candidates-ov (point-max) (point-max))
   (overlay-put vertico--candidates-ov 'after-string
-               (apply #'concat #(" " 0 1 (cursor t)) (and lines "\n") lines))
-  (let* ((resize (default-value 'resize-mini-windows))
-         (delta (- (max (length lines) (if resize 0 vertico-count)) (window-height) -1)))
-    (when (or (> delta 0) (eq resize t))
-      (window-resize nil delta))))
+               (apply #'concat #(" " 0 1 (cursor t))
+                      ;;(and lines "\n")
+                      lines))
+
+  ;; (let* ((resize (default-value 'resize-mini-windows))
+  ;;        (delta (- (max (length lines) (if resize 0 vertico-count)) (window-height) -1)))
+  ;;   (when (or (> delta 0) (eq resize t))
+  ;;     (window-resize nil delta)))
+  )
 
 (defun vertico--display-count ()
   "Update count overlay `vertico--count-ov'."
