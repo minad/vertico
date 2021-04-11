@@ -29,6 +29,7 @@
 * Features::
 * Configuration::
 * Keymap::
+* TAB completion::
 * Complementary packages::
 * Alternatives::
 * Contributions::
@@ -72,7 +73,9 @@ Support for @code{annotation-function}, @code{affixation-function} and @code{x-g
 Vertico is available from @uref{http://elpa.gnu.org/packages/vertico.html, GNU ELPA}, such that it can be installed directly via
 @code{package-install}. After installation, the global minor mode can be enabled with
 @samp{M-x vertico-mode}. In order to configure Vertico and other packages in your
-init.el, you may want to use @code{use-package}. Here is an example configuration:
+init.el, you may want to use @code{use-package}. I recommend to give orderless
+completion a try, which is different from the familiar prefix TAB completion.
+Here is an example configuration:
 
 @lisp
 ;; Enable vertico
@@ -140,11 +143,17 @@ of @samp{TAB} to @code{vertico-insert} and the bindings of @code{vertico-exit/ex
 @samp{TAB} -> @code{vertico-insert}
 @end itemize
 
-Note that none of the bindings of the @code{minibuffer-local-completion-map} are
-bound by default. If you prefer to have the default completion commands a key
-press away you may want to add a few bindings. Then the default completion
-commands will work as usual. For example you can use @samp{M-TAB} to cycle between
-candidates if you have set @code{completion-cycle-threshold}.
+@node TAB completion
+@chapter TAB completion
+
+The bindings of the @code{minibuffer-local-completion-map} are not available in
+Vertico by default. This means that TAB works differently from what you may
+expect from the default Emacs completion system.
+
+If you prefer to have the default completion commands a key press away you can
+add new bindings or even replace the Vertico bindings. Then the default
+completion commands will work as usual. For example you can use @samp{M-TAB} to cycle
+between candidates if you have set @code{completion-cycle-threshold}.
 
 @lisp
 (define-key vertico-map "?" #'minibuffer-completion-help)
@@ -152,9 +161,18 @@ candidates if you have set @code{completion-cycle-threshold}.
 (define-key vertico-map (kbd "M-TAB") #'minibuffer-complete)
 @end lisp
 
-If Vertico is active, you may want to disable the automatic @samp{*Completions*}
-buffer by setting @code{completion-auto-help} to @code{nil} and make TAB-completion less
-noisy by setting @code{completion-show-inline-help} to @code{nil}.
+The @code{orderless} completion style does not support TAB prefix completion. In
+order to enable that you may want to combine @code{orderless} with @code{substring}, or
+not use @code{orderless} at all.
+
+@lisp
+(setq completion-styles '(substring orderless))
+(setq completion-styles '(basic substring partial-completion flex))
+@end lisp
+
+If Vertico is active, it makes sense to disable the automatic @samp{*Completions*}
+buffer by setting @code{completion-auto-help} to @code{nil}. TAB-completion can be made
+less noisy by setting @code{completion-show-inline-help} to @code{nil}.
 
 @lisp
 (advice-add #'vertico--setup :after
