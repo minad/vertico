@@ -230,6 +230,7 @@
         (lambda (x) (and (not (string-match-p ignore x)) (funcall pred x)))
       (lambda (x) (not (string-match-p ignore x))))))
 
+;; bug#47711: Deferred highlighting for `completion-all-completions'
 (declare-function orderless-highlight-matches "ext:orderless")
 (defun vertico--all-completions (&rest args)
   "Compute all completions for ARGS with deferred highlighting."
@@ -286,6 +287,7 @@
 
 (defun vertico--update-candidates (pt content bounds metadata)
   "Preprocess candidates given PT, CONTENT, BOUNDS and METADATA."
+  ;; bug#38024: Icomplete uses `while-no-input-ignore-events' to repair updating issues
   (pcase (let ((while-no-input-ignore-events '(selection-request)))
            (while-no-input (vertico--recompute-candidates pt content bounds metadata)))
     ('nil (abort-recursive-edit))
@@ -432,10 +434,9 @@
          (content (minibuffer-contents-no-properties))
          (before (substring content 0 pt))
          (after (substring content pt))
-         ;; BUG: `completion-boundaries` fails for `partial-completion`
+         ;; bug#47678: `completion-boundaries` fails for `partial-completion`
          ;; if the cursor is moved between the slashes of "~//".
          ;; See also marginalia.el which has the same issue.
-         ;; Upstream bug: https://debbugs.gnu.org/cgi/bugreport.cgi?bug=47678
          (bounds (or (condition-case nil
                          (completion-boundaries before
                                                 minibuffer-completion-table
