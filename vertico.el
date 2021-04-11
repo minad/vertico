@@ -165,13 +165,12 @@
                (alen (length adir)))
           (dolist (elem file-name-history)
             (let* ((len (length elem))
-                   (file (cond
-                          ((and (> len dlen)
-                                (eq t (compare-strings dir 0 dlen elem 0 dlen)))
-                           (substring elem dlen))
-                          ((and (> len alen)
-                                (eq t (compare-strings adir 0 alen elem 0 alen)))
-                           (substring elem alen)))))
+                   (file (cond ((and (> len dlen)
+                                     (eq t (compare-strings dir 0 dlen elem 0 dlen)))
+                                (substring elem dlen))
+                               ((and (> len alen)
+                                     (eq t (compare-strings adir 0 alen elem 0 alen)))
+                                (substring elem alen)))))
               (when file
                 (when-let (slash (string-match-p "/" file))
                   (setq file (substring file 0 (1+ slash))))
@@ -390,10 +389,9 @@
     (overlay-put vertico--count-ov 'before-string
                  (format (car vertico-count-format)
                          (format (cdr vertico-count-format)
-                                 (cond
-                                  ((>= vertico--index 0) (1+ vertico--index))
-                                  ((vertico--require-match) "!")
-                                  (t "*"))
+                                 (cond ((>= vertico--index 0) (1+ vertico--index))
+                                       ((vertico--allow-prompt-selection) "*")
+                                       (t "!"))
                                  vertico--total)))))
 
 (defun vertico--tidy-shadowed-file ()
@@ -411,7 +409,7 @@
   "Highlight the prompt if selected."
   (let ((inhibit-modification-hooks t))
     (vertico--add-face 'vertico-current (minibuffer-prompt-end) (point-max)
-                       (and (< vertico--index 0) (not (vertico--require-match))))))
+                       (and (< vertico--index 0) (vertico--allow-prompt-selection)))))
 
 (defun vertico--add-face (face beg end add)
   "Add FACE between BEG and END depending if ADD is t, otherwise remove."
@@ -450,16 +448,18 @@
     (vertico--display-count)
     (vertico--display-candidates (vertico--format-candidates metadata))))
 
-(defun vertico--require-match ()
-  "Return t if match is required."
-  (not (memq minibuffer--require-match '(nil confirm confirm-after-completion))))
+(defun vertico--allow-prompt-selection ()
+  "Return t if prompt can be selected."
+  (or (memq minibuffer--require-match '(nil confirm confirm-after-completion))
+      ;; Allow prompt selection if default is not an element of candidates
+      (when-let (def (or (car-safe minibuffer-default) minibuffer-default))
+        (and (= (minibuffer-prompt-end) (point)) (not (member def vertico--candidates))))))
 
 (defun vertico--goto (index)
   "Go to candidate with INDEX."
   (setq vertico--keep t
         vertico--index
-        (max (if (and (vertico--require-match) vertico--candidates)
-                 0 -1)
+        (max (if (or (vertico--allow-prompt-selection) (not vertico--candidates)) -1 0)
              (min index (- vertico--total 1)))))
 
 (defun vertico-beginning-of-buffer ()
