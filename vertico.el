@@ -228,8 +228,9 @@
 
 (defun vertico--move-to-front (elem list)
   "Move ELEM to front of LIST."
-  (if-let (head (car (member elem list)))
-      (nconc (list head) (delq head list))
+  (if-let (found (member elem list))
+      (let ((head (list (car found))))
+        (nconc head (delq (setcar found nil) list)))
     list))
 
 (defun vertico--file-predicate ()
