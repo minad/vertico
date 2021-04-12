@@ -88,8 +88,7 @@
   "Face used to highlight the currently selected candidate.")
 
 (defvar vertico-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map minibuffer-local-map)
+  (let ((map (make-composed-keymap nil minibuffer-local-map)))
     (define-key map [remap beginning-of-buffer] #'vertico-beginning-of-buffer)
     (define-key map [remap minibuffer-beginning-of-buffer] #'vertico-beginning-of-buffer)
     (define-key map [remap end-of-buffer] #'vertico-end-of-buffer)
@@ -104,7 +103,7 @@
     (define-key map [C-return] #'vertico-exit-input)
     (define-key map "\t" #'vertico-insert)
     map)
-  "Minibuffer keymap.")
+  "Vertico minibuffer keymap derived from `minibuffer-local-map'.")
 
 (defvar-local vertico--highlight #'identity
   "Deferred candidate highlighting function.")
