@@ -45,8 +45,6 @@ is pretty bare-bone and only provides a minimal set of commands. The code base
 is less than 500 lines of code. Additional optional enhancements can be provided
 externally by complementary packages.
 
-@uref{https://github.com/minad/vertico/blob/main/screenshot.svg?raw=true}
-
 @node Features
 @chapter Features
 
@@ -66,6 +64,8 @@ Long candidates with newlines are formatted to take up less space
 @item
 Support for @code{annotation-function}, @code{affixation-function} and @code{x-group-function}
 @end itemize
+
+@uref{https://github.com/minad/vertico/blob/main/screenshot.svg?raw=true}
 
 @node Configuration
 @chapter Configuration
