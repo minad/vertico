@@ -525,13 +525,13 @@
     (delete-minibuffer-contents)
     (insert cand)))
 
-(defun vertico--candidate ()
-  "Return current candidate string."
-  (let ((content (minibuffer-contents-no-properties)))
-    (if (< vertico--index 0)
-        content
-      (concat (substring content 0 vertico--base)
-              (nth vertico--index vertico--candidates)))))
+(defun vertico--candidate (&optional hl)
+  "Return current candidate string with optional highlighting if HL is non-nil."
+  (let ((content (minibuffer-contents)))
+    (if-let (cand (and (>= vertico--index 0) (nth vertico--index vertico--candidates)))
+        (concat (substring content 0 vertico--base)
+                (if hl (car (funcall vertico--highlight (list cand))) cand))
+      content)))
 
 (defun vertico--setup ()
   "Setup completion UI."
