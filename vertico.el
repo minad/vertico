@@ -370,8 +370,6 @@
       (if (< current-line (- vertico-count 1))
           (setq lines (nthcdr (- (length lines) vertico-count) lines))
         (setcdr (nthcdr (- vertico-count 1) lines) nil)))
-    (when lines
-      (setcar lines (substring (car lines) 0 -1)))
     (nreverse lines)))
 
 (defun vertico--display-candidates (lines)
