@@ -45,10 +45,10 @@ is pretty bare-bone and only provides a minimal set of commands. The code base
 is less than 500 lines of code. Additional optional enhancements can be provided
 externally by complementary packages.
 
-@uref{https://github.com/minad/vertico/blob/main/screenshot.svg?raw=true}
-
 @node Features
 @chapter Features
+
+@uref{https://github.com/minad/vertico/blob/main/screenshot.svg?raw=true}
 
 @itemize
 @item

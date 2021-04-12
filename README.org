@@ -6,6 +6,8 @@
 #+texinfo_dir_title: Vertico: (vertico).
 #+texinfo_dir_desc: VERTical Interactive COmpletion.
 
+#+html: <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Vertigomovie_restoration.jpg/800px-Vertigomovie_restoration.jpg" align="right" width="30%">
+
 * Introduction
 
 This package provides a minimalistic vertical completion UI, which is based on
@@ -14,8 +16,6 @@ full compatibility with built-in Emacs commands and completion tables. Vertico
 is pretty bare-bone and only provides a minimal set of commands. The code base
 is less than 500 lines of code. Additional optional enhancements can be provided
 externally by complementary packages.
-
-[[https://github.com/minad/vertico/blob/main/screenshot.svg?raw=true]]
 
 * Features
 
@@ -26,6 +26,8 @@ externally by complementary packages.
 - Candidates are sorted by history, string length and alphabetically
 - Long candidates with newlines are formatted to take up less space
 - Support for ~annotation-function~, ~affixation-function~ and ~x-group-function~
+
+[[https://github.com/minad/vertico/blob/main/screenshot.svg?raw=true]]
 
 * Configuration
 
