@@ -376,10 +376,13 @@
   (move-overlay vertico--candidates-ov (point-max) (point-max))
   (overlay-put vertico--candidates-ov 'after-string
                (apply #'concat #(" " 0 1 (cursor t)) (and lines "\n") lines))
-  (let* ((resize (default-value 'resize-mini-windows))
-         (delta (- (max (length lines) (if resize 0 vertico-count)) (window-height) -1)))
-    (when (or (> delta 0) (eq resize t))
-      (window-resize nil delta))))
+  (let* ((lh (default-line-height))
+         (resize (default-value 'resize-mini-windows))
+         (dp (- (max (cdr (window-text-pixel-size))
+                     (* lh (1+ (if resize (length lines) vertico-count))))
+                (window-pixel-height)))
+         (dl (ceiling dp lh)))
+    (when (or (> dl 0) (eq resize t)) (window-resize nil dl))))
 
 (defun vertico--display-count ()
   "Update count overlay `vertico--count-ov'."
