@@ -53,6 +53,11 @@ Here is an example configuration:
           completion-category-defaults nil
           completion-category-overrides '((file (styles . (partial-completion))))))
 
+  ;; Persist history over Emacs restarts. Vertico sorts by history.
+  (use-package savehist
+    :init
+    (savehist-mode))
+
   ;; A few more useful configurations...
   (use-package emacs
     :init
