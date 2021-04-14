@@ -171,6 +171,45 @@ follow a similar philosophy:
   candidate rotation feels a bit less intuitive than the UI provided by Vertico
   or Selectrum.
 
+* Problematic completion commands
+
+** ~org-set-tags-command~
+
+ ~org-set-tags-command~ implements a completion table which relies on the ~basic~
+ completion style and TAB completion. This table does not work well with Vertico
+ and Icomplete. The issue can be mitigated by deactivating most of the Vertico UI
+ and relying purely on TAB completion. The UI is still enhanced by Vertico, since
+ Vertico shows the available tags.
+
+ #+begin_src emacs-lisp
+   (defun disable-selection ()
+     (when (eq minibuffer-completion-table #'org-tags-completion-function)
+       (setq-local vertico-map minibuffer-local-completion-map
+                   completion-cycle-threshold nil
+                   completion-styles '(basic))))
+   (advice-add #'vertico--setup :before #'disable-selection)
+ #+end_src
+
+ In order to fix the issues properly, ~org-set-tags-command~ should be
+ implemented using ~completing-read-multiple~ as discussed on the [[https://lists.gnu.org/archive/html/emacs-orgmode/2020-07/msg00222.html][mailing list]].
+
+** ~Info-goto-node~
+
+ The command ~Info-goto-node~ uses the ~Info-read-node-name~ completion table,
+ which almost works as is with Vertico. However there is the issue that the
+ completion table sometimes throws unexpected errors (bug#47771).
+
+** ~tmm-menubar~
+
+ The text menu bar works well with Vertico but always shows a =*Completions*=
+ buffer, which is unwanted if you are using the Vertico UI. This completion
+ buffer can be disabled as follows.
+
+ #+begin_src emacs-lisp
+   (defun kill-completions () (kill-buffer "*Completions*"))
+   (advice-add #'tmm-add-prompt :after #'kill-completions)
+ #+end_src
+
 * Contributions
 
 Since this package is part of GNU ELPA, contributions require copyright

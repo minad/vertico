@@ -32,7 +32,19 @@
 * TAB completion::
 * Complementary packages::
 * Alternatives::
+* Problematic completion commands::
 * Contributions::
+
+@detailmenu
+--- The Detailed Node Listing ---
+
+Problematic completion commands
+
+* @code{org-set-tags-command}::
+* @code{Info-goto-node}::
+* @code{tmm-menubar}::
+
+@end detailmenu
 @end menu
 
 @node Introduction
@@ -235,6 +247,55 @@ the current candidate always appears at the top. From my perspective,
 candidate rotation feels a bit less intuitive than the UI provided by Vertico
 or Selectrum.
 @end itemize
+
+@node Problematic completion commands
+@chapter Problematic completion commands
+
+@menu
+* @code{org-set-tags-command}::
+* @code{Info-goto-node}::
+* @code{tmm-menubar}::
+@end menu
+
+@node @code{org-set-tags-command}
+@section @code{org-set-tags-command}
+
+@code{org-set-tags-command} implements a completion table which relies on the @code{basic}
+completion style and TAB completion. This table does not work well with Vertico
+and Icomplete. The issue can be mitigated by deactivating most of the Vertico UI
+and relying purely on TAB completion. The UI is still enhanced by Vertico, since
+Vertico shows the available tags.
+
+@lisp
+(defun disable-selection ()
+  (when (eq minibuffer-completion-table #'org-tags-completion-function)
+    (setq-local vertico-map minibuffer-local-completion-map
+                completion-cycle-threshold nil
+                completion-styles '(basic))))
+(advice-add #'vertico--setup :before #'disable-selection)
+@end lisp
+
+In order to fix the issues properly, @code{org-set-tags-command} should be
+implemented using @code{completing-read-multiple} as discussed on the @uref{https://lists.gnu.org/archive/html/emacs-orgmode/2020-07/msg00222.html, mailing list}.
+
+@node @code{Info-goto-node}
+@section @code{Info-goto-node}
+
+The command @code{Info-goto-node} uses the @code{Info-read-node-name} completion table,
+which almost works as is with Vertico. However there is the issue that the
+completion table sometimes throws unexpected errors (bug#47771).
+
+@node @code{tmm-menubar}
+@section @code{tmm-menubar}
+
+The text menu bar works well with Vertico but always shows a @samp{*Completions*}
+buffer, which is unwanted if you are using the Vertico UI@. This completion
+buffer can be disabled as follows.
+
+@lisp
+(defun kill-completions () (kill-buffer "*Completions*"))
+(advice-add #'tmm-add-prompt :after #'kill-completions)
+@end lisp
 
 @node Contributions
 @chapter Contributions
