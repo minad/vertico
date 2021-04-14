@@ -89,9 +89,9 @@
 
 (defvar vertico-map
   (let ((map (make-composed-keymap nil minibuffer-local-map)))
-    (define-key map [remap beginning-of-buffer] #'vertico-beginning-of-buffer)
-    (define-key map [remap minibuffer-beginning-of-buffer] #'vertico-beginning-of-buffer)
-    (define-key map [remap end-of-buffer] #'vertico-end-of-buffer)
+    (define-key map [remap beginning-of-buffer] #'vertico-first)
+    (define-key map [remap minibuffer-beginning-of-buffer] #'vertico-first)
+    (define-key map [remap end-of-buffer] #'vertico-last)
     (define-key map [remap scroll-down-command] #'vertico-scroll-down)
     (define-key map [remap scroll-up-command] #'vertico-scroll-up)
     (define-key map [remap next-line] #'vertico-next)
@@ -463,12 +463,12 @@
         (max (if (or (vertico--allow-prompt-selection) (not vertico--candidates)) -1 0)
              (min index (- vertico--total 1)))))
 
-(defun vertico-beginning-of-buffer ()
+(defun vertico-first ()
   "Go to first candidate."
   (interactive)
   (vertico--goto 0))
 
-(defun vertico-end-of-buffer ()
+(defun vertico-last ()
   "Go to last candidate."
   (interactive)
   (vertico--goto (- vertico--total 1)))
