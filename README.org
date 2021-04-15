@@ -10,11 +10,11 @@
 
 * Introduction
 
-This package provides a minimalistic vertical completion UI, which is based on
-the default completion system. By reusing the default system, Vertico achieves
-full compatibility with built-in Emacs commands and completion tables. Vertico
-is pretty bare-bone and only provides a minimal set of commands. The code base
-is less than 500 lines of code. Additional optional enhancements can be provided
+Vertico provides a minimalistic vertical completion UI, which is based on the
+default completion system. By reusing the default system, Vertico achieves full
+compatibility with built-in Emacs commands and completion tables. Vertico is
+pretty bare-bone and only provides a minimal set of commands. The code base is
+less than 500 lines of code. Additional optional enhancements can be provided
 externally by complementary packages.
 
 * Features
@@ -23,7 +23,7 @@ externally by complementary packages.
 - Shows the index of the current candidate and the total number of candidates
 - The current candidate is inserted with =TAB= and selected with =RET=
 - Non-existing candidates are entered by moving the point to the prompt line
-- Candidates are sorted by history, string length and alphabetically
+- Candidates sorting by history, string length and alphabetically
 - Long candidates with newlines are formatted to take up less space
 - Support for ~annotation-function~, ~affixation-function~ and ~x-group-function~
 
@@ -142,6 +142,10 @@ completion UI. These packages are fully supported:
 - [[https://github.com/minad/consult][Consult]]: Many useful search and navigation commands
 - [[https://github.com/oantolin/embark][Embark]]: Minibuffer actions and context menu
 - [[https://github.com/oantolin/orderless][Orderless]]: Advanced completion style
+
+You may also want to look into my [[https://github.com/minad/corfu][Corfu]] package, which provides a minimal
+completion system for completion-in-region using overlays. Corfu is developed in
+the same spirit as Vertico.
 
 * Alternatives
 

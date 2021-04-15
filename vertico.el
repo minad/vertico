@@ -26,11 +26,11 @@
 
 ;;; Commentary:
 
-;; This package provides a minimalistic vertical completion UI, which is based
-;; on the default completion system. By reusing the default system, Vertico
-;; achieve full compatibility with built-in Emacs commands and completion
-;; tables. Vertico is pretty bare-bone and only provides a minimal set of
-;; commands.
+;; Vertico provides a minimalistic vertical completion UI, which is
+;; based on the default completion system. By reusing the default
+;; system, Vertico achieve full compatibility with built-in Emacs
+;; commands and completion tables. Vertico is pretty bare-bone and
+;; only provides a minimal set of commands.
 
 ;;; Code:
 
