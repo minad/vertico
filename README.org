@@ -211,8 +211,7 @@ follow a similar philosophy:
  buffer can be disabled as follows.
 
  #+begin_src emacs-lisp
-   (defun kill-completions () (kill-buffer "*Completions*"))
-   (advice-add #'tmm-add-prompt :after #'kill-completions)
+   (advice-add #'tmm-add-prompt :after #'minibuffer-hide-completions)
  #+end_src
 
 * Contributions
