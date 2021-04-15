@@ -25,6 +25,7 @@ externally by complementary packages.
 - Non-existing candidates are entered by moving the point to the prompt line
 - Candidates sorting by history, string length and alphabetically
 - Long candidates with newlines are formatted to take up less space
+- Deferred completion style highlighting for performance
 - Support for ~annotation-function~, ~affixation-function~ and ~x-group-function~
 
 [[https://github.com/minad/vertico/blob/main/screenshot.svg?raw=true]]
