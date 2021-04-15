@@ -124,7 +124,7 @@
   "Index of current candidate or negative for prompt selection.")
 
 (defvar-local vertico--input nil
-  "Cons of last minibuffer contents and boundaries or t.")
+  "Cons of last minibuffer contents and point or t.")
 
 (defvar-local vertico--candidates nil
   "List of candidates.")
