@@ -291,28 +291,32 @@
            (while-no-input (vertico--recompute-candidates pt content bounds metadata)))
     ('nil (abort-recursive-edit))
     (`(,base ,total ,candidates ,hl)
+     ;; Find position of old candidate in the new list.
      (unless (and vertico--keep (< vertico--index 0))
-       (if-let* ((old (and candidates
-                           vertico--keep
-                           (>= vertico--index 0)
-                           (nth vertico--index vertico--candidates)))
-                 (idx (seq-position candidates old)))
-           ;; Update index, when kept candidate is found in new candidates list.
-           (setq vertico--index idx)
-         ;; Otherwise select the prompt for missing candidates or for matching content, as long as
-         ;; the full content after the boundary is empty, including content after point.
-         (setq vertico--keep nil
-               vertico--index
-               (if (or (not candidates)
-                       (and (= (car bounds) (length content))
-                            (test-completion content minibuffer-completion-table
-                                             minibuffer-completion-predicate)))
-                   -1 0))))
+       (let ((old (and candidates
+                       vertico--keep
+                       (>= vertico--index 0)
+                       (nth vertico--index vertico--candidates))))
+         (setq vertico--index (and old (seq-position candidates old)))))
      (setq vertico--input (cons content pt)
            vertico--base base
            vertico--total total
            vertico--highlight hl
-           vertico--candidates candidates))))
+           vertico--candidates candidates)
+     ;; If the current index is nil, compute new index. Select the prompt:
+     ;; * If there are no candidates
+     ;; * If the default is missing from the candidate list.
+     ;; * For matching content, as long as the full content after the boundary is empty,
+     ;;   including content after point.
+     (unless vertico--index
+       (setq vertico--keep nil
+             vertico--index
+             (if (or (not vertico--candidates)
+                     (vertico--default-missing-p)
+                     (and (= (car bounds) (length content))
+                          (test-completion content minibuffer-completion-table
+                                           minibuffer-completion-predicate)))
+                 -1 0))))))
 
 (defun vertico--flatten-string (prop str)
   "Flatten STR with display or invisible PROP."
