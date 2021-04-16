@@ -2,8 +2,8 @@
 
 ;; Copyright (C) 2021  Free Software Foundation, Inc.
 
-;; Author: Daniel Mendler
-;; Maintainer: Daniel Mendler
+;; Author: Daniel Mendler <mail@daniel-mendler.de>
+;; Maintainer: Daniel Mendler <mail@daniel-mendler.de>
 ;; Created: 2021
 ;; Version: 0.4
 ;; Package-Requires: ((emacs "27.1"))
