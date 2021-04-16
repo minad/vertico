@@ -392,7 +392,7 @@
                  (format (car vertico-count-format)
                          (format (cdr vertico-count-format)
                                  (cond ((>= vertico--index 0) (1+ vertico--index))
-                                       ((vertico--allow-prompt-selection) "*")
+                                       ((vertico--allow-prompt-selection-p) "*")
                                        (t "!"))
                                  vertico--total)))))
 
@@ -411,7 +411,7 @@
   "Highlight the prompt if selected."
   (let ((inhibit-modification-hooks t))
     (vertico--add-face 'vertico-current (minibuffer-prompt-end) (point-max)
-                       (and (< vertico--index 0) (vertico--allow-prompt-selection)))))
+                       (and (< vertico--index 0) (vertico--allow-prompt-selection-p)))))
 
 (defun vertico--add-face (face beg end add)
   "Add FACE between BEG and END depending if ADD is t, otherwise remove."
@@ -449,18 +449,21 @@
     (vertico--display-count)
     (vertico--display-candidates (vertico--format-candidates metadata))))
 
-(defun vertico--allow-prompt-selection ()
+(defun vertico--allow-prompt-selection-p ()
   "Return t if prompt can be selected."
   (or (memq minibuffer--require-match '(nil confirm confirm-after-completion))
-      ;; Allow prompt selection if default is not an element of candidates
-      (when-let (def (or (car-safe minibuffer-default) minibuffer-default))
-        (and (= (minibuffer-prompt-end) (point)) (not (member def vertico--candidates))))))
+      (vertico--default-missing-p)))
+
+(defun vertico--default-missing-p ()
+  "Return t if default is missing from the candidate list."
+  (when-let (def (or (car-safe minibuffer-default) minibuffer-default))
+    (and (= (minibuffer-prompt-end) (point)) (not (member def vertico--candidates)))))
 
 (defun vertico--goto (index)
   "Go to candidate with INDEX."
   (setq vertico--keep t
         vertico--index
-        (max (if (or (vertico--allow-prompt-selection) (not vertico--candidates)) -1 0)
+        (max (if (or (vertico--allow-prompt-selection-p) (not vertico--candidates)) -1 0)
              (min index (- vertico--total 1)))))
 
 (defun vertico-first ()
