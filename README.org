@@ -13,9 +13,9 @@
 Vertico provides a minimalistic vertical completion UI, which is based on the
 default completion system. By reusing the default system, Vertico achieves full
 compatibility with built-in Emacs commands and completion tables. Vertico is
-pretty bare-bone and only provides a minimal set of commands. The code base is
-less than 500 lines of code. Additional optional enhancements can be provided
-externally by complementary packages.
+pretty bare-bone and comes with only a minimal set of commands. The code base is
+less than 500 lines of code. Additional enhancements can be installed separately
+via complementary packages.
 
 * Features
 
@@ -151,7 +151,7 @@ the same spirit as Vertico.
 * Alternatives
 
 There are many alternative completion UIs, each UI with its own advantages and
-disadvantages. The [[https://github.com/raxod502/selectrum][Selectrum readme]] provides an extensive comparison of many
+disadvantages. The [[https://github.com/raxod502/selectrum][Selectrum readme]] gives an extensive comparison of many
 available completion systems from the perspective of Selectrum.
 
 Vertico aims to be fully compliant with all Emacs commands and achieves that
@@ -167,14 +167,14 @@ with Emacs. There are at least two other interactive completion UIs, which
 follow a similar philosophy:
 
 - [[https://github.com/raxod502/selectrum][Selectrum]]: If you are looking for a less minimalistic and more full-featured
-  (but also more complex) package, you may be interested in Selectrum, which
-  provides a similar UI as Vertico. Additionally Selectrum supports Avy-style
-  quick keys, a horizontal display and a configurable buffer display.
+  (but also more complex) package, you may be interested in Selectrum, which has
+  a similar UI as Vertico. Additionally Selectrum supports Avy-style quick keys,
+  a horizontal display and a configurable buffer display.
 - [[https://github.com/oantolin/icomplete-vertical][Icomplete-vertical]]: This package enhances the Emacs builtin Icomplete with a
   vertical display. In contrast to Vertico, the candidates are rotated such that
   the current candidate always appears at the top. From my perspective,
-  candidate rotation feels a bit less intuitive than the UI provided by Vertico
-  or Selectrum.
+  candidate rotation feels a bit less intuitive than the UI of Vertico or
+  Selectrum.
 
 * Problematic completion commands
 
