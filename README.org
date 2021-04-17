@@ -79,15 +79,16 @@ Here is an example configuration:
     (setq enable-recursive-minibuffers t))
 #+end_src
 
-* Keymap
+* Key bindings
 
 Vertico defines its own local keymap in the minibuffer which is derived from
 ~minibuffer-local-map~. The keymap mostly keeps the ~fundamental-mode~
-keybindings intact, but rebinds a few commands. Note in particular the binding
-of =TAB= to ~vertico-insert~ and the bindings of ~vertico-exit/exit-input~.
+keybindings intact and remaps and binds only a few commands. Note in particular
+the binding of =TAB= to ~vertico-insert~ and the bindings of
+~vertico-exit/exit-input~.
 
-- ~beginning-of-buffer~, ~minibuffer-beginning-of-buffer~ -> ~vertico-beginning-of-buffer~
-- ~end-of-buffer~ -> ~vertico-end-of-buffer~
+- ~beginning-of-buffer~, ~minibuffer-beginning-of-buffer~ -> ~vertico-first~
+- ~end-of-buffer~ -> ~vertico-last~
 - ~scroll-down-command~ -> ~vertico-scroll-down~
 - ~scroll-up-command~ -> ~vertico-scroll-up~
 - ~next-line~, ~next-line-or-history-element~ -> ~vertico-next~
