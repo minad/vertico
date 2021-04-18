@@ -267,7 +267,7 @@
                                              minibuffer-completion-predicate)
                                            pt metadata))
          (all (car all-hl))
-         (base (if-let (last (last all)) (prog1 (cdr last) (setcdr last nil)) 0))
+         (base (or (when-let (z (last all)) (prog1 (cdr z) (setcdr z nil))) 0))
          (def (or (car-safe minibuffer-default) minibuffer-default))
          (total (length all)))
     (when (<= total vertico-sort-threshold)
