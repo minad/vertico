@@ -266,9 +266,11 @@
 (defun vertico--recompute-candidates (pt content bounds metadata)
   "Recompute candidates given PT, CONTENT, BOUNDS and METADATA."
   (let* ((field (substring content (car bounds) (+ pt (cdr bounds))))
+         ;; `minibuffer-completing-file-name' has been obsoleted by the completion category
+         (completing-file (eq 'file (completion-metadata-get metadata 'category)))
          (all-hl (vertico--all-completions content
                                            minibuffer-completion-table
-                                           (if minibuffer-completing-file-name
+                                           (if completing-file
                                                (vertico--file-predicate)
                                              minibuffer-completion-predicate)
                                            pt metadata))
@@ -282,7 +284,7 @@
     ;; Move special candidates: "field" appears at the top, before "field/", before default value
     (when (stringp def)
       (setq all (vertico--move-to-front def all)))
-    (when (and minibuffer-completing-file-name (not (string-suffix-p "/" field)))
+    (when (and completing-file (not (string-suffix-p "/" field)))
       (setq all (vertico--move-to-front (concat field "/") all)))
     (setq all (vertico--move-to-front field all))
     (when-let (group (completion-metadata-get metadata 'x-group-function))
@@ -407,8 +409,7 @@
 
 (defun vertico--tidy-shadowed-file ()
   "Tidy shadowed file name, see `rfn-eshadow-overlay'."
-  (when (and minibuffer-completing-file-name
-             (eq this-command #'self-insert-command)
+  (when (and (eq this-command #'self-insert-command)
              (bound-and-true-p rfn-eshadow-overlay)
              (overlay-buffer rfn-eshadow-overlay)
              (= (point) (point-max))
