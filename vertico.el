@@ -230,6 +230,7 @@
       (lambda (x) (not (string-match-p ignore x))))))
 
 ;; bug#47711: Deferred highlighting for `completion-all-completions'
+;; XXX There is one complication: `completion--twq-all' already adds `completions-common-part'.
 (declare-function orderless-highlight-matches "ext:orderless")
 (defun vertico--all-completions (&rest args)
   "Compute all completions for ARGS with deferred highlighting."
