@@ -356,9 +356,10 @@
                      (`(,c ,s) (setq suffix s) c)
                      (`(,c ,p ,s) (setq prefix p suffix s) c)
                      (c c))))
-        (when-let (new-title (and group-format (caar (funcall group (list cand)))))
-          (unless (equal title new-title)
-            (push (format group-format (setq title new-title)) lines)))
+        (when-let (group-result (and group-format (funcall group cand)))
+          (setq cand (car group-result))
+          (unless (equal title (cdr group-result))
+            (push (format group-format (setq title (cdr group-result))) lines)))
         (when (string-match-p "\n" cand)
           (setq cand (thread-last cand
                        (replace-regexp-in-string "[\t ]+" " ")
