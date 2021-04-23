@@ -287,9 +287,20 @@
     (when (and completing-file (not (string-suffix-p "/" field)))
       (setq all (vertico--move-to-front (concat field "/") all)))
     (setq all (vertico--move-to-front field all))
-    (when-let (group (completion-metadata-get metadata 'x-group-function))
-      (setq all (mapcan #'cdr (funcall group all))))
+    (when-let (title-fun (completion-metadata-get metadata 'x-title-function))
+      (setq all (vertico--group-by title-fun all)))
     (list base total all (cdr all-hl))))
+
+(defun vertico--group-by (fun elems)
+  "Group ELEMS by FUN."
+  (let ((groups))
+    (dolist (cand elems)
+      (let* ((key (funcall fun cand nil))
+             (group (assoc key groups)))
+        (if group
+            (setcdr group (cons cand (cdr group)))
+          (push (list key cand) groups))))
+    (mapcan (lambda (x) (nreverse (cdr x))) (nreverse groups))))
 
 (defun vertico--update-candidates (pt content bounds metadata)
   "Preprocess candidates given PT, CONTENT, BOUNDS and METADATA."
@@ -339,8 +350,8 @@
 
 (defun vertico--format-candidates (metadata)
   "Format current candidates with METADATA."
-  (let* ((group (completion-metadata-get metadata 'x-group-function))
-         (group-format (and group vertico-group-format (concat vertico-group-format "\n")))
+  (let* ((title-fun (completion-metadata-get metadata 'x-title-function))
+         (group-format (and title-fun vertico-group-format (concat vertico-group-format "\n")))
          (index (min (max 0 (- vertico--index (/ vertico-count 2) (if group-format -1 0)))
                      (max 0 (- vertico--total vertico-count))))
          (candidates
@@ -356,10 +367,11 @@
                      (`(,c ,s) (setq suffix s) c)
                      (`(,c ,p ,s) (setq prefix p suffix s) c)
                      (c c))))
-        (when-let (group-result (and group-format (funcall group cand)))
-          (setq cand (car group-result))
-          (unless (equal title (cdr group-result))
-            (push (format group-format (setq title (cdr group-result))) lines)))
+        (when group-format
+          (let ((new-title (funcall title-fun cand nil)))
+            (unless (equal title new-title)
+              (push (format group-format (setq title new-title)) lines)))
+          (setq cand (funcall title-fun cand 'transform)))
         (when (string-match-p "\n" cand)
           (setq cand (thread-last cand
                        (replace-regexp-in-string "[\t ]+" " ")
