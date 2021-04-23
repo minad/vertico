@@ -14,8 +14,8 @@ Vertico provides a minimalistic vertical completion UI, which is based on the
 default completion system. By reusing the default system, Vertico achieves full
 compatibility with built-in Emacs commands and completion tables. Vertico is
 pretty bare-bone and comes with only a minimal set of commands. The code base is
-less than 500 lines of code. Additional enhancements can be installed separately
-via complementary packages.
+small (~500 lines of code without whitespace and comments). Additional
+enhancements can be installed separately via complementary packages.
 
 * Features
 
@@ -26,7 +26,7 @@ via complementary packages.
 - Candidates sorting by history, string length and alphabetically
 - Long candidates with newlines are formatted to take up less space
 - Deferred completion style highlighting for performance
-- Support for ~annotation-function~, ~affixation-function~ and ~x-group-function~
+- Support for ~annotation-function~, ~affixation-function~ and ~x-title-function~
 
 [[https://github.com/minad/vertico/blob/main/screenshot.svg?raw=true]]
 
