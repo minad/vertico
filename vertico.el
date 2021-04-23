@@ -367,10 +367,9 @@
                      (`(,c ,s) (setq suffix s) c)
                      (`(,c ,p ,s) (setq prefix p suffix s) c)
                      (c c))))
-        (when group-format
-          (let ((new-title (funcall title-fun cand nil)))
-            (unless (equal title new-title)
-              (push (format group-format (setq title new-title)) lines)))
+        (when-let (new-title (and group-format (funcall title-fun cand nil)))
+          (unless (equal title new-title)
+            (push (format group-format (setq title new-title)) lines))
           (setq cand (funcall title-fun cand 'transform)))
         (when (string-match-p "\n" cand)
           (setq cand (thread-last cand
