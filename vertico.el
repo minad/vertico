@@ -107,8 +107,8 @@
 (defvar-local vertico--history-hash nil
   "History hash table.")
 
-(defvar-local vertico--history-dir nil
-  "Directory of `vertico--history-hash'.")
+(defvar-local vertico--history-base nil
+  "Base prefix of `vertico--history-hash'.")
 
 (defvar-local vertico--candidates-ov nil
   "Overlay showing the candidates.")
@@ -140,48 +140,31 @@
       (and (= (length x) (length y))
            (string< x y))))
 
-(defun vertico--sort (input candidates)
-  "Sort CANDIDATES by history, length and alphabetically, given current INPUT."
-  ;; Store the history position first in a hashtable in order to allow O(1)
-  ;; history lookup. File names get special treatment. In principle, completion
-  ;; tables with boundaries should also get special treatment, but files are
-  ;; the most important.
-  (cond
-   ((eq minibuffer-history-variable 'file-name-history)
-    (let ((dir (expand-file-name (substitute-in-file-name
-                                  (or (file-name-directory input)
-                                      default-directory)))))
-      (unless (equal vertico--history-dir dir)
-        (setq vertico--history-hash (make-hash-table :test #'equal :size (length file-name-history))
-              vertico--history-dir dir)
-        (let* ((index 0)
-               (adir (abbreviate-file-name dir))
-               (dlen (length dir))
-               (alen (length adir)))
-          (dolist (elem file-name-history)
-            (let* ((len (length elem))
-                   (file (cond ((and (> len dlen)
-                                     (eq t (compare-strings dir 0 dlen elem 0 dlen)))
-                                (substring elem dlen))
-                               ((and (> len alen)
-                                     (eq t (compare-strings adir 0 alen elem 0 alen)))
-                                (substring elem alen)))))
-              (when file
-                (when-let (slash (string-match-p "/" file))
-                  (setq file (substring file 0 (1+ slash))))
-                (unless (gethash file vertico--history-hash)
-                  (puthash file index vertico--history-hash)))
-              (setq index (1+ index))))))))
-   ((not vertico--history-hash)
-    (let ((index 0)
-          ;; History disabled if `minibuffer-history-variable' eq `t'.
-          (hist (and (not (eq minibuffer-history-variable t))
-                     (symbol-value minibuffer-history-variable))))
-      (setq vertico--history-hash (make-hash-table :test #'equal :size (length hist)))
-      (dolist (elem hist)
-        (unless (gethash elem vertico--history-hash)
-          (puthash elem index vertico--history-hash))
-        (setq index (1+ index))))))
+(defun vertico--sort (base candidates)
+  "Sort CANDIDATES by history, length and alphabetically, given current BASE prefix string."
+  (unless (and vertico--history-hash (equal vertico--history-base base))
+    (let* ((index 0)
+           (base-size (length base))
+           ;; History disabled if `minibuffer-history-variable' eq `t'.
+           (hist (and (not (eq minibuffer-history-variable t))
+                      (symbol-value minibuffer-history-variable)))
+           (hash (make-hash-table :test #'equal :size (length hist))))
+      (if (= base-size 0)
+          ;; Put history elements into the hash
+          (dolist (elem hist)
+            (unless (gethash elem hash)
+              (puthash elem index hash))
+            (setq index (1+ index)))
+        ;; Drop base string from history elements, before putting them into the hash
+        (dolist (elem hist)
+          (when (and (>= (length elem) base-size)
+                     (eq t (compare-strings base 0 base-size elem 0 base-size)))
+            (setq elem (substring elem base-size))
+            (unless (gethash elem hash)
+              (puthash elem index hash)))
+          (setq index (1+ index))))
+      (setq vertico--history-hash hash
+            vertico--history-base base)))
   ;; Separate history candidates from candidates first.
   ;; Move the remaining candidates into buckets according to length.
   (let* ((max-bucket 40)
@@ -280,7 +263,7 @@
          (total (length all)))
     (setq all (if-let (sort (completion-metadata-get metadata 'display-sort-function))
                   (funcall sort all)
-                (vertico--sort content all)))
+                (vertico--sort (substring content 0 base) all)))
     ;; Move special candidates: "field" appears at the top, before "field/", before default value
     (when (stringp def)
       (setq all (vertico--move-to-front def all)))
