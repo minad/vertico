@@ -169,8 +169,9 @@ follow a similar philosophy:
 
 - [[https://github.com/raxod502/selectrum][Selectrum]]: If you are looking for a less minimalistic and more full-featured
   (but also more complex) package, you may be interested in Selectrum, which has
-  a similar UI as Vertico. Additionally Selectrum supports Avy-style quick keys,
-  a horizontal display and a configurable buffer display.
+  a similar UI as Vertico. Additionally Selectrum optimizes Tramp file directory
+  browsing with caching, supports Avy-style quick keys, a horizontal display and
+  a configurable buffer display.
 - [[https://github.com/oantolin/icomplete-vertical][Icomplete-vertical]]: This package enhances the Emacs builtin Icomplete with a
   vertical display. In contrast to Vertico, the candidates are rotated such that
   the current candidate always appears at the top. From my perspective,
