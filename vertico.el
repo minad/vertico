@@ -220,9 +220,9 @@
 ;; bug#47711: Deferred highlighting for `completion-all-completions'
 ;; XXX There is one complication: `completion--twq-all' already adds `completions-common-part'.
 (declare-function orderless-highlight-matches "ext:orderless")
+(require 'orderless nil 'noerror)
 (defun vertico--all-completions (&rest args)
   "Compute all completions for ARGS with deferred highlighting."
-  (require 'orderless nil 'noerror)
   (cl-letf* ((orig-pcm (symbol-function #'completion-pcm--hilit-commonality))
              (orig-flex (symbol-function #'completion-flex-all-completions))
              ((symbol-function #'completion-flex-all-completions)
