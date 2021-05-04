@@ -390,9 +390,8 @@
            (resize (default-value 'resize-mini-windows))
            (dp (- (max (cdr (window-text-pixel-size))
                        (* lh (1+ (if resize height vertico-count))))
-                  (window-pixel-height)))
-           (dl (ceiling dp lh)))
-      (when (or (> dl 0) (eq resize t)) (window-resize nil dl)))))
+                  (window-pixel-height))))
+      (when (or (> dp 0) (eq resize t)) (window-resize nil dp nil nil 'pixelwise)))))
 
 (defun vertico--display-count ()
   "Update count overlay `vertico--count-ov'."
