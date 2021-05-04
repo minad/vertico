@@ -222,6 +222,7 @@
 (declare-function orderless-highlight-matches "ext:orderless")
 (defun vertico--all-completions (&rest args)
   "Compute all completions for ARGS with deferred highlighting."
+  (require 'orderless nil 'noerror)
   (cl-letf* ((orig-pcm (symbol-function #'completion-pcm--hilit-commonality))
              (orig-flex (symbol-function #'completion-flex-all-completions))
              ((symbol-function #'completion-flex-all-completions)
