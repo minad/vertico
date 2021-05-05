@@ -386,10 +386,10 @@
 (defun vertico--resize-window (height)
   "Resize active minibuffer window to HEIGHT."
   (unless (frame-root-window-p (active-minibuffer-window))
-    (let* ((lh (default-line-height))
-           (resize (default-value 'resize-mini-windows))
+    (let* ((resize (default-value 'resize-mini-windows))
+           (window-resize-pixelwise t)
            (dp (- (max (cdr (window-text-pixel-size))
-                       (* lh (1+ (if resize height vertico-count))))
+                       (* (default-line-height) (1+ (if resize height vertico-count))))
                   (window-pixel-height))))
       (when (or (> dp 0) (eq resize t)) (window-resize nil dp nil nil 'pixelwise)))))
 
