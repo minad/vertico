@@ -60,6 +60,10 @@
   "Maximal number of candidates to show."
   :type 'integer)
 
+(defcustom vertico-cycle nil
+  "Enable cycling for `vertico-next' and `vertico-previous'."
+  :type 'boolean)
+
 (defcustom vertico-multiline
   (cons #("⤶" 0 1 (face vertico-multiline))
         #("…" 0 1 (face vertico-multiline)))
@@ -497,12 +501,18 @@
 (defun vertico-next ()
   "Go to next candidate."
   (interactive)
-  (vertico--goto (1+ vertico--index)))
+  (vertico--goto
+   (if (and vertico-cycle (= (1+ vertico--index) vertico--total))
+       -1
+     (1+ vertico--index))))
 
 (defun vertico-previous ()
   "Go to previous candidate."
   (interactive)
-  (vertico--goto (- vertico--index 1)))
+  (vertico--goto
+   (if (and vertico-cycle (= vertico--index (if (vertico--allow-prompt-selection-p) -1 0)))
+       (- vertico--total 1)
+     (- vertico--index 1))))
 
 (defun vertico-exit (&optional arg)
   "Exit minibuffer with current candidate or input if prefix ARG is given."
