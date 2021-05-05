@@ -231,5 +231,5 @@ described in the next section.
 
 * Contributions
 
-Since this package is part of GNU ELPA, contributions require copyright
+Since this package is part of [[http://elpa.gnu.org/packages/vertico.html][GNU ELPA]] contributions require a copyright
 assignment to the FSF.
