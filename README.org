@@ -180,7 +180,7 @@ follow a similar philosophy:
   vertical display. In contrast to Vertico, the candidates are rotated such that
   the current candidate always appears at the top. From my perspective,
   candidate rotation feels a bit less intuitive than the UI of Vertico or
-  Selectrum.
+  Selectrum. Note that Emacs 28 offers an built-in ~icomplete-vertical-mode~.
 
 * Caveats
 
