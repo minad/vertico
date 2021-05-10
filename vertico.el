@@ -397,7 +397,9 @@
            (dp (- (max (cdr (window-text-pixel-size))
                        (* (default-line-height) (1+ (if resize height vertico-count))))
                   (window-pixel-height))))
-      (when (or (> dp 0) (eq resize t)) (window-resize nil dp nil nil 'pixelwise)))))
+      (when (and (or (/= height 0) (< dp 0))
+                 (or (> dp 0) (eq resize t)))
+        (window-resize nil dp nil nil 'pixelwise)))))
 
 (defun vertico--display-count ()
   "Update count overlay `vertico--count-ov'."
