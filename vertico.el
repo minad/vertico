@@ -266,8 +266,7 @@
                                            pt metadata))
          (all (car all-hl))
          (base (or (when-let (z (last all)) (prog1 (cdr z) (setcdr z nil))) 0))
-         (def (or (car-safe minibuffer-default) minibuffer-default))
-         (total (length all)))
+         (def (or (car-safe minibuffer-default) minibuffer-default)))
     (setq all (if-let (sort (completion-metadata-get metadata 'display-sort-function))
                   (funcall sort all)
                 (vertico--sort (substring content 0 base) all)))
@@ -279,7 +278,7 @@
     (setq all (vertico--move-to-front field all))
     (when-let (title-fun (completion-metadata-get metadata 'x-title-function))
       (setq all (vertico--group-by title-fun all)))
-    (list base total all (cdr all-hl))))
+    (list base (length all) all (cdr all-hl))))
 
 (defun vertico--group-by (fun elems)
   "Group ELEMS by FUN."
