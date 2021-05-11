@@ -552,7 +552,7 @@
   ;; then the returned candidate only includes the prefix
   ;; "~/emacs/master/lisp/", but not the suffix "/calc". Default
   ;; completion has the same problem when selecting in the
-  ;; *Completions* buffer.
+  ;; *Completions* buffer. See bug#48356.
   (when-let (cand (and (>= vertico--index 0) (vertico--candidate)))
     (delete-minibuffer-contents)
     (insert cand)))
