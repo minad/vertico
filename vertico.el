@@ -223,6 +223,7 @@
 
 ;; bug#47711: Deferred highlighting for `completion-all-completions'
 ;; XXX There is one complication: `completion--twq-all' already adds `completions-common-part'.
+;; See below `vertico--candidate'.
 (declare-function orderless-highlight-matches "ext:orderless")
 (declare-function orderless-pattern-compiler "ext:orderless")
 (require 'orderless nil 'noerror)
@@ -430,13 +431,13 @@
     (vertico--add-face 'vertico-current (minibuffer-prompt-end) (point-max)
                        (and (< vertico--index 0) (vertico--allow-prompt-selection-p)))))
 
-(defun vertico--add-face (face beg end add)
-  "Add FACE between BEG and END depending if ADD is t, otherwise remove."
+(defun vertico--add-face (face beg end add &optional obj)
+  "Add FACE between BEG and END from OBJ if ADD is t, otherwise remove."
   (while (< beg end)
-    (let* ((val (get-text-property beg 'face))
+    (let* ((val (get-text-property beg 'face obj))
            (faces (remq face (if (listp val) val (list val))))
-           (next (next-single-property-change beg 'face nil end)))
-      (add-text-properties beg next `(face ,(if add (cons face faces) faces)))
+           (next (next-single-property-change beg 'face obj end)))
+      (add-text-properties beg next `(face ,(if add (cons face faces) faces)) obj)
       (setq beg next))))
 
 (defun vertico--exhibit ()
@@ -562,9 +563,14 @@
 (defun vertico--candidate (&optional hl)
   "Return current candidate string with optional highlighting if HL is non-nil."
   (let ((content (minibuffer-contents)))
-    (if-let (cand (and (>= vertico--index 0) (nth vertico--index vertico--candidates)))
-        (concat (substring content 0 vertico--base)
-                (if hl (car (funcall vertico--highlight (list cand))) cand))
+    (if (>= vertico--index 0)
+        (let ((cand (nth vertico--index vertico--candidates)))
+          ;;; XXX Drop the completions-common-part face which is added by `completion--twq-all'.
+          ;; This is a hack in Emacs and should better be fixed in Emacs itself, the corresponding
+          ;; code is already marked with a FIXME. Should this be reported as a bug?
+          (vertico--add-face 'completions-common-part 0 (length cand) nil cand)
+          (concat (substring content 0 vertico--base)
+                  (if hl (car (funcall vertico--highlight (list cand))) cand)))
       content)))
 
 (defun vertico--setup ()
