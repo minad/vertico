@@ -273,8 +273,8 @@
     (when (and completing-file (not (string-suffix-p "/" field)))
       (setq all (vertico--move-to-front (concat field "/") all)))
     (setq all (vertico--move-to-front field all))
-    (when-let (title-fun (completion-metadata-get metadata 'x-title-function))
-      (setq all (vertico--group-by title-fun all)))
+    (when-let (group-fun (completion-metadata-get metadata 'group-function))
+      (setq all (vertico--group-by group-fun all)))
     (list base (length all) all (cdr all-hl))))
 
 (defun vertico--group-by (fun elems)
@@ -347,8 +347,8 @@
 
 (defun vertico--format-candidates (metadata)
   "Format current candidates with METADATA."
-  (let* ((title-fun (completion-metadata-get metadata 'x-title-function))
-         (group-format (and title-fun vertico-group-format (concat vertico-group-format "\n")))
+  (let* ((group-fun (completion-metadata-get metadata 'group-function))
+         (group-format (and group-fun vertico-group-format (concat vertico-group-format "\n")))
          (index (min (max 0 (- vertico--index (/ vertico-count 2) (if group-format -1 0)))
                      (max 0 (- vertico--total vertico-count))))
          (candidates
@@ -362,10 +362,10 @@
       (let ((prefix "") (suffix ""))
         (when (consp cand)
           (setq prefix (cadr cand) suffix (caddr cand) cand (car cand)))
-        (when-let (new-title (and group-format (funcall title-fun cand nil)))
+        (when-let (new-title (and group-format (funcall group-fun cand nil)))
           (unless (equal title new-title)
             (push (format group-format (setq title new-title)) lines))
-          (setq cand (funcall title-fun cand 'transform)))
+          (setq cand (funcall group-fun cand 'transform)))
         (when (string-match-p "\n" cand)
           (setq cand (thread-last cand
                        (replace-regexp-in-string "[\t ]+" " ")

@@ -26,7 +26,7 @@ enhancements can be installed separately via complementary packages.
 - Sorting by history position, string length and alphabetically
 - Long candidates with newlines are formatted to take up less space
 - Deferred completion style highlighting for performance
-- Support for ~annotation-function~, ~affixation-function~ and ~x-title-function~
+- Support for ~annotation-function~, ~affixation-function~ and ~group-function~
 
 [[https://github.com/minad/vertico/blob/main/screenshot.svg?raw=true]]
 
