@@ -375,11 +375,13 @@
           (add-face-text-property 0 (length cand) 'vertico-current 'append cand))
         (push cand lines)
         (setq index (1+ index))))
-    (when (> (length lines) vertico-count)
-      (if (< current-line (- vertico-count 1))
-          (setq lines (nthcdr (- (length lines) vertico-count) lines))
-        (setcdr (nthcdr (- vertico-count 1) lines) nil)))
-    (nreverse lines)))
+    (setq lines (nreverse lines) index (length lines))
+    (while (> index vertico-count)
+      (if (< current-line (/ index 2))
+          (nbutlast lines)
+        (setq current-line (- current-line 1) lines (cdr lines)))
+      (setq index (- index 1)))
+    lines))
 
 (defun vertico--display-candidates (lines)
   "Update candidates overlay `vertico--candidates-ov' with LINES."
