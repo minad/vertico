@@ -183,9 +183,10 @@ follow a similar philosophy:
 
 * Problematic completion commands
 
-  A few completion commands make certain assumptions about the completion
-  styles and the completion UI. Some of the assumptions may not hold in Vertico
-  and as such require minor workarounds.
+  Vertico works well and is robust in most scenarios. However a few completion
+  commands make certain assumptions about the completion styles and the
+  completion UI. Some of these assumptions may not hold in Vertico and as such
+  require minor workarounds.
 
 ** ~org-set-tags-command~
 
