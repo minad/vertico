@@ -34,6 +34,7 @@
 
 ;;; Code:
 
+(require 'seq)
 (require 'cl-lib)
 (eval-when-compile (require 'subr-x))
 
@@ -300,7 +301,7 @@
                        vertico--keep
                        (>= vertico--index 0)
                        (nth vertico--index vertico--candidates))))
-         (setq vertico--index (and old (cl-position old candidates :test #'equal)))))
+         (setq vertico--index (and old (seq-position candidates old)))))
      (setq vertico--input (cons content pt)
            vertico--base base
            vertico--total total
@@ -340,8 +341,8 @@
          (index (min (max 0 (- vertico--index (/ vertico-count 2) (if group-format -1 0)))
                      (max 0 (- vertico--total vertico-count))))
          (candidates
-          (thread-last (cl-subseq vertico--candidates index
-                                  (min (+ index vertico-count) vertico--total))
+          (thread-last (seq-subseq vertico--candidates index
+                                   (min (+ index vertico-count) vertico--total))
             (funcall vertico--highlight)
             (vertico--annotate metadata)))
          (max-width (- (window-width) 4))
