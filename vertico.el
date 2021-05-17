@@ -34,10 +34,8 @@
 
 ;;; Code:
 
-(require 'seq)
-(eval-when-compile
-  (require 'cl-lib)
-  (require 'subr-x))
+(require 'cl-lib)
+(eval-when-compile (require 'subr-x))
 
 (defgroup vertico nil
   "VERTical Interactive COmpletion."
@@ -212,15 +210,6 @@
         (nconc head (delq (setcar found nil) list)))
     list))
 
-(defun vertico--file-predicate ()
-  "Filter predicate for files."
-  (let ((ignore (concat "\\(?:\\`\\|/\\)\\.?\\./\\'"
-                        (and completion-ignored-extensions
-                             (concat "\\|" (regexp-opt completion-ignored-extensions) "\\'")))))
-    (if-let (pred minibuffer-completion-predicate)
-        (lambda (x) (and (not (string-match-p ignore x)) (funcall pred x)))
-      (lambda (x) (not (string-match-p ignore x))))))
-
 ;; bug#47711: Deferred highlighting for `completion-all-completions'
 ;; XXX There is one complication: `completion--twq-all' already adds `completions-common-part'.
 ;; See below `vertico--candidate'.
@@ -261,13 +250,19 @@
          (completing-file (eq 'file (completion-metadata-get metadata 'category)))
          (all-hl (vertico--all-completions content
                                            minibuffer-completion-table
-                                           (if completing-file
-                                               (vertico--file-predicate)
-                                             minibuffer-completion-predicate)
+                                           minibuffer-completion-predicate
                                            pt metadata))
          (all (car all-hl))
          (base (or (when-let (z (last all)) (prog1 (cdr z) (setcdr z nil))) 0))
          (def (or (car-safe minibuffer-default) minibuffer-default)))
+    ;; Filter the ignored file extensions. We cannot use modified predicate for this filtering,
+    ;; since this breaks the special casing in the `completion-file-name-table' for `file-exists-p'
+    ;; and `file-directory-p'.
+    (when completing-file
+      (let ((ignore (concat "\\(?:\\`\\|/\\)\\.?\\./\\'"
+                            (and completion-ignored-extensions
+                                 (concat "\\|" (regexp-opt completion-ignored-extensions) "\\'")))))
+        (setq all (cl-delete-if (lambda (x) (string-match-p ignore x)) all))))
     (setq all (if-let (sort (completion-metadata-get metadata 'display-sort-function))
                   (funcall sort all)
                 (vertico--sort (substring content 0 base) all)))
@@ -305,7 +300,7 @@
                        vertico--keep
                        (>= vertico--index 0)
                        (nth vertico--index vertico--candidates))))
-         (setq vertico--index (and old (seq-position candidates old)))))
+         (setq vertico--index (and old (cl-position old candidates :test #'equal)))))
      (setq vertico--input (cons content pt)
            vertico--base base
            vertico--total total
@@ -345,8 +340,8 @@
          (index (min (max 0 (- vertico--index (/ vertico-count 2) (if group-format -1 0)))
                      (max 0 (- vertico--total vertico-count))))
          (candidates
-          (thread-last (seq-subseq vertico--candidates index
-                                   (min (+ index vertico-count) vertico--total))
+          (thread-last (cl-subseq vertico--candidates index
+                                  (min (+ index vertico-count) vertico--total))
             (funcall vertico--highlight)
             (vertico--annotate metadata)))
          (max-width (- (window-width) 4))
