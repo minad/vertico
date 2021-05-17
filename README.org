@@ -20,10 +20,10 @@ enhancements can be installed separately via complementary packages.
 * Features
 
 - Vertical display with arrow key navigation
-- Shows the index of the current candidate and the total number of candidates
+- Prompt shows the current candidate index and the total number of candidates
 - The current candidate is inserted with =TAB= and selected with =RET=
-- Non-existing candidates are entered by moving the point to the prompt line
-- Candidates sorting by history position, string length and alphabetically
+- Non-existing candidates can be entered by moving the point to the prompt line
+- Sorting by history position, string length and alphabetically
 - Long candidates with newlines are formatted to take up less space
 - Deferred completion style highlighting for performance
 - Support for ~annotation-function~, ~affixation-function~ and ~x-title-function~
