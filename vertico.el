@@ -286,7 +286,7 @@
         (if group
             (setcdr group (cons cand (cdr group)))
           (push (list key cand) groups))))
-    (mapcan (lambda (x) (nreverse (cdr x))) (nreverse groups))))
+    (nreverse (mapcan #'cdr groups))))
 
 (defun vertico--update-candidates (pt content bounds metadata)
   "Preprocess candidates given PT, CONTENT, BOUNDS and METADATA."
