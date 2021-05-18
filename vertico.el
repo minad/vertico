@@ -280,20 +280,22 @@
 (defun vertico--group-by (fun elems)
   "Group ELEMS by FUN."
   (when elems
-    (let ((groups))
+    (let ((group-list) (group-hash (make-hash-table :test #'equal)))
       (while elems
         (let* ((key (funcall fun (car elems) nil))
-               (group (cdr (assoc key groups))))
+               (group (gethash key group-hash)))
           (if group
               (setcdr group (setcdr (cdr group) elems)) ;; Append to tail of group
-            (push `(,key ,elems . ,elems) groups)) ;; New group (key head . tail)
+            (setq group (cons elems elems)) ;; (head . tail)
+            (push group group-list)
+            (puthash key group group-hash))
           (setq elems (cdr elems))))
-      (setcdr (cddar groups) nil) ;; Unlink last tail
-      (setq groups (nreverse groups))
-      (prog1 (cadar groups)
-        (while (cdr groups)
-          (setcdr (cddar groups) (cadadr groups)) ;; Link groups
-          (setq groups (cdr groups)))))))
+      (setcdr (cdar group-list) nil) ;; Unlink last tail
+      (setq group-list (nreverse group-list))
+      (prog1 (caar group-list)
+        (while (cdr group-list)
+          (setcdr (cdar group-list) (caadr group-list)) ;; Link groups
+          (setq group-list (cdr group-list)))))))
 
 (defun vertico--update-candidates (pt content bounds metadata)
   "Preprocess candidates given PT, CONTENT, BOUNDS and METADATA."
