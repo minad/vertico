@@ -335,11 +335,13 @@
   "Flatten STR with display or invisible PROP."
   (let ((end (length str)) (pos 0) (chunks))
     (while (< pos end)
-      (let ((next (next-single-property-change pos prop str end)))
-        (if-let (val (get-text-property pos prop str))
-            (when (and (eq prop 'display) (stringp val))
-              (push val chunks))
-          (push (substring str pos next) chunks))
+      (let ((next (next-single-property-change pos prop str end))
+            (val (get-text-property pos prop str)))
+        (cond
+         ((and val (eq prop 'display) (stringp val))
+          (push val chunks))
+         ((not (and val (eq prop 'invisible)))
+          (push (substring str pos next) chunks)))
         (setq pos next)))
     (apply #'concat (nreverse chunks))))
 
