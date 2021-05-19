@@ -242,7 +242,12 @@
                 (let ((regexps (orderless-pattern-compiler pattern)))
                   (setq hl (lambda (x) (orderless-highlight-matches regexps x))))
                 cands)))
-    (cons (apply #'completion-all-completions args) hl)))
+    ;; Avoid buffer switching in the completion predicate of `describe-variable'.
+    ;; See https://github.com/minad/vertico/issues/40.
+    (with-current-buffer (if (eq (car args) #'help--symbol-completion-table)
+                             (window-buffer (minibuffer-selected-window))
+                           (current-buffer))
+      (cons (apply #'completion-all-completions args) hl))))
 
 (defun vertico--recompute-candidates (pt content bounds metadata)
   "Recompute candidates given PT, CONTENT, BOUNDS and METADATA."
