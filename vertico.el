@@ -235,7 +235,12 @@
                 (and cands (nconc cands base))))
              ((symbol-function #'completion-pcm--hilit-commonality)
               (lambda (pattern cands)
-                (setq hl (lambda (x) (completion-pcm--hilit-commonality pattern x)))
+                (setq hl (lambda (x)
+                           ;; `completion-pcm--hilit-commonality' sometimes throws an internal error
+                           ;; for example when entering "/sudo:://u".
+                           (condition-case nil
+                               (completion-pcm--hilit-commonality pattern x)
+                             (t x))))
                 cands))
              ((symbol-function #'orderless-highlight-matches)
               (lambda (pattern cands)
