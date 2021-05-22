@@ -194,14 +194,22 @@
      ;; Last bucket needs special treatment
      (sort (aref buckets max-bucket) #'vertico--sort-predicate))))
 
-(defun vertico--annotate (metadata candidates)
+(defun vertico--affixate (metadata candidates)
   "Annotate CANDIDATES with annotation function specified by METADATA."
   (if-let (aff (or (completion-metadata-get metadata 'affixation-function)
                    (plist-get completion-extra-properties :affixation-function)))
       (funcall aff candidates)
     (if-let (ann (or (completion-metadata-get metadata 'annotation-function)
                      (plist-get completion-extra-properties :annotation-function)))
-        (mapcar (lambda (cand) (list cand "" (or (funcall ann cand) ""))) candidates)
+        (mapcar (lambda (cand)
+                  (let ((suffix (or (funcall ann cand) "")))
+                    (list cand ""
+                          ;; The default completion UI adds the `completions-annotations' face
+                          ;; if no other faces are present.
+                          (if (text-property-not-all 0 (length suffix) 'face nil suffix)
+                              suffix
+                            (propertize suffix 'face 'completions-annotations)))))
+                  candidates)
       candidates)))
 
 (defun vertico--move-to-front (elem list)
@@ -367,7 +375,7 @@
           (thread-last (seq-subseq vertico--candidates index
                                    (min (+ index vertico-count) vertico--total))
             (funcall vertico--highlight)
-            (vertico--annotate metadata)))
+            (vertico--affixate metadata)))
          (max-width (- (window-width) 4))
          (current-line 0) (title) (lines))
     (dolist (cand candidates)
@@ -385,11 +393,7 @@
                        (replace-regexp-in-string "\\`[\t\n ]+\\|[\t\n ]+\\'" ""))
                 cand (truncate-string-to-width cand max-width 0 nil (cdr vertico-multiline))))
         (setq cand (vertico--flatten-string 'invisible (vertico--flatten-string 'display cand))
-              cand (concat prefix cand
-                           (if (text-property-not-all 0 (length suffix) 'face nil suffix)
-                               suffix
-                             (propertize suffix 'face 'completions-annotations))
-                           "\n"))
+              cand (concat prefix cand suffix "\n"))
         (when (= index vertico--index)
           (setq current-line (length lines))
           (add-face-text-property 0 (length cand) 'vertico-current 'append cand))
