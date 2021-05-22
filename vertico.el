@@ -299,9 +299,16 @@
 
 (defun vertico--update-candidates (pt content bounds metadata)
   "Preprocess candidates given PT, CONTENT, BOUNDS and METADATA."
-  ;; bug#38024: Icomplete uses `while-no-input-ignore-events' to repair updating issues
-  (pcase (let ((while-no-input-ignore-events '(selection-request)))
-           (while-no-input (vertico--recompute-candidates pt content bounds metadata)))
+  (pcase
+      ;; If Tramp is used, do not compute the candidates in an interruptible fashion,
+      ;; since this will break the Tramp password and user name prompts (See #23).
+      (if (and (eq 'file (completion-metadata-get metadata 'category))
+               (string-match-p "/\\(sudo\\|sshx?\\):" content))
+          (vertico--recompute-candidates pt content bounds metadata)
+          ;; bug#38024: Icomplete uses `while-no-input-ignore-events' to repair updating issues
+        (let ((while-no-input-ignore-events '(selection-request))
+              (non-essential t))
+          (while-no-input (vertico--recompute-candidates pt content bounds metadata))))
     ('nil (abort-recursive-edit))
     (`(,base ,total ,candidates ,hl)
      ;; Find position of old candidate in the new list.
