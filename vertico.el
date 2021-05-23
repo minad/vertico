@@ -316,7 +316,7 @@
       ;; If Tramp is used, do not compute the candidates in an interruptible fashion,
       ;; since this will break the Tramp password and user name prompts (See #23).
       (if (and (eq 'file (completion-metadata-get metadata 'category))
-               (string-match-p "\\`/[^:]+:" (substitute-in-file-name content)))
+               (string-match-p "\\`/[^/|:]+:" (substitute-in-file-name content)))
           (vertico--recompute-candidates pt content bounds metadata)
           ;; bug#38024: Icomplete uses `while-no-input-ignore-events' to repair updating issues
         (let ((while-no-input-ignore-events '(selection-request))
