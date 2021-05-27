@@ -310,13 +310,17 @@
           (setcdr (cdar group-list) (caadr group-list)) ;; Link groups
           (setq group-list (cdr group-list)))))))
 
+(defun vertico--remote-p (path)
+  "Return t if PATH is a remote path."
+  (string-match-p "\\`/[^/|:]+:" (substitute-in-file-name path)))
+
 (defun vertico--update-candidates (pt content bounds metadata)
   "Preprocess candidates given PT, CONTENT, BOUNDS and METADATA."
   (pcase
       ;; If Tramp is used, do not compute the candidates in an interruptible fashion,
       ;; since this will break the Tramp password and user name prompts (See #23).
       (if (and (eq 'file (completion-metadata-get metadata 'category))
-               (string-match-p "\\`/[^/|:]+:" (substitute-in-file-name content)))
+               (or (vertico--remote-p content) (vertico--remote-p default-directory)))
           (vertico--recompute-candidates pt content bounds metadata)
           ;; bug#38024: Icomplete uses `while-no-input-ignore-events' to repair updating issues
         (let ((while-no-input-ignore-events '(selection-request))
