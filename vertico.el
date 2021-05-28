@@ -407,8 +407,8 @@
     (while (> index vertico-count)
       (if (< current-line (/ index 2))
           (nbutlast lines)
-        (setq current-line (- current-line 1) lines (cdr lines)))
-      (setq index (- index 1)))
+        (setq current-line (1- current-line) lines (cdr lines)))
+      (setq index (1- index)))
     lines))
 
 (defun vertico--display-candidates (lines)
@@ -507,7 +507,7 @@
   (setq vertico--keep t
         vertico--index
         (max (if (or (vertico--allow-prompt-selection-p) (not vertico--candidates)) -1 0)
-             (min index (- vertico--total 1)))))
+             (min index (1- vertico--total)))))
 
 (defun vertico-first ()
   "Go to first candidate, or to the prompt when the first candidate is selected."
@@ -517,7 +517,7 @@
 (defun vertico-last ()
   "Go to last candidate."
   (interactive)
-  (vertico--goto (- vertico--total 1)))
+  (vertico--goto (1- vertico--total)))
 
 (defun vertico-scroll-down ()
   "Go back by one page."
@@ -542,8 +542,8 @@
   (interactive)
   (vertico--goto
    (if (and vertico-cycle (= vertico--index (if (vertico--allow-prompt-selection-p) -1 0)))
-       (- vertico--total 1)
-     (- vertico--index 1))))
+       (1- vertico--total)
+     (1- vertico--index))))
 
 (defun vertico-exit (&optional arg)
   "Exit minibuffer with current candidate or input if prefix ARG is given."
