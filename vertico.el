@@ -471,14 +471,12 @@
   "Exhibit completion UI."
   (vertico--tidy-shadowed-file)
   (let* ((pt (max 0 (- (point) (minibuffer-prompt-end))))
-         (metadata (completion-metadata (buffer-substring-no-properties
-                                         (minibuffer-prompt-end)
-                                         (+ (minibuffer-prompt-end) pt))
-                                        minibuffer-completion-table
-                                        minibuffer-completion-predicate))
          (content (minibuffer-contents-no-properties))
          (before (substring content 0 pt))
          (after (substring content pt))
+         (metadata (completion-metadata before
+                                        minibuffer-completion-table
+                                        minibuffer-completion-predicate))
          ;; bug#47678: `completion-boundaries` fails for `partial-completion`
          ;; if the cursor is moved between the slashes of "~//".
          ;; See also marginalia.el which has the same issue.
