@@ -96,6 +96,8 @@
     (define-key map [remap previous-line] #'vertico-previous)
     (define-key map [remap next-line-or-history-element] #'vertico-next)
     (define-key map [remap previous-line-or-history-element] #'vertico-previous)
+    (define-key map [remap backward-paragraph] #'vertico-previous-group)
+    (define-key map [remap forward-paragraph] #'vertico-next-group)
     (define-key map [remap exit-minibuffer] #'vertico-exit)
     (define-key map [remap kill-ring-save] #'vertico-save)
     (define-key map [C-return] #'vertico-exit-input)
@@ -558,6 +560,35 @@
                  (eq (ignore-errors (read-char "Confirm")) 13)))
         (exit-minibuffer)
       (message "Match required"))))
+
+(defun vertico--goto-group (next)
+  "Move to next group if NEXT is non-nil, otherwise move to previous group."
+  (let* ((end (minibuffer-prompt-end))
+         (metadata (completion-metadata (buffer-substring end (max end (point)))
+                                        minibuffer-completion-table
+                                        minibuffer-completion-predicate))
+         (group-fun (or (completion-metadata-get metadata 'group-function) #'ignore))
+         (title-fun (lambda ()
+                      (if (< vertico--index 0)
+                          'vertico--prompt-selected
+                        (funcall group-fun (nth vertico--index vertico--candidates) nil))))
+         (orig-title (funcall title-fun))
+         (orig-index vertico--index))
+    (while (let ((last-index vertico--index))
+             (if next (vertico-next) (vertico-previous))
+             (if (or (= vertico--index orig-index) (= vertico--index last-index))
+                 (and (vertico--goto orig-index) nil)
+               (equal orig-title (funcall title-fun)))))))
+
+(defun vertico-next-group ()
+  "Move to next group."
+  (interactive)
+  (vertico--goto-group 'next))
+
+(defun vertico-previous-group ()
+  "Move to previous group."
+  (interactive)
+  (vertico--goto-group nil))
 
 (defun vertico-exit-input ()
   "Exit minibuffer with input."
