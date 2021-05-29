@@ -27,10 +27,9 @@
 ;;; Commentary:
 
 ;; Vertico provides a minimalistic vertical completion UI, which is
-;; based on the default completion system. By reusing the default
-;; system, Vertico achieves full compatibility with built-in Emacs
-;; commands and completion tables. Vertico is pretty bare-bone and
-;; comes with only a minimal set of commands.
+;; based on the default completion system. By reusing the built-in
+;; facilities, Vertico achieves full compatibility with built-in Emacs
+;; commands and completion tables.
 
 ;;; Code:
 
