@@ -47,7 +47,8 @@ Here is an example configuration:
     :init
     (vertico-mode)
 
-    ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
+    ;; Optionally enable cycling for `vertico-next', `vertico-previous',
+    ;; `vertico-next-group' and `vertico-previous-group'.
     ;; (setq vertico-cycle t)
   )
 
@@ -99,6 +100,8 @@ the binding of =TAB= to ~vertico-insert~ and the bindings of
 - ~scroll-up-command~ -> ~vertico-scroll-up~
 - ~next-line~, ~next-line-or-history-element~ -> ~vertico-next~
 - ~previous-line~, ~previous-line-or-history-element~ -> ~vertico-previous~
+- ~forward-paragraph~ -> ~vertico-next-group~
+- ~backward-paragraph~ -> ~vertico-previous-group~
 - ~exit-minibuffer~ -> ~vertico-exit~
 - ~kill-ring-save~ -> ~vertico-save~
 - =<C-return>= -> ~vertico-exit-input~
