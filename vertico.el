@@ -568,17 +568,14 @@
                                         minibuffer-completion-table
                                         minibuffer-completion-predicate))
          (group-fun (or (completion-metadata-get metadata 'group-function) #'ignore))
-         (title-fun (lambda ()
-                      (if (< vertico--index 0)
-                          'vertico--prompt-selected
-                        (funcall group-fun (nth vertico--index vertico--candidates) nil))))
-         (orig-title (funcall title-fun))
          (orig-index vertico--index))
     (while (let ((last-index vertico--index))
              (if next (vertico-next) (vertico-previous))
              (if (or (= vertico--index orig-index) (= vertico--index last-index))
                  (and (vertico--goto orig-index) nil)
-               (equal orig-title (funcall title-fun)))))))
+               (and (> vertico--index 0)
+                    (equal (funcall group-fun (nth (1- vertico--index) vertico--candidates) nil)
+                           (funcall group-fun (nth vertico--index vertico--candidates) nil))))))))
 
 (defun vertico-next-group ()
   "Move to next group."
