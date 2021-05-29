@@ -14,7 +14,7 @@ Vertico provides a minimalistic vertical completion UI, which is based on the
 default completion system. By reusing the built-in facilities system, Vertico
 achieves full compatibility with built-in Emacs commands and completion tables.
 Vertico only provides the completion UI and comes with only a minimal set of
-commands. The code base is small and maintainable (~500 lines of code without
+commands. The code base is small and maintainable (~600 lines of code without
 whitespace and comments).
 
 Additional enhancements can be installed separately via complementary packages.
