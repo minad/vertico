@@ -260,16 +260,15 @@
 
 (defun vertico--recompute-candidates (pt content bounds metadata)
   "Recompute candidates given PT, CONTENT, BOUNDS and METADATA."
-  (let* ((field (substring content (car bounds) (+ pt (cdr bounds))))
-         ;; `minibuffer-completing-file-name' has been obsoleted by the completion category
-         (completing-file (eq 'file (completion-metadata-get metadata 'category)))
-         (all-hl (vertico--all-completions content
-                                           minibuffer-completion-table
-                                           minibuffer-completion-predicate
-                                           pt metadata))
-         (all (car all-hl))
-         (base (or (when-let (z (last all)) (prog1 (cdr z) (setcdr z nil))) 0))
-         (def (or (car-safe minibuffer-default) minibuffer-default)))
+  (pcase-let* ((field (substring content (car bounds) (+ pt (cdr bounds))))
+               ;; `minibuffer-completing-file-name' has been obsoleted by the completion category
+               (completing-file (eq 'file (completion-metadata-get metadata 'category)))
+               (`(,all . ,hl) (vertico--all-completions content
+                                                        minibuffer-completion-table
+                                                        minibuffer-completion-predicate
+                                                        pt metadata))
+               (base (or (when-let (z (last all)) (prog1 (cdr z) (setcdr z nil))) 0))
+               (def (or (car-safe minibuffer-default) minibuffer-default)))
     ;; Filter the ignored file extensions. We cannot use modified predicate for this filtering,
     ;; since this breaks the special casing in the `completion-file-name-table' for `file-exists-p'
     ;; and `file-directory-p'.
@@ -289,7 +288,7 @@
     (setq all (vertico--move-to-front field all))
     (when-let (group-fun (completion-metadata-get metadata 'group-function))
       (setq all (vertico--group-by group-fun all)))
-    (list base (length all) all (cdr all-hl))))
+    (list base (length all) all hl)))
 
 (defun vertico--group-by (fun elems)
   "Group ELEMS by FUN."
