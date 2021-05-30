@@ -6,6 +6,7 @@
 #+texinfo_dir_title: Vertico: (vertico).
 #+texinfo_dir_desc: VERTical Interactive COmpletion.
 
+#+html: <a href="http://elpa.gnu.org/packages/vertico.html"><img alt="GNU ELPA" src="https://img.shields.io/badge/GNU%20ELPA-vertico-bb3955"/></a>
 #+html: <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Vertigomovie_restoration.jpg/800px-Vertigomovie_restoration.jpg" align="right" width="30%">
 
 * Introduction
