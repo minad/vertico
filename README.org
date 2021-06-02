@@ -146,17 +146,6 @@ completion styles are used instead of ~orderless~:
         read-buffer-completion-ignore-case t)
 #+end_src
 
-If Vertico is active, it makes sense to disable the automatic =*Completions*=
-buffer by setting ~completion-auto-help~ to ~nil~. TAB-completion can be made
-less noisy by setting ~completion-show-inline-help~ to ~nil~.
-
-#+begin_src emacs-lisp
-  (advice-add #'vertico--setup :after
-              (lambda (&rest _)
-                (setq-local completion-auto-help nil
-                            completion-show-inline-help nil)))
-#+end_src
-
 * Complementary packages
 
 Vertico works well together with a few complementary packages, which enrich the

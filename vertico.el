@@ -631,7 +631,9 @@
         vertico--count-ov (make-overlay (point-min) (point-min) nil t t))
   (setq-local resize-mini-windows 'grow-only
               truncate-lines (< (minibuffer-prompt-end) (/ (window-width) 2))
-              max-mini-window-height 1.0)
+              max-mini-window-height 1.0
+              completion-auto-help nil
+              completion-show-inline-help nil)
   (use-local-map vertico-map)
   (add-hook 'post-command-hook #'vertico--exhibit -99 'local))
 
