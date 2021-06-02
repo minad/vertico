@@ -135,6 +135,17 @@ not use ~orderless~ at all.
   (setq completion-styles '(basic substring partial-completion flex))
 #+end_src
 
+Because Vertico is fully compatible with Emacs default completion
+system, further customization of completion behavior can be achieved
+by setting the designated Emacs variables. For example, one may wish
+to disable case-sensitivity for file and buffer matching when built-in
+completion styles are used instead of ~orderless~:
+
+#+begin_src emacs-lisp
+  (setq read-file-name-completion-ignore-case t
+        read-buffer-completion-ignore-case t)
+#+end_src
+
 If Vertico is active, it makes sense to disable the automatic =*Completions*=
 buffer by setting ~completion-auto-help~ to ~nil~. TAB-completion can be made
 less noisy by setting ~completion-show-inline-help~ to ~nil~.
