@@ -520,31 +520,31 @@
   (interactive)
   (vertico--goto (1- vertico--total)))
 
-(defun vertico-scroll-down ()
-  "Go back by one page."
-  (interactive)
-  (vertico--goto (max 0 (- vertico--index vertico-count))))
+(defun vertico-scroll-down (&optional n)
+  "Go back by N pages."
+  (interactive "p")
+  (vertico--goto (max 0 (- vertico--index (* (or n 1) vertico-count)))))
 
-(defun vertico-scroll-up ()
-  "Go forward by one page."
-  (interactive)
-  (vertico--goto (+ vertico--index vertico-count)))
+(defun vertico-scroll-up (&optional n)
+  "Go forward by N pages."
+  (interactive "p")
+  (vertico-scroll-down (- (or n 1))))
 
-(defun vertico-next ()
-  "Go to next candidate."
-  (interactive)
-  (vertico--goto
-   (if (and vertico-cycle (= (1+ vertico--index) vertico--total))
-       -1
-     (1+ vertico--index))))
+(defun vertico-next (&optional n)
+  "Go forward N candidates."
+  (interactive "p")
+  (let ((index (+ vertico--index (or n 1))))
+    (vertico--goto
+     (cond
+      ((not vertico-cycle) index)
+      ((= vertico--total 0) -1)
+      ((vertico--allow-prompt-selection-p) (1- (mod (1+ index) (1+ vertico--total))))
+      (t (mod index vertico--total))))))
 
-(defun vertico-previous ()
-  "Go to previous candidate."
-  (interactive)
-  (vertico--goto
-   (if (and vertico-cycle (= vertico--index (if (vertico--allow-prompt-selection-p) -1 0)))
-       (1- vertico--total)
-     (1- vertico--index))))
+(defun vertico-previous (&optional n)
+  "Go backward N candidates."
+  (interactive "p")
+  (vertico-next (- (or n 1))))
 
 (defun vertico-exit (&optional arg)
   "Exit minibuffer with current candidate or input if prefix ARG is given."
