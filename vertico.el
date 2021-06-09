@@ -561,31 +561,30 @@
         (exit-minibuffer)
       (message "Match required"))))
 
-(defun vertico--goto-group (next)
-  "Move to next group if NEXT is non-nil, otherwise move to previous group."
+(defun vertico-next-group (&optional arg)
+  "Move ARG groups forward."
+  (interactive "p")
   (let* ((end (minibuffer-prompt-end))
          (metadata (completion-metadata (buffer-substring end (max end (point)))
                                         minibuffer-completion-table
                                         minibuffer-completion-predicate))
-         (group-fun (or (completion-metadata-get metadata 'group-function) #'ignore))
-         (orig-index vertico--index))
-    (while (let ((last-index vertico--index))
-             (if next (vertico-next) (vertico-previous))
-             (if (or (= vertico--index orig-index) (= vertico--index last-index))
-                 (and (vertico--goto orig-index) nil)
-               (and (> vertico--index 0)
-                    (equal (funcall group-fun (nth (1- vertico--index) vertico--candidates) nil)
-                           (funcall group-fun (nth vertico--index vertico--candidates) nil))))))))
-
-(defun vertico-next-group (&optional arg)
-  "Move ARG groups forward."
-  (interactive "p")
-  (or arg (setq arg 1))
-  (if (< 0 arg)
-      (dotimes (_ arg)
-        (vertico--goto-group 'next))
-    (dotimes (_ (- arg))
-      (vertico--goto-group nil))))
+         (group-fun (completion-metadata-get metadata 'group-function))
+         (arg (or arg 1))
+         (abs-arg (if group-fun (abs arg) 0))
+         (orig-index))
+    (while (<= 0 (setq abs-arg (1- abs-arg)))
+      (setq orig-index vertico--index)
+      (while (let ((last-index vertico--index))
+               (if (< 0 arg) (vertico-next) (vertico-previous))
+               (cond
+                ((or (= vertico--index orig-index) (= vertico--index last-index))
+                 (vertico--goto orig-index)
+                 (setq abs-arg 0)
+                 nil)
+                ((> 0 vertico--index) t)
+                ((= 0 vertico--index) nil)
+                ((equal (funcall group-fun (nth (1- vertico--index) vertico--candidates) nil)
+                        (funcall group-fun (nth vertico--index vertico--candidates) nil)))))))))
 
 (defun vertico-previous-group (&optional arg)
   "Move ARG groups backward."
