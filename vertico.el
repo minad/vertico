@@ -519,31 +519,32 @@
   (interactive)
   (vertico--goto (1- vertico--total)))
 
-(defun vertico-scroll-down ()
-  "Go back by one page."
-  (interactive)
-  (vertico--goto (max 0 (- vertico--index vertico-count))))
+(defun vertico-scroll-down (&optional arg)
+  "Go back by ARG pages."
+  (interactive "p")
+  (vertico--goto (max 0 (- vertico--index (* (or arg 1) vertico-count)))))
 
-(defun vertico-scroll-up ()
-  "Go forward by one page."
-  (interactive)
-  (vertico--goto (+ vertico--index vertico-count)))
+(defun vertico-scroll-up (&optional arg)
+  "Go forward by ARG pages."
+  (interactive "p")
+  (vertico-scroll-down (- (or arg 1))))
 
-(defun vertico-next ()
-  "Go to next candidate."
-  (interactive)
-  (vertico--goto
-   (if (and vertico-cycle (= (1+ vertico--index) vertico--total))
-       -1
-     (1+ vertico--index))))
+(defun vertico-next (&optional arg)
+  "Go forward ARG candidates."
+  (interactive "p")
+  (let ((index (+ vertico--index (or arg 1))))
+    (when vertico-cycle
+      (if (vertico--allow-prompt-selection-p)
+          (setq index (1- (mod (1+ index) (1+ vertico--total))))
+        (setq index (if (eq vertico--total 0)
+                        -1
+                      (mod index vertico--total)))))
+    (vertico--goto index)))
 
-(defun vertico-previous ()
-  "Go to previous candidate."
-  (interactive)
-  (vertico--goto
-   (if (and vertico-cycle (= vertico--index (if (vertico--allow-prompt-selection-p) -1 0)))
-       (1- vertico--total)
-     (1- vertico--index))))
+(defun vertico-previous (&optional arg)
+  "Go backward ARG candidates."
+  (interactive "p")
+  (vertico-next (- (or arg 1))))
 
 (defun vertico-exit (&optional arg)
   "Exit minibuffer with current candidate or input if prefix ARG is given."
@@ -576,15 +577,20 @@
                     (equal (funcall group-fun (nth (1- vertico--index) vertico--candidates) nil)
                            (funcall group-fun (nth vertico--index vertico--candidates) nil))))))))
 
-(defun vertico-next-group ()
-  "Move to next group."
-  (interactive)
-  (vertico--goto-group 'next))
+(defun vertico-next-group (&optional arg)
+  "Move ARG groups forward."
+  (interactive "p")
+  (or arg (setq arg 1))
+  (if (< 0 arg)
+      (dotimes (_ arg)
+        (vertico--goto-group 'next))
+    (dotimes (_ (- arg))
+      (vertico--goto-group nil))))
 
-(defun vertico-previous-group ()
-  "Move to previous group."
-  (interactive)
-  (vertico--goto-group nil))
+(defun vertico-previous-group (&optional arg)
+  "Move ARG groups backward."
+  (interactive "p")
+  (vertico-next-group (- (or arg 1))))
 
 (defun vertico-exit-input ()
   "Exit minibuffer with input."
