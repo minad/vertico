@@ -470,7 +470,8 @@
 (defun vertico--exhibit ()
   "Exhibit completion UI."
   (vertico--tidy-shadowed-file)
-  (let* ((pt (max 0 (- (point) (minibuffer-prompt-end))))
+  (let* ((buffer-undo-list t) ;; Overlays affect point position and undo list!
+         (pt (max 0 (- (point) (minibuffer-prompt-end))))
          (content (minibuffer-contents-no-properties))
          (before (substring content 0 pt))
          (after (substring content pt))
