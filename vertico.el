@@ -501,7 +501,7 @@
 (defun vertico--default-missing-p ()
   "Return t if default is missing from the candidate list."
   (when-let (def (or (car-safe minibuffer-default) minibuffer-default))
-    (and (= (minibuffer-prompt-end) (point)) (not (member def vertico--candidates)))))
+    (and (= (point-max) (minibuffer-prompt-end)) (not (member def vertico--candidates)))))
 
 (defun vertico--goto (index)
   "Go to candidate with INDEX."
