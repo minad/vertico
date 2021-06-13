@@ -228,13 +228,22 @@ available completion systems from the perspective of Selectrum.
 
 ** ~org-refile~
 
-   When ~org-refile-use-outline-path~ is set to ~file~, refile
-   completion with Vertico enabled requires
-   ~org-outline-path-complete-in-steps~ to be disabled in order to
-   work properly.
+   ~org-refile~ uses ~org-olpath-completing-read~ to complete the outline path
+   in steps, when ~org-refile-use-outline-path~ is non-nil.
+
+   Unfortunately the implementation of this Org completion table is broken. In
+   order to fix the issue at the root, the completion table should make use of
+   completion boundaries and should be written in the same way as the built-in
+   file completion table.
+
+   In order to workaround the issues with the current implementation it is
+   recommended to disable the outline path completion in steps. The completion
+   on the full path is also faster since the input string matches directly
+   against the full path, which works very well with Orderless.
 
    #+begin_src emacs-lisp
-   (setq org-outline-path-complete-in-steps nil)
+     (setq org-refile-use-outline-path 'file
+           org-outline-path-complete-in-steps nil)
    #+end_src
 
 ** ~tmm-menubar~
