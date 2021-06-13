@@ -12,12 +12,12 @@
 
 * Introduction
 
-Vertico provides a minimalistic vertical completion UI, which is based on the
-default completion system. By reusing the built-in facilities system, Vertico
-achieves full compatibility with built-in Emacs commands and completion tables.
-Vertico only provides the completion UI and comes with only a minimal set of
-commands. The code base is small and maintainable (~600 lines of code without
-whitespace and comments).
+Vertico provides a performant and minimalistic vertical completion UI, which is
+based on the default completion system. By reusing the built-in facilities
+system, Vertico achieves /full compatibility/ with built-in Emacs completion
+commands and completion tables. Vertico only provides the completion UI and
+comes with a minimal set of commands. The code base is small and maintainable
+(~600 lines of code without whitespace and comments).
 
 Additional enhancements can be installed separately via complementary packages.
 
@@ -184,12 +184,12 @@ to their liking - completion plays an integral part in how the users interacts
 with Emacs. There are at least two other interactive completion UIs, which
 follow a similar philosophy:
 
-- [[https://github.com/raxod502/selectrum][Selectrum]]: If you are looking for a less minimalistic
-  (but more complex) package, you may be interested in Selectrum, which has a
-  similar UI as Vertico. Additionally Selectrum supports Avy-style quick keys, a
-  horizontal display and a configurable buffer display. On the other hand,
-  Selectrum is not not yet fully compatible with every Emacs completion command
-  ([[https://github.com/raxod502/selectrum/issues/481][Issue #481]]).
+- [[https://github.com/raxod502/selectrum][Selectrum]]: Selectrum has a similar UI as Vertico. Additionally Selectrum
+  supports Avy-style quick keys, a horizontal display and a configurable buffer
+  display. On the other hand, Selectrum is significantly more complex and not
+  fully compatible with every Emacs completion command ([[https://github.com/raxod502/selectrum/issues/481][Issue #481]]), since it
+  uses its own filtering infrastructure, which deviates from the standard Emacs
+  completion facilities.
 - [[https://github.com/oantolin/icomplete-vertical][Icomplete-vertical]]: This package enhances the Emacs builtin Icomplete with a
   vertical display. In contrast to Vertico, the candidates are rotated such that
   the current candidate always appears at the top. From my perspective,
