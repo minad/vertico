@@ -226,6 +226,17 @@ available completion systems from the perspective of Selectrum.
  In order to fix the issues properly, ~org-set-tags-command~ should be
  implemented using ~completing-read-multiple~ as discussed on the [[https://lists.gnu.org/archive/html/emacs-orgmode/2020-07/msg00222.html][mailing list]].
 
+** ~org-refile~
+
+   When ~org-refile-use-outline-path~ is set to ~file~, refile
+   completion with Vertico enabled requires
+   ~org-outline-path-complete-in-steps~ to be disabled in order to
+   work properly.
+
+   #+begin_src emacs-lisp
+   (setq org-outline-path-complete-in-steps nil)
+   #+end_src
+
 ** ~tmm-menubar~
 
  The text menu bar works well with Vertico but always shows a =*Completions*=
