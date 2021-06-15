@@ -210,7 +210,7 @@
                           (if (text-property-not-all 0 (length suffix) 'face nil suffix)
                               suffix
                             (propertize suffix 'face 'completions-annotations)))))
-                  candidates)
+                candidates)
       candidates)))
 
 (defun vertico--move-to-front (elem list)
@@ -322,7 +322,7 @@
       (if (and (eq 'file (completion-metadata-get metadata 'category))
                (or (vertico--remote-p content) (vertico--remote-p default-directory)))
           (vertico--recompute-candidates pt content bounds metadata)
-          ;; bug#38024: Icomplete uses `while-no-input-ignore-events' to repair updating issues
+        ;; bug#38024: Icomplete uses `while-no-input-ignore-events' to repair updating issues
         (let ((while-no-input-ignore-events '(selection-request))
               (non-essential t))
           (while-no-input (vertico--recompute-candidates pt content bounds metadata))))
