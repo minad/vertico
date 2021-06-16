@@ -293,22 +293,22 @@
 (defun vertico--group-by (fun elems)
   "Group ELEMS by FUN."
   (when elems
-    (let ((group-list) (group-hash (make-hash-table :test #'equal)))
+    (let ((list) (ht (make-hash-table :test #'equal)))
       (while elems
         (let* ((key (funcall fun (car elems) nil))
-               (group (gethash key group-hash)))
+               (group (gethash key ht)))
           (if group
               (setcdr group (setcdr (cdr group) elems)) ;; Append to tail of group
             (setq group (cons elems elems)) ;; (head . tail)
-            (push group group-list)
-            (puthash key group group-hash))
+            (push group list)
+            (puthash key group ht))
           (setq elems (cdr elems))))
-      (setcdr (cdar group-list) nil) ;; Unlink last tail
-      (setq group-list (nreverse group-list))
-      (prog1 (caar group-list)
-        (while (cdr group-list)
-          (setcdr (cdar group-list) (caadr group-list)) ;; Link groups
-          (setq group-list (cdr group-list)))))))
+      (setcdr (cdar list) nil) ;; Unlink last tail
+      (setq list (nreverse list))
+      (prog1 (caar list)
+        (while (cdr list)
+          (setcdr (cdar list) (caadr list)) ;; Link groups
+          (setq list (cdr list)))))))
 
 (defun vertico--remote-p (path)
   "Return t if PATH is a remote path."
