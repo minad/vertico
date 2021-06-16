@@ -288,7 +288,14 @@
     (setq all (vertico--move-to-front field all))
     (when-let (group-fun (completion-metadata-get metadata 'group-function))
       (setq all (vertico--group-by group-fun all)))
-    (list base (length all) all hl)))
+    (list base
+          (length all)
+          ;; Find position of old candidate in the new list.
+          (when vertico--keep
+            (if (< vertico--index 0)
+                vertico--index
+              (seq-position all (nth vertico--index vertico--candidates))))
+          all hl)))
 
 (defun vertico--group-by (fun elems)
   "Group ELEMS by FUN."
@@ -325,15 +332,9 @@
               (non-essential t))
           (while-no-input (vertico--recompute-candidates pt content bounds metadata))))
     ('nil (abort-recursive-edit))
-    (`(,base ,total ,candidates ,hl)
-     ;; Find position of old candidate in the new list.
-     (unless (and vertico--keep (< vertico--index 0))
-       (let ((old (and candidates
-                       vertico--keep
-                       (>= vertico--index 0)
-                       (nth vertico--index vertico--candidates))))
-         (setq vertico--index (and old (seq-position candidates old)))))
+    (`(,base ,total ,index ,candidates ,hl)
      (setq vertico--input (cons content pt)
+           vertico--index index
            vertico--base base
            vertico--total total
            vertico--highlight hl
