@@ -299,9 +299,7 @@
                (group (gethash key ht)))
           (if group
               (setcdr group (setcdr (cdr group) elems)) ;; Append to tail of group
-            (setq group (cons elems elems)) ;; (head . tail)
-            (push group list)
-            (puthash key group ht))
+            (push (puthash key (cons elems elems) ht) list))
           (setq elems (cdr elems))))
       (setcdr (cdar list) nil) ;; Unlink last tail
       (setq list (nreverse list))
