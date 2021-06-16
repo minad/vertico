@@ -98,6 +98,8 @@
     (define-key map [remap previous-line-or-history-element] #'vertico-previous)
     (define-key map [remap backward-paragraph] #'vertico-previous-group)
     (define-key map [remap forward-paragraph] #'vertico-next-group)
+    (define-key map [remap backward-list] #'vertico-cycle-previous-group)
+    (define-key map [remap forward-list] #'vertico-cycle-next-group)
     (define-key map [remap exit-minibuffer] #'vertico-exit)
     (define-key map [remap kill-ring-save] #'vertico-save)
     (define-key map [C-return] #'vertico-exit-input)
@@ -135,8 +137,14 @@
 (defvar-local vertico--total 0
   "Length of the candidate list `vertico--candidates'.")
 
-(defvar-local vertico--keep nil
-  "Keep current candidate index `vertico--index'.")
+(defvar-local vertico--keep-candidate nil
+  "Keep current candidate.")
+
+(defvar-local vertico--keep-groups nil
+  "Keep current group order.")
+
+(defvar-local vertico--groups nil
+  "List of group titles.")
 
 (defvar-local vertico--default-missing nil
   "Default candidate is missing from candidates list.")
@@ -274,7 +282,8 @@
                                                         minibuffer-completion-predicate
                                                         pt metadata))
                (base (or (when-let (z (last all)) (prog1 (cdr z) (setcdr z nil))) 0))
-               (def (or (car-safe minibuffer-default) minibuffer-default)))
+               (def (or (car-safe minibuffer-default) minibuffer-default))
+               (groups))
     ;; Filter the ignored file extensions. We cannot use modified predicate for this filtering,
     ;; since this breaks the special casing in the `completion-file-name-table' for `file-exists-p'
     ;; and `file-directory-p'.
@@ -293,35 +302,44 @@
     (when (and completing-file (not (string-suffix-p "/" field)))
       (setq all (vertico--move-to-front (concat field "/") all)))
     (setq all (vertico--move-to-front field all))
-    (when-let (group-fun (completion-metadata-get metadata 'group-function))
-      (setq all (vertico--group-by group-fun all)))
+    (when-let (group-fun (and all (completion-metadata-get metadata 'group-function)))
+      (setq groups (vertico--group-by group-fun all) all (cdr groups)))
     (list base (length all)
           ;; Default value is missing from collection
           (and def (= pt 0) (not (member def all)))
           ;; Find position of old candidate in the new list.
-          (when vertico--keep
+          (when vertico--keep-candidate
             (if (< vertico--index 0)
                 vertico--index
               (seq-position all (nth vertico--index vertico--candidates))))
-          all hl)))
+          all (car groups) hl)))
 
 (defun vertico--group-by (fun elems)
   "Group ELEMS by FUN."
-  (when elems
-    (let ((list) (ht (make-hash-table :test #'equal)))
-      (while elems
-        (let* ((key (funcall fun (car elems) nil))
-               (group (gethash key ht)))
-          (if group
-              (setcdr group (setcdr (cdr group) elems)) ;; Append to tail of group
-            (push (puthash key (cons elems elems) ht) list))
-          (setq elems (cdr elems))))
-      (setcdr (cdar list) nil) ;; Unlink last tail
-      (setq list (nreverse list))
-      (prog1 (caar list)
-        (while (cdr list)
-          (setcdr (cdar list) (caadr list)) ;; Link groups
-          (setq list (cdr list)))))))
+  (let ((list) (ht (make-hash-table :test #'equal)) (groups) (titles))
+    (while elems
+      (let* ((title (funcall fun (car elems) nil))
+             (group (gethash title ht)))
+        (if group
+            (setcdr group (setcdr (cdr group) elems)) ;; Append to tail of group
+          (puthash title (cons elems elems) ht) ;; Store (head . tail) group element
+          (push title list))
+        (pop elems)))
+    (dolist (title (and vertico--keep-groups vertico--groups))
+      (when-let (group (gethash title ht))
+        (push group groups)
+        (push title titles)
+        (remhash title ht)))
+    (dolist (title (nreverse list))
+      (when-let (group (gethash title ht))
+        (push group groups)
+        (push title titles)))
+    (setcdr (cdar groups) nil) ;; Unlink last tail
+    (setq groups (nreverse groups) list groups)
+    (while (cdr list)
+      (setcdr (cdar list) (caadr list)) ;; Link groups
+      (pop list))
+    (cons (nreverse titles) (caar groups))))
 
 (defun vertico--remote-p (path)
   "Return t if PATH is a remote path."
@@ -340,12 +358,13 @@
               (non-essential t))
           (while-no-input (vertico--recompute-candidates pt content bounds metadata))))
     ('nil (abort-recursive-edit))
-    (`(,base ,total ,def-missing ,index ,candidates ,hl)
+    (`(,base ,total ,def-missing ,index ,candidates ,groups ,hl)
      (setq vertico--input (cons content pt)
            vertico--index index
            vertico--base base
            vertico--total total
            vertico--highlight hl
+           vertico--groups groups
            vertico--candidates candidates
            vertico--default-missing def-missing)
      ;; If the current index is nil, compute new index. Select the prompt:
@@ -354,7 +373,7 @@
      ;; * For matching content, as long as the full content after the boundary is empty,
      ;;   including content after point.
      (unless vertico--index
-       (setq vertico--keep nil
+       (setq vertico--keep-candidate nil
              vertico--index
              (if (or (not vertico--candidates)
                      vertico--default-missing
@@ -508,7 +527,7 @@
 
 (defun vertico--goto (index)
   "Go to candidate with INDEX."
-  (setq vertico--keep t
+  (setq vertico--keep-candidate t
         vertico--index
         (max (if (or (vertico--allow-prompt-selection-p) (not vertico--candidates)) -1 0)
              (min index (1- vertico--total)))))
@@ -563,6 +582,23 @@
                  (eq (ignore-errors (read-char "Confirm")) 13)))
         (exit-minibuffer)
       (message "Match required"))))
+
+(defun vertico-cycle-next-group (&optional n)
+  "Cycle N groups forward."
+  (interactive "p")
+  (when vertico--groups
+    (let* ((len (length vertico--groups))
+           (tail (- len (mod (- (or n 1)) len))))
+      (setq vertico--keep-groups t
+            vertico--keep-candidate nil
+            vertico--input nil
+            vertico--groups (nconc (nthcdr tail vertico--groups)
+                                   (seq-take vertico--groups tail))))))
+
+(defun vertico-cycle-previous-group (&optional n)
+  "Cycle N groups backward."
+  (interactive "p")
+  (vertico-cycle-next-group (- (or n 1))))
 
 (defun vertico-next-group (&optional n)
   "Move N groups forward."
