@@ -105,8 +105,6 @@ the binding of =TAB= to ~vertico-insert~ and the bindings of
 - ~previous-line~, ~previous-line-or-history-element~ -> ~vertico-previous~
 - ~forward-paragraph~ -> ~vertico-next-group~
 - ~backward-paragraph~ -> ~vertico-previous-group~
-- ~forward-list~ -> ~vertico-cycle-next-group~
-- ~backward-list~ -> ~vertico-cycle-previous-group~
 - ~exit-minibuffer~ -> ~vertico-exit~
 - ~kill-ring-save~ -> ~vertico-save~
 - =<C-return>= -> ~vertico-exit-input~
