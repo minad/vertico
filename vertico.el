@@ -98,8 +98,6 @@
     (define-key map [remap previous-line-or-history-element] #'vertico-previous)
     (define-key map [remap backward-paragraph] #'vertico-previous-group)
     (define-key map [remap forward-paragraph] #'vertico-next-group)
-    (define-key map [remap backward-list] #'vertico-cycle-previous-group)
-    (define-key map [remap forward-list] #'vertico-cycle-next-group)
     (define-key map [remap exit-minibuffer] #'vertico-exit)
     (define-key map [remap kill-ring-save] #'vertico-save)
     (define-key map [C-return] #'vertico-exit-input)
@@ -600,7 +598,7 @@
         (exit-minibuffer)
       (message "Match required"))))
 
-(defun vertico-cycle-next-group (&optional n)
+(defun vertico-next-group (&optional n)
   "Cycle N groups forward."
   (interactive "p")
   (when vertico--groups
@@ -618,39 +616,8 @@
           vertico--lock-candidate nil
           vertico--input nil)))
 
-(defun vertico-cycle-previous-group (&optional n)
-  "Cycle N groups backward."
-  (interactive "p")
-  (vertico-cycle-next-group (- (or n 1))))
-
-(defun vertico-next-group (&optional n)
-  "Move N groups forward."
-  (interactive "p")
-  (setq n (or n 1))
-  (let* ((end (minibuffer-prompt-end))
-         (metadata (completion-metadata (buffer-substring end (max end (point)))
-                                        minibuffer-completion-table
-                                        minibuffer-completion-predicate))
-         (group-fun (or (completion-metadata-get metadata 'group-function) #'ignore))
-         (step (if (> n 0) 1 -1))
-         (start-index vertico--index)
-         last-index)
-    (setq n (abs n))
-    (while (> n 0)
-      (setq last-index vertico--index)
-      (vertico-next step)
-      (cond
-       ((or (= vertico--index last-index) (= vertico--index start-index))
-        (vertico--goto start-index)
-        (setq n 0))
-       ((or (<= vertico--index 0)
-            (not (equal (funcall group-fun (nth (1- vertico--index) vertico--candidates) nil)
-                        (funcall group-fun (nth vertico--index vertico--candidates) nil))))
-        (setq n (1- n)
-              start-index vertico--index))))))
-
 (defun vertico-previous-group (&optional n)
-  "Move N groups backward."
+  "Cycle N groups backward."
   (interactive "p")
   (vertico-next-group (- (or n 1))))
 
