@@ -144,8 +144,8 @@
       (and (= (length x) (length y))
            (string< x y))))
 
-(defun vertico--sort (base candidates)
-  "Sort CANDIDATES by history, length and alphabetically, given current BASE prefix string."
+(defun vertico--update-history-hash (base)
+  "Update history hash, given current BASE prefix string."
   (unless (and vertico--history-hash (equal vertico--history-base base))
     (let* ((index 0)
            (base-size (length base))
@@ -168,7 +168,10 @@
               (puthash elem index hash)))
           (setq index (1+ index))))
       (setq vertico--history-hash hash
-            vertico--history-base base)))
+            vertico--history-base base))))
+
+(defun vertico--sort (candidates)
+  "Sort CANDIDATES by history, length and alphabetically."
   ;; Separate history candidates from candidates first.
   ;; Move the remaining candidates into buckets according to length.
   (let* ((max-bucket 40)
@@ -279,7 +282,8 @@
         (setq all (cl-delete-if (lambda (x) (string-match-p ignore x)) all))))
     (setq all (if-let (sort (completion-metadata-get metadata 'display-sort-function))
                   (funcall sort all)
-                (vertico--sort (substring content 0 base) all)))
+                (vertico--update-history-hash (substring content 0 base))
+                (vertico--sort all)))
     ;; Move special candidates: "field" appears at the top, before "field/", before default value
     (when (stringp def)
       (setq all (vertico--move-to-front def all)))
