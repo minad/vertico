@@ -599,25 +599,29 @@
       (message "Match required"))))
 
 (defun vertico-next-group (&optional n)
-  "Cycle N groups forward."
+  "Cycle N groups forward.
+When the prefix argument is 0, the group order is reset."
   (interactive "p")
-  (when vertico--groups
-    (setq vertico--groups
-          (vertico--cycle
-           vertico--groups
-           (let ((len (length vertico--groups)))
-             (- len (mod (- (or n 1)) len))))
-          vertico--all-groups
-          (vertico--cycle
-           vertico--all-groups
-           (seq-position vertico--all-groups
-                         (car vertico--groups)))
-          vertico--lock-groups t
-          vertico--lock-candidate nil
+  (when (cdr vertico--groups)
+    (if (eq n 0)
+        (setq vertico--groups nil
+              vertico--all-groups nil
+              vertico--lock-groups nil)
+      (setq vertico--groups
+            (vertico--cycle vertico--groups
+                            (let ((len (length vertico--groups)))
+                              (- len (mod (- (or n 1)) len))))
+            vertico--all-groups
+            (vertico--cycle vertico--all-groups
+                            (seq-position vertico--all-groups
+                                          (car vertico--groups)))
+            vertico--lock-groups t))
+    (setq vertico--lock-candidate nil
           vertico--input nil)))
 
 (defun vertico-previous-group (&optional n)
-  "Cycle N groups backward."
+  "Cycle N groups backward.
+When the prefix argument is 0, the group order is reset."
   (interactive "p")
   (vertico-next-group (- (or n 1))))
 
