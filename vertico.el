@@ -138,6 +138,9 @@
 (defvar-local vertico--keep nil
   "Keep current candidate index `vertico--index'.")
 
+(defvar-local vertico--default-missing nil
+  "Default candidate is missing from candidates list.")
+
 (defun vertico--sort-predicate (x y)
   "Sorting predicate which compares X and Y."
   (or (< (length x) (length y))
@@ -292,8 +295,9 @@
     (setq all (vertico--move-to-front field all))
     (when-let (group-fun (completion-metadata-get metadata 'group-function))
       (setq all (vertico--group-by group-fun all)))
-    (list base
-          (length all)
+    (list base (length all)
+          ;; Default value is missing from collection
+          (and def (= pt 0) (not (member def all)))
           ;; Find position of old candidate in the new list.
           (when vertico--keep
             (if (< vertico--index 0)
@@ -336,13 +340,14 @@
               (non-essential t))
           (while-no-input (vertico--recompute-candidates pt content bounds metadata))))
     ('nil (abort-recursive-edit))
-    (`(,base ,total ,index ,candidates ,hl)
+    (`(,base ,total ,def-missing ,index ,candidates ,hl)
      (setq vertico--input (cons content pt)
            vertico--index index
            vertico--base base
            vertico--total total
            vertico--highlight hl
-           vertico--candidates candidates)
+           vertico--candidates candidates
+           vertico--default-missing def-missing)
      ;; If the current index is nil, compute new index. Select the prompt:
      ;; * If there are no candidates
      ;; * If the default is missing from the candidate list.
@@ -352,7 +357,7 @@
        (setq vertico--keep nil
              vertico--index
              (if (or (not vertico--candidates)
-                     (vertico--default-missing-p)
+                     vertico--default-missing
                      (and (= (car bounds) (length content))
                           (test-completion content minibuffer-completion-table
                                            minibuffer-completion-predicate)))
@@ -499,12 +504,7 @@
 (defun vertico--allow-prompt-selection-p ()
   "Return t if prompt can be selected."
   (or (memq minibuffer--require-match '(nil confirm confirm-after-completion))
-      (vertico--default-missing-p)))
-
-(defun vertico--default-missing-p ()
-  "Return t if default is missing from the candidate list."
-  (when-let (def (or (car-safe minibuffer-default) minibuffer-default))
-    (and (= (point-max) (minibuffer-prompt-end)) (not (member def vertico--candidates)))))
+      vertico--default-missing))
 
 (defun vertico--goto (index)
   "Go to candidate with INDEX."
