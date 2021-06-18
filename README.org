@@ -30,7 +30,8 @@ Additional enhancements can be installed separately via complementary packages.
 - Sorting by history position, string length and alphabetically
 - Long candidates with newlines are formatted to take up less space
 - Deferred completion style highlighting for performance
-- Support for ~annotation-function~, ~affixation-function~ and ~group-function~
+- Support for annotations (~annotation-function~ and ~affixation-function~)
+- Support for grouping and group cycling commands (~group-function~)
 
 [[https://github.com/minad/vertico/blob/main/screenshot.svg?raw=true]]
 
@@ -104,6 +105,8 @@ the binding of =TAB= to ~vertico-insert~ and the bindings of
 - ~previous-line~, ~previous-line-or-history-element~ -> ~vertico-previous~
 - ~forward-paragraph~ -> ~vertico-next-group~
 - ~backward-paragraph~ -> ~vertico-previous-group~
+- ~forward-list~ -> ~vertico-cycle-next-group~
+- ~backward-list~ -> ~vertico-cycle-previous-group~
 - ~exit-minibuffer~ -> ~vertico-exit~
 - ~kill-ring-save~ -> ~vertico-save~
 - =<C-return>= -> ~vertico-exit-input~
@@ -184,12 +187,12 @@ to their liking - completion plays an integral part in how the users interacts
 with Emacs. There are at least two other interactive completion UIs, which
 follow a similar philosophy:
 
-- [[https://github.com/raxod502/selectrum][Selectrum]]: Selectrum has a similar UI as Vertico. Additionally Selectrum
-  supports Avy-style quick keys, a horizontal display and a configurable buffer
-  display. On the other hand, Selectrum is significantly more complex and not
-  fully compatible with every Emacs completion command ([[https://github.com/raxod502/selectrum/issues/481][Issue #481]]), since it
-  uses its own filtering infrastructure, which deviates from the standard Emacs
-  completion facilities.
+- [[https://github.com/raxod502/selectrum][Selectrum]]: Selectrum has a similar UI as Vertico. Vertico offers more commands
+  for grouping support. Selectrum supports additional Avy-style quick keys and a
+  horizontal display. On the other hand, Selectrum is significantly more complex
+  and not fully compatible with every Emacs completion command ([[https://github.com/raxod502/selectrum/issues/481][Issue #481]]),
+  since it uses its own filtering infrastructure, which deviates from the
+  standard Emacs completion facilities.
 - [[https://github.com/oantolin/icomplete-vertical][Icomplete-vertical]]: This package enhances the Emacs builtin Icomplete with a
   vertical display. In contrast to Vertico, the candidates are rotated such that
   the current candidate always appears at the top. From my perspective,
