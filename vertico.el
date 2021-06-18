@@ -390,8 +390,8 @@
      (unless vertico--index
        (setq vertico--lock-candidate nil
              vertico--index
-             (if (or (not vertico--candidates)
-                     vertico--default-missing
+             (if (or vertico--default-missing
+                     (not vertico--candidates)
                      (and (= (car bounds) (length content))
                           (test-completion content minibuffer-completion-table
                                            minibuffer-completion-predicate)))
@@ -537,8 +537,8 @@
 
 (defun vertico--allow-prompt-selection-p ()
   "Return t if prompt can be selected."
-  (or (memq minibuffer--require-match '(nil confirm confirm-after-completion))
-      vertico--default-missing))
+  (or vertico--default-missing
+      (memq minibuffer--require-match '(nil confirm confirm-after-completion))))
 
 (defun vertico--goto (index)
   "Go to candidate with INDEX."
