@@ -135,8 +135,8 @@
 (defvar-local vertico--total 0
   "Length of the candidate list `vertico--candidates'.")
 
-(defvar-local vertico--keep nil
-  "Keep current candidate index `vertico--index'.")
+(defvar-local vertico--lock-candidate nil
+  "Lock-in current candidate.")
 
 (defvar-local vertico--default-missing nil
   "Default candidate is missing from candidates list.")
@@ -299,7 +299,7 @@
           ;; Default value is missing from collection
           (and def (= pt 0) (not (member def all)))
           ;; Find position of old candidate in the new list.
-          (when vertico--keep
+          (when vertico--lock-candidate
             (if (< vertico--index 0)
                 vertico--index
               (seq-position all (nth vertico--index vertico--candidates))))
@@ -354,7 +354,7 @@
      ;; * For matching content, as long as the full content after the boundary is empty,
      ;;   including content after point.
      (unless vertico--index
-       (setq vertico--keep nil
+       (setq vertico--lock-candidate nil
              vertico--index
              (if (or (not vertico--candidates)
                      vertico--default-missing
@@ -508,7 +508,7 @@
 
 (defun vertico--goto (index)
   "Go to candidate with INDEX."
-  (setq vertico--keep t
+  (setq vertico--lock-candidate t
         vertico--index
         (max (if (or (vertico--allow-prompt-selection-p) (not vertico--candidates)) -1 0)
              (min index (1- vertico--total)))))
