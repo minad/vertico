@@ -391,25 +391,32 @@
        (setq vertico--lock-candidate nil
              vertico--index
              (if (or vertico--default-missing
-                     (not vertico--candidates)
+                     (= 0 vertico--total)
                      (and (= (car bounds) (length content))
                           (test-completion content minibuffer-completion-table
                                            minibuffer-completion-predicate)))
                  -1 0))))))
 
-(defun vertico--flatten-string (prop str)
-  "Flatten STR with display or invisible PROP."
-  (let ((end (length str)) (pos 0) (chunks))
-    (while (< pos end)
-      (let ((next (next-single-property-change pos prop str end))
-            (val (get-text-property pos prop str)))
-        (cond
-         ((and val (eq prop 'display) (stringp val))
-          (push val chunks))
-         ((not (and val (eq prop 'invisible)))
-          (push (substring str pos next) chunks)))
-        (setq pos next)))
-    (apply #'concat (nreverse chunks))))
+(defun vertico--display-string (string)
+  "Compute display STRING by replacing display and invisible properties."
+  (let ((end (length string)))
+    (if (or (text-property-not-all 0 end 'display nil string)
+            (text-property-not-all 0 end 'invisible nil string))
+        (let ((pos 0) (chunks))
+          (while (< pos end)
+            (let ((nextd (next-single-property-change pos 'display string end))
+                  (display (get-text-property pos 'display string)))
+              (if (stringp display)
+                  (progn
+                    (push display chunks)
+                    (setq pos nextd))
+                (while (< pos nextd)
+                  (let ((nexti (next-single-property-change pos 'invisible string nextd)))
+                    (unless (get-text-property pos 'invisible string)
+                      (push (substring string pos nexti) chunks))
+                    (setq pos nexti))))))
+          (apply #'concat (nreverse chunks)))
+      string)))
 
 (defun vertico--format-candidates (metadata)
   "Format current candidates with METADATA."
@@ -438,8 +445,7 @@
                        (replace-regexp-in-string "[\t\n ]*\n[\t\n ]*" (car vertico-multiline))
                        (replace-regexp-in-string "\\`[\t\n ]+\\|[\t\n ]+\\'" ""))
                 cand (truncate-string-to-width cand max-width 0 nil (cdr vertico-multiline))))
-        (setq cand (vertico--flatten-string 'invisible (vertico--flatten-string 'display cand))
-              cand (concat prefix cand suffix "\n"))
+        (setq cand (concat prefix (vertico--display-string cand) suffix "\n"))
         (when (= index vertico--index)
           (setq current-line (length lines))
           (add-face-text-property 0 (length cand) 'vertico-current 'append cand))
@@ -544,7 +550,7 @@
   "Go to candidate with INDEX."
   (setq vertico--lock-candidate t
         vertico--index
-        (max (if (or (vertico--allow-prompt-selection-p) (not vertico--candidates)) -1 0)
+        (max (if (or (vertico--allow-prompt-selection-p) (= vertico--total 0)) -1 0)
              (min index (1- vertico--total)))))
 
 (defun vertico-first ()
