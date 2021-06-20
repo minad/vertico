@@ -50,8 +50,7 @@ Here is an example configuration:
     :init
     (vertico-mode)
 
-    ;; Optionally enable cycling for `vertico-next', `vertico-previous',
-    ;; `vertico-next-group' and `vertico-previous-group'.
+    ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
     ;; (setq vertico-cycle t)
   )
 
