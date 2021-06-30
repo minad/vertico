@@ -58,6 +58,11 @@
   "Maximal number of candidates to show."
   :type 'integer)
 
+(defcustom vertico-resize resize-mini-windows
+  "How to resize the Vertico minibuffer window.
+See `resize-mini-windows' for documentation."
+  :type '(choice (const nil) (const t) (const grow-only)))
+
 (defcustom vertico-cycle nil
   "Enable cycling for `vertico-next' and `vertico-previous'."
   :type 'boolean)
@@ -463,13 +468,12 @@
 (defun vertico--resize-window (height)
   "Resize active minibuffer window to HEIGHT."
   (unless (frame-root-window-p (active-minibuffer-window))
-    (let* ((resize (default-value 'resize-mini-windows))
-           (window-resize-pixelwise t)
+    (let* ((window-resize-pixelwise t)
            (dp (- (max (cdr (window-text-pixel-size))
-                       (* (default-line-height) (1+ (if resize height vertico-count))))
+                       (* (default-line-height) (1+ (if vertico-resize height vertico-count))))
                   (window-pixel-height))))
       (when (and (or (/= height 0) (< dp 0))
-                 (or (> dp 0) (eq resize t)))
+                 (or (> dp 0) (eq vertico-resize t)))
         (window-resize nil dp nil nil 'pixelwise)))))
 
 (defun vertico--display-count ()

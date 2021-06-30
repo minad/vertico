@@ -50,6 +50,9 @@ Here is an example configuration:
     :init
     (vertico-mode)
 
+    ;; Grow and shrink the Vertico minibuffer
+    ;; (setq vertico-resize t)
+
     ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
     ;; (setq vertico-cycle t)
   )
@@ -75,9 +78,6 @@ Here is an example configuration:
     (defun crm-indicator (args)
       (cons (concat "[CRM] " (car args)) (cdr args)))
     (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-    ;; Grow and shrink minibuffer
-    ;;(setq resize-mini-windows t)
 
     ;; Do not allow the cursor in the minibuffer prompt
     (setq minibuffer-prompt-properties
