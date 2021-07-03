@@ -64,7 +64,7 @@ Here is an example configuration:
     :init
     (setq completion-styles '(orderless)
           completion-category-defaults nil
-          completion-category-overrides '((file (styles . (partial-completion))))))
+          completion-category-overrides '((file (styles partial-completion)))))
 
   ;; Persist history over Emacs restarts. Vertico sorts by history position.
   (use-package savehist
@@ -248,13 +248,41 @@ available completion systems from the perspective of Selectrum.
 
 ** ~tmm-menubar~
 
- The text menu bar works well with Vertico but always shows a =*Completions*=
- buffer, which is unwanted if you are using the Vertico UI. This completion
- buffer can be disabled as follows.
+   The text menu bar works well with Vertico but always shows a =*Completions*=
+   buffer, which is unwanted if you are using the Vertico UI. This completion
+   buffer can be disabled as follows.
 
- #+begin_src emacs-lisp
-   (advice-add #'tmm-add-prompt :after #'minibuffer-hide-completions)
- #+end_src
+   #+begin_src emacs-lisp
+     (advice-add #'tmm-add-prompt :after #'minibuffer-hide-completions)
+   #+end_src
+
+** Tramp hostname completion
+
+   In combination with Orderless, hostnames are not made available for
+   completion after entering =/ssh:=. In order to avoid this problem, the =basic=
+   completion style should be specified for the file completion category.
+
+   #+begin_src emacs-lisp
+     (setq completion-styles '(orderless)
+           completion-category-overrides '((file (styles basic partial-completion))))
+   #+end_src
+
+   For users who are familiar with the =completion-style= machinery: You may also
+   define a custom completion style which sets in only for remote files!
+
+   #+begin_src emacs-lisp
+     (defun basic-remote-try-completion (string table pred point)
+       (and (vertico--remote-p string)
+            (completion-basic-try-completion string table pred point)))
+     (defun basic-remote-all-completions (string table pred point)
+       (and (vertico--remote-p string)
+            (completion-basic-all-completions string table pred point)))
+     (add-to-list
+      'completion-styles-alist
+      '(basic-remote basic-remote-try-completion basic-remote-all-completions nil))
+     (setq completion-styles '(orderless)
+           completion-category-overrides '((file (styles basic-remote partial-completion))))
+   #+end_src
 
 * Contributions
 
