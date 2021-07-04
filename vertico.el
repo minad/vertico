@@ -416,6 +416,15 @@ See `resize-mini-windows' for documentation."
         (setq pos next)))
     (apply #'concat (nreverse chunks))))
 
+(defun vertico--truncate-multiline (cand max-width)
+  "Truncate multiline CAND to MAX-WIDTH."
+  (truncate-string-to-width
+   (thread-last cand
+     (replace-regexp-in-string "[\t ]+" " ")
+     (replace-regexp-in-string "[\t\n ]*\n[\t\n ]*" (car vertico-multiline))
+     (replace-regexp-in-string "\\`[\t\n ]+\\|[\t\n ]+\\'" ""))
+   max-width 0 nil (cdr vertico-multiline)))
+
 (defun vertico--format-candidates (metadata)
   "Format current candidates with METADATA."
   (let* ((group-fun (completion-metadata-get metadata 'group-function))
@@ -438,11 +447,7 @@ See `resize-mini-windows' for documentation."
             (push (format group-format (setq title new-title)) lines))
           (setq cand (funcall group-fun cand 'transform)))
         (when (string-match-p "\n" cand)
-          (setq cand (thread-last cand
-                       (replace-regexp-in-string "[\t ]+" " ")
-                       (replace-regexp-in-string "[\t\n ]*\n[\t\n ]*" (car vertico-multiline))
-                       (replace-regexp-in-string "\\`[\t\n ]+\\|[\t\n ]+\\'" ""))
-                cand (truncate-string-to-width cand max-width 0 nil (cdr vertico-multiline))))
+          (setq cand (vertico--truncate-multiline cand max-width)))
         (setq cand (vertico--flatten-string 'invisible (vertico--flatten-string 'display cand))
               cand (concat prefix cand suffix "\n"))
         (when (= index vertico--index)
