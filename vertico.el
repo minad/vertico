@@ -425,6 +425,14 @@ See `resize-mini-windows' for documentation."
      (replace-regexp-in-string "\\`[\t\n ]+\\|[\t\n ]+\\'" ""))
    max-width 0 nil (cdr vertico-multiline)))
 
+(defun vertico--format-candidate (cand prefix suffix index)
+  "Format CAND given PREFIX, SUFFIX and INDEX."
+  (setq cand (vertico--flatten-string 'invisible (vertico--flatten-string 'display cand))
+        cand (concat prefix cand suffix "\n"))
+  (when (= index vertico--index)
+    (add-face-text-property 0 (length cand) 'vertico-current 'append cand))
+  cand)
+
 (defun vertico--format-candidates (metadata)
   "Format current candidates with METADATA."
   (let* ((group-fun (completion-metadata-get metadata 'group-function))
@@ -446,14 +454,11 @@ See `resize-mini-windows' for documentation."
           (unless (equal title new-title)
             (push (format group-format (setq title new-title)) lines))
           (setq cand (funcall group-fun cand 'transform)))
+        (when (= index vertico--index)
+          (setq curr-line (length lines)))
         (when (string-match-p "\n" cand)
           (setq cand (vertico--truncate-multiline cand max-width)))
-        (setq cand (vertico--flatten-string 'invisible (vertico--flatten-string 'display cand))
-              cand (concat prefix cand suffix "\n"))
-        (when (= index vertico--index)
-          (setq curr-line (length lines))
-          (add-face-text-property 0 (length cand) 'vertico-current 'append cand))
-        (push cand lines)
+        (push (vertico--format-candidate cand prefix suffix index) lines)
         (setq index (1+ index))))
     (setq lines (nreverse lines) index (length lines))
     (while (> index vertico-count)
