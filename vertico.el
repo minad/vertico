@@ -427,8 +427,8 @@ See `resize-mini-windows' for documentation."
 
 (defun vertico--format-candidate (cand prefix suffix index)
   "Format CAND given PREFIX, SUFFIX and INDEX."
-  (setq cand (vertico--flatten-string 'invisible (vertico--flatten-string 'display cand))
-        cand (concat prefix cand suffix "\n"))
+  (setq cand (concat prefix cand suffix "\n")
+        cand (vertico--flatten-string 'invisible (vertico--flatten-string 'display cand)))
   (when (= index vertico--index)
     (add-face-text-property 0 (length cand) 'vertico-current 'append cand))
   cand)
