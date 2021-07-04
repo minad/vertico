@@ -396,7 +396,7 @@ See `resize-mini-windows' for documentation."
        (setq vertico--lock-candidate nil
              vertico--index
              (if (or vertico--default-missing
-                     (not vertico--candidates)
+                     (= 0 vertico--total)
                      (and (= (car bounds) (length content))
                           (test-completion content minibuffer-completion-table
                                            minibuffer-completion-predicate)))
@@ -428,7 +428,7 @@ See `resize-mini-windows' for documentation."
             (funcall vertico--highlight)
             (vertico--affixate metadata)))
          (max-width (- (window-width) 4))
-         (current-line 0) (title) (lines))
+         (curr-line 0) (title) (lines))
     (dolist (cand candidates)
       (let ((prefix "") (suffix ""))
         (when (consp cand)
@@ -446,15 +446,15 @@ See `resize-mini-windows' for documentation."
         (setq cand (vertico--flatten-string 'invisible (vertico--flatten-string 'display cand))
               cand (concat prefix cand suffix "\n"))
         (when (= index vertico--index)
-          (setq current-line (length lines))
+          (setq curr-line (length lines))
           (add-face-text-property 0 (length cand) 'vertico-current 'append cand))
         (push cand lines)
         (setq index (1+ index))))
     (setq lines (nreverse lines) index (length lines))
     (while (> index vertico-count)
-      (if (< current-line (/ index 2))
+      (if (< curr-line (/ index 2))
           (nbutlast lines)
-        (setq current-line (1- current-line) lines (cdr lines)))
+        (setq curr-line (1- curr-line) lines (cdr lines)))
       (setq index (1- index)))
     lines))
 
@@ -548,7 +548,7 @@ See `resize-mini-windows' for documentation."
   "Go to candidate with INDEX."
   (setq vertico--lock-candidate t
         vertico--index
-        (max (if (or (vertico--allow-prompt-selection-p) (not vertico--candidates)) -1 0)
+        (max (if (or (vertico--allow-prompt-selection-p) (= 0 vertico--total)) -1 0)
              (min index (1- vertico--total)))))
 
 (defun vertico-first ()
