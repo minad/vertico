@@ -312,7 +312,7 @@ See `resize-mini-windows' for documentation."
       (setq groups (vertico--group-by group-fun all) all (car groups)))
     (list base (length all)
           ;; Default value is missing from collection
-          (and def (= pt 0) (not (member def all)))
+          (and def (equal content "") (not (member def all)))
           ;; Find position of old candidate in the new list.
           (when vertico--lock-candidate
             (if (< vertico--index 0)
