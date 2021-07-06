@@ -604,15 +604,15 @@ See `resize-mini-windows' for documentation."
   (interactive "P")
   (unless arg (vertico-insert))
   (let ((input (minibuffer-contents-no-properties)))
-    (if (or (memq minibuffer--require-match '(nil confirm-after-completion))
-            (equal "" input) ;; The questionable null completion
-            (test-completion input
-                             minibuffer-completion-table
-                             minibuffer-completion-predicate)
-            (and (eq minibuffer--require-match 'confirm)
-                 (eq (ignore-errors (read-char "Confirm")) 13)))
-        (exit-minibuffer)
-      (message "Match required"))))
+    (when (or (memq minibuffer--require-match '(nil confirm-after-completion))
+              (equal "" input) ;; The questionable null completion
+              (test-completion input
+                               minibuffer-completion-table
+                               minibuffer-completion-predicate)
+              (if (eq minibuffer--require-match 'confirm)
+                  (eq (ignore-errors (read-char "Confirm")) 13)
+                (and (message "Match required") nil)))
+      (exit-minibuffer))))
 
 (defun vertico-next-group (&optional n)
   "Cycle N groups forward.
