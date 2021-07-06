@@ -557,10 +557,11 @@ See `resize-mini-windows' for documentation."
 
 (defun vertico--goto (index)
   "Go to candidate with INDEX."
-  (setq vertico--lock-candidate t
-        vertico--index
-        (max (if (or (vertico--allow-prompt-selection-p) (= 0 vertico--total)) -1 0)
-             (min index (1- vertico--total)))))
+  (let ((prompt (vertico--allow-prompt-selection-p)))
+    (setq vertico--index
+          (max (if (or prompt (= 0 vertico--total)) -1 0)
+               (min index (1- vertico--total)))
+          vertico--lock-candidate (or (>= vertico--index 0) prompt))))
 
 (defun vertico-first ()
   "Go to first candidate, or to the prompt when the first candidate is selected."
