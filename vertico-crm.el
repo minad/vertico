@@ -146,16 +146,16 @@ See `completing-read-multiple' for the arguments."
         (when (> vertico--total 1)
           (vertico--goto (if (= (1+ vertico--index) vertico--total)
                              -1
-                           (1+ vertico--index))))
-        (setq vertico--input t))
+                           (1+ vertico--index)))))
       (if (member cand vertico-crm--selected)
           ;; Multi selections are not possible.
           ;; This is probably no problem, since this is rarely desired.
           (setq vertico-crm--selected (delete cand vertico-crm--selected))
         (setq vertico--lock-groups t
-              vertico--all-groups '("Selected")
+              vertico--all-groups '("Selected") ;; TODO keep other groups
               vertico-crm--selected
               (nconc vertico-crm--selected (list (vertico-crm--format cand)))))
+      (setq vertico--input t)
       (vertico-crm--update-count))))
 
 (defun vertico-crm-select-erase ()
