@@ -18,8 +18,8 @@ a UI which behaves /correctly/ under all circumstances. By reusing the built-in
 facilities system, Vertico achieves /full compatibility/ with built-in Emacs
 completion commands and completion tables. Vertico only provides the completion
 UI. Additional enhancements can be installed separately via complementary
-packages. The code base is small and maintainable (~600 lines of code without
-whitespace and comments).
+packages. The code base is small and maintainable (~vertico.el~ is only about 600
+lines of code without whitespace and comments).
 
 * Features
 
@@ -32,6 +32,7 @@ whitespace and comments).
 - Deferred completion style highlighting for performance
 - Support for annotations (~annotation-function~ and ~affixation-function~)
 - Support for grouping and group cycling commands (~group-function~)
+- Optional enhanced =completing-read-multiple= UI (=vertico-crm-mode=)
 
 [[https://github.com/minad/vertico/blob/main/screenshot.svg?raw=true]]
 
@@ -48,7 +49,11 @@ Here is an example configuration:
   ;; Enable vertico
   (use-package vertico
     :init
+    ;; Enable the Vertico UI
     (vertico-mode)
+
+    ;; Optionally enable an enhanced `completing-read-multiple` UI
+    (vertico-crm-mode)
 
     ;; Grow and shrink the Vertico minibuffer
     ;; (setq vertico-resize t)
@@ -74,11 +79,6 @@ Here is an example configuration:
   ;; A few more useful configurations...
   (use-package emacs
     :init
-    ;; Add prompt indicator to `completing-read-multiple'.
-    (defun crm-indicator (args)
-      (cons (concat "[CRM] " (car args)) (cdr args)))
-    (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
     ;; Do not allow the cursor in the minibuffer prompt
     (setq minibuffer-prompt-properties
           '(read-only t cursor-intangible t face minibuffer-prompt))
@@ -193,12 +193,14 @@ to their liking - completion plays an integral part in how the users interacts
 with Emacs. There are at least two other interactive completion UIs, which
 follow a similar philosophy:
 
-- [[https://github.com/raxod502/selectrum][Selectrum]]: Selectrum has a similar UI as Vertico. Vertico offers more commands
-  for grouping support. Selectrum supports additional Avy-style quick keys and a
-  horizontal display. On the other hand, Selectrum is significantly more complex
-  and not fully compatible with every Emacs completion command ([[https://github.com/raxod502/selectrum/issues/481][Issue #481]]),
-  since it uses its own filtering infrastructure, which deviates from the
-  standard Emacs completion facilities.
+- [[https://github.com/raxod502/selectrum][Selectrum]]: Selectrum has a similar UI as Vertico. Vertico additionally has
+  the ability to cycle over candidates, offers a more enhanced
+  =completing-read-multiple= UI and additional commands for grouping support. On
+  the other hand, Selectrum supports Avy-style quick keys and a horizontal
+  display. Furthermore Selectrum is significantly more complex and not fully
+  compatible with every Emacs completion command ([[https://github.com/raxod502/selectrum/issues/481][Issue #481]]), since it uses its
+  own filtering infrastructure, which deviates from the standard Emacs
+  completion facilities.
 - [[https://github.com/oantolin/icomplete-vertical][Icomplete-vertical]]: This package enhances the Emacs builtin Icomplete with a
   vertical display. In contrast to Vertico, the candidates are rotated such that
   the current candidate always appears at the top. From my perspective,
