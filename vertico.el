@@ -672,6 +672,7 @@ When the prefix argument is 0, the group order is reset."
 (defun vertico--candidate (&optional hl)
   "Return current candidate string with optional highlighting if HL is non-nil."
   (let ((content (minibuffer-contents)))
+    (vertico--add-face 'vertico-current 0 (length content) nil content)
     (if (>= vertico--index 0)
         (let ((cand (nth vertico--index vertico--candidates)))
           ;;; XXX Drop the completions-common-part face which is added by `completion--twq-all'.
