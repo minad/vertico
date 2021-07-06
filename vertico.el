@@ -489,7 +489,7 @@ See `resize-mini-windows' for documentation."
 
 (defun vertico--display-count ()
   "Update count overlay `vertico--count-ov'."
-  (when vertico-count-format
+  (when vertico--count-ov
     (move-overlay vertico--count-ov (point-min) (point-min))
     (overlay-put vertico--count-ov 'before-string
                  (format (car vertico-count-format)
@@ -682,7 +682,8 @@ When the prefix argument is 0, the group order is reset."
   "Setup completion UI."
   (setq vertico--input t
         vertico--candidates-ov (make-overlay (point-max) (point-max) nil t t)
-        vertico--count-ov (make-overlay (point-min) (point-min) nil t t))
+        vertico--count-ov (and vertico-count-format
+                               (make-overlay (point-min) (point-min) nil t t)))
   (setq-local resize-mini-windows 'grow-only
               max-mini-window-height 1.0
               completion-auto-help nil
