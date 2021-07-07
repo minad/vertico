@@ -477,10 +477,10 @@ See `resize-mini-windows' for documentation."
 
 (defun vertico--resize-window (height)
   "Resize active minibuffer window to HEIGHT."
-  (unless vertico-resize
-    (setq height (max height vertico-count)))
   (setq-local truncate-lines (< (point-max) (- (window-width) 4)))
   (unless (frame-root-window-p (active-minibuffer-window))
+    (unless vertico-resize
+      (setq height (max height vertico-count)))
     (let* ((window-resize-pixelwise t)
            (dp (- (max (cdr (window-text-pixel-size))
                        (* (default-line-height) (1+ height)))
