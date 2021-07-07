@@ -693,6 +693,7 @@ When the prefix argument is 0, the group order is reset."
                                (make-overlay (point-min) (point-min) nil t t)))
   (setq-local resize-mini-windows 'grow-only
               max-mini-window-height 1.0
+              truncate-lines (< (point-max) (- (window-width) 4))
               completion-auto-help nil
               completion-show-inline-help nil)
   (use-local-map vertico-map)
