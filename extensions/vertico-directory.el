@@ -1,4 +1,4 @@
-;;; vertico-ido.el --- Provide Ido-like commands for Vertico -*- lexical-binding: t -*-
+;;; vertico-directory.el --- Ido-like direction navigation for Vertico -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2021  Free Software Foundation, Inc.
 
@@ -22,16 +22,18 @@
 ;;; Commentary:
 
 ;; This package is a Vertico extension, which provides Ido-like
-;; commands. The commands can be bound in the `vertico-map'.
+;; directory navigation commands. The commands can be bound in the
+;; `vertico-map'.
 ;;
-;; (define-key vertico-map "\d" #'vertico-ido-delete-char)
-;; (define-key vertico-map "\M-\d" #'vertico-ido-delete-word)
+;; (define-key vertico-map "\r" #'vertico-directory-enter)
+;; (define-key vertico-map "\d" #'vertico-directory-delete-char)
+;; (define-key vertico-map "\M-\d" #'vertico-directory-delete-word)
 
 ;;; Code:
 
 (require 'vertico)
 
-(defun vertico-ido--completing-file-p ()
+(defun vertico-directory--completing-file-p ()
   "Return non-nil when completing file names."
   (eq 'file
       (completion-metadata-get
@@ -43,19 +45,21 @@
        'category)))
 
 ;;;###autoload
-(defun vertico-ido-exit ()
-  "Exit completion with current candidate or insert directory."
+(defun vertico-directory-enter ()
+  "Enter directory or exit completion with current candidate."
   (interactive)
   (if (and (>= vertico--index 0)
            (string-suffix-p "/" (vertico--candidate))
-           (vertico-ido--completing-file-p))
+           (vertico-directory--completing-file-p))
       (vertico-insert)
     (vertico-exit)))
 
-(defun vertico-ido--delete-directory ()
+;;;###autoload
+(defun vertico-directory-up ()
   "Delete directory before point."
+  (interactive)
   (when (and (eq (char-before) ?/)
-             (vertico-ido--completing-file-p))
+             (vertico-directory--completing-file-p))
     (save-excursion
       (goto-char (1- (point)))
       (when (search-backward "/" (point-min) t)
@@ -63,20 +67,20 @@
     t))
 
 ;;;###autoload
-(defun vertico-ido-delete-char ()
+(defun vertico-directory-delete-char ()
   "Delete directory or char before point."
   (interactive)
-  (unless (vertico-ido--delete-directory)
+  (unless (vertico-directory-up)
     (call-interactively #'backward-delete-char)))
 
 ;;;###autoload
-(defun vertico-ido-delete-word ()
+(defun vertico-directory-delete-word ()
   "Delete directory or word before point."
   (interactive)
-  (unless (vertico-ido--delete-directory)
+  (unless (vertico-directory-up)
     (let ((pt (point)))
       (forward-word -1)
       (delete-region pt (point)))))
 
-(provide 'vertico-ido)
-;;; vertico-ido.el ends here
+(provide 'vertico-directory)
+;;; vertico-directory.el ends here
