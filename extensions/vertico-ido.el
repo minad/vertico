@@ -22,8 +22,8 @@
 ;; This package is a Vertico extension, which provides Ido-like
 ;; commands. The commands can be bound in the `vertico-map'.
 ;;
-;; (define-key vertico-map "\r" #'vertico-ido-exit)
-;; (define-key vertico-map "\d" #'vertico-ido-delete)
+;; (define-key vertico-map "\d" #'vertico-ido-delete-char)
+;; (define-key vertico-map "\M-\d" #'vertico-ido-delete-word)
 
 ;;; Code:
 
@@ -50,17 +50,31 @@
       (vertico-insert)
     (vertico-exit)))
 
+(defun vertico-ido--delete-directory ()
+  "Delete directory before point."
+  (when (and (eq (char-before) ?/)
+             (vertico-ido--completing-file-p))
+    (save-excursion
+      (goto-char (1- (point)))
+      (when (search-backward "/" (point-min) t)
+        (delete-region (1+ (point)) (point-max))))
+    t))
+
 ;;;###autoload
-(defun vertico-ido-delete ()
-  "Delete char before or go up directory for file cagetory selectrum buffers."
+(defun vertico-ido-delete-char ()
+  "Delete directory or char before point."
   (interactive)
-  (if (and (eq (char-before) ?/)
-           (vertico-ido--completing-file-p))
-      (save-excursion
-        (goto-char (1- (point)))
-        (when (search-backward "/" (point-min) t)
-          (delete-region (1+ (point)) (point-max))))
-    (call-interactively 'backward-delete-char)))
+  (unless (vertico-ido--delete-directory)
+    (call-interactively #'backward-delete-char)))
+
+;;;###autoload
+(defun vertico-ido-delete-word ()
+  "Delete directory or word before point."
+  (interactive)
+  (unless (vertico-ido--delete-directory)
+    (let ((pt (point)))
+      (forward-word -1)
+      (delete-region pt (point)))))
 
 (provide 'vertico-ido)
 ;;; vertico-ido.el ends here
