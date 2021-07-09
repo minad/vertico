@@ -21,6 +21,8 @@
 
 ;; This package is a Vertico extension, which allows to repeat the last
 ;; Vertico session via the `vertico-repeat' command.
+;;
+;; (global-set-key "\M-r" #'vertico-repeat)
 
 ;;; Code:
 
