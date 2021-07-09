@@ -152,10 +152,10 @@
   We maintain a few small extension packages to Vertico in this repository
   in the subdirectory [[https://github.com/minad/vertico/tree/main/extensions][extensions/]]. Currently these extensions are available:
 
-  - vertico-buffer: Offers =vertico-buffer-mode= to display Vertico in a separate buffer
-  - vertico-ido: Ido-like commands for directory navigation
-  - vertico-repeat: The =vertico-repeat= command to repeat the last completion session
-  - vertico-reverse: Offers =vertico-reverse-mode=, which reverse the display
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-buffer.el][vertico-buffer.el]]: Offers =vertico-buffer-mode= to display Vertico in a separate buffer
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-ido.el][vertico-ido.el]]: Ido-like commands for directory navigation
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-repeat.el][vertico-repeat.el]]: The =vertico-repeat= command to repeat the last completion session
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-reverse.el][vertico-reverse.el]]: Offers =vertico-reverse-mode=, which reverse the display
 
 * Complementary packages
 
