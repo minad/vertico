@@ -55,7 +55,7 @@
                (concat "{" (string-join candidates " | ") "}")
              "[No match]"))))
 
-(defun vertico-flat--disable-annotations (_ candidates)
+(defun vertico-flat--affixate (_ candidates)
   "Return CANDIDATES without adding annotations."
   candidates)
 
@@ -67,11 +67,11 @@
    (vertico-flat-mode
     (setq vertico-flat--group-format vertico-group-format
           vertico-group-format nil)
-    (advice-add #'vertico--affixate :override #'vertico-flat--disable-annotations)
+    (advice-add #'vertico--affixate :override #'vertico-flat--affixate)
     (advice-add #'vertico--display-candidates :override #'vertico-flat--display))
    (t
     (setq vertico-group-format vertico-flat--group-format)
-    (advice-remove #'vertico--affixate #'vertico-flat--disable-annotations)
+    (advice-remove #'vertico--affixate #'vertico-flat--affixate)
     (advice-remove #'vertico--display-candidates #'vertico-flat--display))))
 
 (provide 'vertico-flat)
