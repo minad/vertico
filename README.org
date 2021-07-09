@@ -152,6 +152,7 @@
   We maintain a few small extension packages to Vertico in this repository
   in the subdirectory [[https://github.com/minad/vertico/tree/main/extensions][extensions/]]. Currently these extensions are available:
 
+  - [[https://github.com/minad/vertico/blob/main/extensions/horizontico.el][horizontico.el]]: HORIZONTal Interactive COmpletion
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-buffer.el][vertico-buffer.el]]: Offers =vertico-buffer-mode= to display Vertico in a separate buffer
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-ido.el][vertico-ido.el]]: Commands for Ido-like directory navigation
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-repeat.el][vertico-repeat.el]]: The command =vertico-repeate= repeats the last completion session
@@ -212,13 +213,12 @@
   with Emacs. There are at least two other interactive completion UIs, which
   follow a similar philosophy:
 
-  - [[https://github.com/raxod502/selectrum][Selectrum]]: Selectrum has a similar UI as Vertico. Vertico additionally has
-    the ability to cycle over candidates and offers more commands for grouping
-    support. On the other hand, Selectrum supports Avy-style quick keys and a
-    horizontal display. Furthermore Selectrum is significantly more complex and
-    not fully compatible with every Emacs completion command ([[https://github.com/raxod502/selectrum/issues/481][Issue #481]]), since
-    it uses its own filtering infrastructure, which deviates from the standard
-    Emacs completion facilities.
+  - [[https://github.com/raxod502/selectrum][Selectrum]]: Selectrum has a similar UI as Vertico. Selectrum is significantly
+    more complex and not fully compatible with every Emacs completion command
+    ([[https://github.com/raxod502/selectrum/issues/481][Issue #481]]), since it uses its own filtering infrastructure, which deviates
+    from the standard Emacs completion facilities. Selectrum supports additional
+    Avy-style quick keys. Vertico additionally has the ability to cycle over
+    candidates and offers more commands for grouping support.
   - [[https://github.com/oantolin/icomplete-vertical][Icomplete-vertical]]: This package enhances the Emacs builtin Icomplete with a
     vertical display. In contrast to Vertico, the candidates are rotated such that
     the current candidate always appears at the top. From my perspective,
