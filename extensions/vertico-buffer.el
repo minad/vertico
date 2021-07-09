@@ -52,10 +52,12 @@
     (let ((str (buffer-string))
           (pt (point)))
       (if (= pt (point-max))
-          (concat str #(" " 0 1 (face (:inverse-video t))))
+          (setq str (concat str #(" " 0 1 (face (:inverse-video t)))))
         (setq pt (max (minibuffer-prompt-end) pt))
-        (put-text-property (1- pt) pt 'face '(:inverse-video t) str)
-        str))))
+        (put-text-property (1- pt) pt 'face '(:inverse-video t) str))
+      (when vertico-count-format
+        (setq str (concat (propertize (vertico--format-count) 'face 'minibuffer-prompt) str)))
+      str)))
 
 (defun vertico-buffer--display (lines)
   "Display LINES in buffer."

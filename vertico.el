@@ -42,9 +42,10 @@
   :group 'convenience
   :prefix "vertico-")
 
-(defcustom vertico-count-format (cons "%-6s " "%s/%s")
+(defcustom vertico-count-format
+  '(7 "%s/%s ")
   "Format string used for the candidate count."
-  :type '(choice (const nil) (cons string string)))
+  :type '(choice (const nil) (list integer string)))
 
 (defcustom vertico-group-format
   (concat
@@ -489,17 +490,25 @@ See `resize-mini-windows' for documentation."
                 (and (< dp 0) (eq vertico-resize t)))
         (window-resize nil dp nil nil 'pixelwise)))))
 
+(defun vertico--format-count ()
+  "Format the count string."
+  (when (stringp (car vertico-count-format))
+    (message "Deprecated `vertico-count-format' configuration.")
+    (setq vertico-count-format `(7 "%s/%s")))
+  (concat
+   (format (cadr vertico-count-format)
+           (cond ((>= vertico--index 0) (1+ vertico--index))
+                 ((vertico--allow-prompt-selection-p) "*")
+                 (t "!"))
+           vertico--total)
+   (propertize " " 'display
+               `(space :align-to (+ left ,(car vertico-count-format))))))
+
 (defun vertico--display-count ()
   "Update count overlay `vertico--count-ov'."
   (when vertico--count-ov
     (move-overlay vertico--count-ov (point-min) (point-min))
-    (overlay-put vertico--count-ov 'before-string
-                 (format (car vertico-count-format)
-                         (format (cdr vertico-count-format)
-                                 (cond ((>= vertico--index 0) (1+ vertico--index))
-                                       ((vertico--allow-prompt-selection-p) "*")
-                                       (t "!"))
-                                 vertico--total)))))
+    (overlay-put vertico--count-ov 'before-string (vertico--format-count))))
 
 (defun vertico--tidy-shadowed-file ()
   "Tidy shadowed file name, see `rfn-eshadow-overlay'."
