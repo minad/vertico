@@ -12,14 +12,14 @@
 
 * Introduction
 
-  Vertico provides a performant and minimalistic vertical completion UI, which is
-  based on the default completion system. The main focus of Vertico is to provide
-  a UI which behaves /correctly/ under all circumstances. By reusing the built-in
-  facilities system, Vertico achieves /full compatibility/ with built-in Emacs
-  completion commands and completion tables. Vertico only provides the completion
-  UI. Additional enhancements can be installed separately via complementary
-  packages. The code base is small and maintainable (~vertico.el~ is only about 600
-  lines of code without whitespace and comments).
+  Vertico provides a performant and minimalistic vertical completion UI, which
+  is based on the default completion system. The main focus of Vertico is to
+  provide a UI which behaves /correctly/ under all circumstances. By reusing the
+  built-in facilities system, Vertico achieves /full compatibility/ with built-in
+  Emacs completion commands and completion tables. Vertico only provides the
+  completion UI. Additional enhancements can be installed separately via
+  extensions or complementary packages. The code base is small and maintainable
+  (~vertico.el~ is only about 600 lines of code without whitespace and comments).
 
 * Features
 
@@ -146,6 +146,16 @@
     (setq read-file-name-completion-ignore-case t
           read-buffer-completion-ignore-case t)
   #+end_src
+
+* Extensions
+
+  We maintain a few small extension packages to Vertico in this repository
+  in the subdirectory [[https://github.com/minad/vertico/tree/main/extensions][extensions/]]. Currently these extensions are available:
+
+  - vertico-buffer: Offers =vertico-buffer-mode= to display Vertico in a separate buffer
+  - vertico-ido: Ido-like commands for directory navigation
+  - vertico-repeat: The =vertico-repeat= command to repeat the last completion session
+  - vertico-reverse: Offers =vertico-reverse-mode=, which reverse the display
 
 * Complementary packages
 
