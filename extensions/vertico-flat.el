@@ -1,4 +1,4 @@
-;;; horizontico.el --- HORIZONTal Interactive COmpletion -*- lexical-binding: t -*-
+;;; vertico-flat.el --- Flat, horizontal display for Vertico -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2021  Free Software Foundation, Inc.
 
@@ -27,10 +27,9 @@
 
 (require 'vertico)
 
-(defvar horizontico--orig-group-format nil)
-(defvar horizontico--orig-count nil)
+(defvar vertico-flat--group-format nil)
 
-(defun horizontico--display (candidates)
+(defun vertico-flat--display (candidates)
   "Display CANDIDATES horizontally."
   (move-overlay vertico--candidates-ov (point-max) (point-max))
   (when (>= vertico--index 0)
@@ -56,27 +55,24 @@
                (concat "{" (string-join candidates " | ") "}")
              "[No match]"))))
 
-(defun horizontico--disable-annotations (_ candidates)
+(defun vertico-flat--disable-annotations (_ candidates)
   "Return CANDIDATES without adding annotations."
   candidates)
 
 ;;;###autoload
-(define-minor-mode horizontico-mode
-  "HORIZONTal Interactive COmpletion."
+(define-minor-mode vertico-flat-mode
+  "Flat, horizontal display for Vertico."
   :global t
   (cond
-   (horizontico-mode
-    (setq horizontico--orig-group-format vertico-group-format
-          horizontico--orig-count vertico-count
-          vertico-group-format nil
-          vertico-count 20)
-    (advice-add #'vertico--affixate :override #'horizontico--disable-annotations)
-    (advice-add #'vertico--display-candidates :override #'horizontico--display))
+   (vertico-flat-mode
+    (setq vertico-flat--group-format vertico-group-format
+          vertico-group-format nil)
+    (advice-add #'vertico--affixate :override #'vertico-flat--disable-annotations)
+    (advice-add #'vertico--display-candidates :override #'vertico-flat--display))
    (t
-    (setq vertico-group-format horizontico--orig-group-format
-          vertico-count horizontico--orig-count)
-    (advice-remove #'vertico--affixate #'horizontico--disable-annotations)
-    (advice-remove #'vertico--display-candidates #'horizontico--display))))
+    (setq vertico-group-format vertico-flat--group-format)
+    (advice-remove #'vertico--affixate #'vertico-flat--disable-annotations)
+    (advice-remove #'vertico--display-candidates #'vertico-flat--display))))
 
-(provide 'horizontico)
-;;; horizontico.el ends here
+(provide 'vertico-flat)
+;;; vertico-flat.el ends here
