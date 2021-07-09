@@ -47,8 +47,7 @@
                           candidates)))
   (setq candidates
         (seq-map-indexed (lambda (cand idx)
-                           (replace-regexp-in-string
-                            "\\` +" ""
+                           (string-trim
                             (replace-regexp-in-string
                              "[ \t]+" (if (= idx 0) #(" " 0 1 (face vertico-current)) " ")
                              (substring cand 0 -1))))
