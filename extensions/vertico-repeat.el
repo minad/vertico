@@ -33,6 +33,7 @@
 (defvar vertico-repeat--input nil)
 (defvar vertico-repeat--command nil)
 (defvar vertico-repeat--candidate nil)
+(defvar vertico-repeat--restore nil)
 
 (defun vertico-repeat--save-input ()
   "Save current minibuffer content for `vertico-repeat'."
@@ -47,12 +48,13 @@
 
 (defun vertico-repeat--save ()
   "Save Vertico status for `vertico-repeat'."
-  (unless (eq real-this-command #'vertico-repeat)
+  (unless vertico-repeat--restore
     (setq vertico-repeat--command (if (boundp 'minibuffer-current-command)
                                       minibuffer-current-command
                                     this-command)
           vertico-repeat--input ""
-          vertico-repeat--candidate nil))
+          vertico-repeat--candidate nil
+          vertico-repeat--restore nil))
   (add-hook 'post-command-hook #'vertico-repeat--save-input nil 'local)
   (add-hook 'minibuffer-exit-hook #'vertico-repeat--save-candidate nil 'local))
 
@@ -74,9 +76,10 @@
   (interactive)
   (unless vertico-repeat--command
     (user-error "No repeatable Vertico session"))
-  (minibuffer-with-setup-hook
-      #'vertico-repeat--restore
-    (command-execute (setq this-command vertico-repeat--command))))
+  (let ((vertico-repeat--restore t))
+    (minibuffer-with-setup-hook
+        #'vertico-repeat--restore
+      (command-execute (setq this-command vertico-repeat--command)))))
 
 ;;;###autoload
 (advice-add #'vertico--setup :after #'vertico-repeat--save)
