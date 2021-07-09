@@ -46,10 +46,10 @@
 (defun vertico-reverse--display (lines)
   "Display LINES in reverse."
   (move-overlay vertico--candidates-ov (point-min) (point-min))
-  (let ((string (concat
-                 (unless (eq vertico-resize t)
-                   (make-string (- vertico-count (length lines)) ?\n))
-		 (apply #'concat (nreverse lines)))))
+  (setq lines (nreverse lines))
+  (unless (eq vertico-resize t)
+    (setq lines (nconc (make-list (max 0 (- vertico-count (length lines))) "\n") lines)))
+  (let ((string (apply #'concat lines)))
     (add-face-text-property 0 (length string) 'default 'append string)
     (overlay-put vertico--candidates-ov 'before-string string))
   (vertico--resize-window (length lines)))
