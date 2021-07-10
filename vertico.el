@@ -509,6 +509,8 @@ See `resize-mini-windows' for documentation."
   "Update count overlay `vertico--count-ov'."
   (when vertico--count-ov
     (move-overlay vertico--count-ov (point-min) (point-min))
+    ;; Set priority for compatibility with `minibuffer-depth-indicate-mode'
+    (overlay-put vertico--count-ov 'priority 1)
     (overlay-put vertico--count-ov 'before-string (vertico--format-count))))
 
 (defun vertico--tidy-shadowed-file ()
