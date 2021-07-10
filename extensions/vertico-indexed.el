@@ -50,10 +50,12 @@
                    prefix)
            suffix index start))
 
-(defun vertico-indexed--goto ()
-  "Goto candidate given by `current-prefix-arg'."
-  (when current-prefix-arg
-    (vertico--goto (+ vertico-indexed--start (prefix-numeric-value current-prefix-arg)))))
+(defun vertico-indexed--handle-prefix (orig)
+  "Handle prefix argument before calling ORIG function."
+  (let ((vertico--index (if current-prefix-arg
+                            (+ vertico-indexed--start (prefix-numeric-value current-prefix-arg))
+                          vertico--index)))
+    (funcall orig)))
 
 ;;;###autoload
 (define-minor-mode vertico-indexed-mode
@@ -62,12 +64,12 @@
   (cond
    (vertico-indexed-mode
     (advice-add #'vertico--format-candidate :around #'vertico-indexed--format-candidate)
-    (advice-add #'vertico-insert :before #'vertico-indexed--goto)
-    (advice-add #'vertico-exit :before #'vertico-indexed--goto))
+    (advice-add #'vertico-insert :around #'vertico-indexed--handle-prefix)
+    (advice-add #'vertico-exit :around #'vertico-indexed--handle-prefix))
    (t
     (advice-remove #'vertico--format-candidate #'vertico-indexed--format-candidate)
-    (advice-remove #'vertico-insert #'vertico-indexed--goto)
-    (advice-remove #'vertico-exit #'vertico-indexed--goto))))
+    (advice-remove #'vertico-insert #'vertico-indexed--handle-prefix)
+    (advice-remove #'vertico-exit #'vertico-indexed--handle-prefix))))
 
 (provide 'vertico-indexed)
 ;;; vertico-indexed.el ends here
