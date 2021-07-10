@@ -516,16 +516,6 @@ See `resize-mini-windows' for documentation."
     (overlay-put vertico--count-ov 'priority 1)
     (overlay-put vertico--count-ov 'before-string (vertico--format-count))))
 
-(defun vertico--tidy-shadowed-file ()
-  "Tidy shadowed file name, see `rfn-eshadow-overlay'."
-  (when (and (eq this-command #'self-insert-command)
-             (bound-and-true-p rfn-eshadow-overlay)
-             (overlay-buffer rfn-eshadow-overlay)
-             (= (point) (point-max))
-             (or (>= (- (point) (overlay-end rfn-eshadow-overlay)) 2)
-                 (eq ?/ (char-before (- (point) 2)))))
-    (delete-region (overlay-start rfn-eshadow-overlay) (overlay-end rfn-eshadow-overlay))))
-
 (defun vertico--prompt-selection ()
   "Highlight the prompt if selected."
   (let ((inhibit-modification-hooks t))
@@ -543,7 +533,6 @@ See `resize-mini-windows' for documentation."
 
 (defun vertico--exhibit ()
   "Exhibit completion UI."
-  (vertico--tidy-shadowed-file)
   (let* ((buffer-undo-list t) ;; Overlays affect point position and undo list!
          (pt (max 0 (- (point) (minibuffer-prompt-end))))
          (content (minibuffer-contents-no-properties))

@@ -28,11 +28,13 @@
 
 ;; This package is a Vertico extension, which provides Ido-like
 ;; directory navigation commands. The commands can be bound in the
-;; `vertico-map'.
+;; `vertico-map'. Furthermore a cleanup function for shadowed file paths
+;; is provided.
 ;;
 ;; (define-key vertico-map "\r" #'vertico-directory-enter)
 ;; (define-key vertico-map "\d" #'vertico-directory-delete-char)
 ;; (define-key vertico-map "\M-\d" #'vertico-directory-delete-word)
+;; (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 
 ;;; Code:
 
@@ -86,6 +88,17 @@
     (let ((pt (point)))
       (forward-word -1)
       (delete-region pt (point)))))
+
+;;;###autoload
+(defun vertico-directory-tidy ()
+  "Tidy shadowed file name, see `rfn-eshadow-overlay'."
+  (when (and (eq this-command #'self-insert-command)
+             (bound-and-true-p rfn-eshadow-overlay)
+             (overlay-buffer rfn-eshadow-overlay)
+             (= (point) (point-max))
+             (or (>= (- (point) (overlay-end rfn-eshadow-overlay)) 2)
+                 (eq ?/ (char-before (- (point) 2)))))
+    (delete-region (overlay-start rfn-eshadow-overlay) (overlay-end rfn-eshadow-overlay))))
 
 (provide 'vertico-directory)
 ;;; vertico-directory.el ends here
