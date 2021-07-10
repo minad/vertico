@@ -520,16 +520,16 @@ See `resize-mini-windows' for documentation."
 (defun vertico--prompt-selection ()
   "Highlight the prompt if selected."
   (let ((inhibit-modification-hooks t))
-    (vertico--add-face 'vertico-current (minibuffer-prompt-end) (point-max)
-                       (and (< vertico--index 0) (vertico--allow-prompt-selection-p)))))
+    (if (and (< vertico--index 0) (vertico--allow-prompt-selection-p))
+        (add-face-text-property (minibuffer-prompt-end) (point-max) 'vertico-current 'append)
+      (vertico--remove-face (minibuffer-prompt-end) (point-max) 'vertico-current))))
 
-(defun vertico--add-face (face beg end add &optional obj)
-  "Add FACE between BEG and END from OBJ if ADD is t, otherwise remove."
+(defun vertico--remove-face (beg end face &optional obj)
+  "Remove FACE between BEG and END from OBJ."
   (while (< beg end)
-    (let* ((val (get-text-property beg 'face obj))
-           (faces (remq face (if (listp val) val (list val))))
-           (next (next-single-property-change beg 'face obj end)))
-      (add-text-properties beg next `(face ,(if add (cons face faces) faces)) obj)
+    (let ((val (get-text-property beg 'face obj))
+          (next (next-single-property-change beg 'face obj end)))
+      (put-text-property beg next 'face (remq face (if (listp val) val (list val))) obj)
       (setq beg next))))
 
 (defun vertico--exhibit ()
@@ -680,13 +680,13 @@ When the prefix argument is 0, the group order is reset."
 (defun vertico--candidate (&optional hl)
   "Return current candidate string with optional highlighting if HL is non-nil."
   (let ((content (minibuffer-contents)))
-    (vertico--add-face 'vertico-current 0 (length content) nil content)
+    (vertico--remove-face 0 (length content) 'vertico-current content)
     (if (>= vertico--index 0)
         (let ((cand (nth vertico--index vertico--candidates)))
           ;;; XXX Drop the completions-common-part face which is added by `completion--twq-all'.
           ;; This is a hack in Emacs and should better be fixed in Emacs itself, the corresponding
           ;; code is already marked with a FIXME. Should this be reported as a bug?
-          (vertico--add-face 'completions-common-part 0 (length cand) nil cand)
+          (vertico--remove-face 0 (length cand) 'completions-common-part cand)
           (concat (substring content 0 vertico--base)
                   (if hl (car (funcall vertico--highlight (list cand))) cand)))
       content)))
