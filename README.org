@@ -157,6 +157,7 @@
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-directory.el][vertico-directory.el]]: Commands for Ido-like directory navigation
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-flat.el][vertico-flat.el]]: Enable =vertico-flat-mode= to enable a flat, horizontal display
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-indexed.el][vertico-indexed.el]]: Select indexed candidates with prefix arguments
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-mouse.el][vertico-mouse.el]]: Mouse support for scrolling and candidate selection
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-quick.el][vertico-quick.el]]: Select using Avy-style quick keys
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-repeat.el][vertico-repeat.el]]: The command =vertico-repeat= repeats the last completion session
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-reverse.el][vertico-reverse.el]]: Enable =vertico-reverse-mode= to reverse the display
