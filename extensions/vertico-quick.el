@@ -66,7 +66,8 @@
          (len (+ fst snd))
          (idx (- index start))
          ;; Ensure that space is not trimmed by `vertico-flat-mode'
-         (sp (propertize "_" 'display `(space :width 1))))
+         (sp #("_" 0 1 (display (space :width 1))))
+         (sp2 #("__" 0 2 (display (space :width 2)))))
     (funcall orig cand
              (concat
               (if (>= idx fst)
@@ -77,7 +78,7 @@
                      ((eq first vertico-quick--first)
                       (concat sp (propertize (char-to-string second) 'face 'vertico-quick1)))
                      (vertico-quick--first
-                      (concat sp sp))
+                      sp2)
                      (t
                       (concat (propertize (char-to-string first) 'face 'vertico-quick1)
                               (propertize (char-to-string second) 'face 'vertico-quick2)))))
