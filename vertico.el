@@ -703,7 +703,7 @@ When the prefix argument is 0, the group order is reset."
               completion-auto-help nil
               completion-show-inline-help nil)
   (use-local-map vertico-map)
-  (add-hook 'post-command-hook #'vertico--exhibit -99 'local))
+  (add-hook 'post-command-hook #'vertico--exhibit -90 'local))
 
 (defun vertico--advice (orig &rest args)
   "Advice for ORIG completion function, receiving ARGS."
