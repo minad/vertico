@@ -56,17 +56,15 @@
   :type 'string
   :group 'vertico)
 
-(defvar-local vertico-quick--index 0)
 (defvar-local vertico-quick--list 0)
 (defvar-local vertico-quick--first nil)
 
-(defun vertico-quick--format-candidate (orig cand prefix suffix index)
+(defun vertico-quick--format-candidate (orig cand prefix suffix index start)
   "Format candidate, see `vertico--format-candidate' for arguments."
   (let* ((fst (length vertico-quick1))
          (snd (length vertico-quick2))
          (len (+ fst snd))
-         (idx vertico-quick--index))
-    (setq vertico-quick--index (1+ idx))
+         (idx (- index start)))
     (funcall orig cand
              (concat
               (if (>= idx fst)
@@ -87,15 +85,13 @@
                       "  "
                     (concat (propertize (char-to-string first) 'face 'vertico-quick1) " "))))
               (make-string (max 1 (- (length prefix) 2)) ?\s))
-             suffix
-             index)))
+             suffix index start)))
 
 ;;;###autoload
 (defun vertico-quick-jump ()
   "Jump to candidate using quick keys."
   (interactive)
-  (cl-letf* ((vertico-quick--index 0)
-             (vertico-quick--list nil)
+  (cl-letf* ((vertico-quick--list nil)
              (key nil)
              (orig-format (symbol-function #'vertico--format-candidate))
              ((symbol-function #'vertico--format-candidate)
@@ -104,7 +100,6 @@
     (setq key (read-key))
     (when (seq-position vertico-quick2 key)
       (let ((vertico-quick--first key)
-            (vertico-quick--index 0)
             (vertico-quick--list))
         (vertico--exhibit))
       (setq key (+ (lsh key 16) (read-key))))
