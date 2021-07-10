@@ -52,10 +52,7 @@
                (concat (plist-get vertico-flat-format :left)
                        (string-join candidates (plist-get vertico-flat-format :separator))
                        (plist-get vertico-flat-format :right))
-             (plist-get vertico-flat-format :no-match))))
-  (let ((window-resize-pixelwise t)
-        (window-min-height 1))
-    (window-resize nil (- (window-height)))))
+             (plist-get vertico-flat-format :no-match)))))
 
 (defun vertico-flat--format-candidates (_metadata)
   "Format candidates."
