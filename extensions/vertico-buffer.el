@@ -93,7 +93,7 @@
   (with-current-buffer vertico-buffer--buffer
     (add-hook 'window-selection-change-functions 'vertico-buffer--select nil 'local)
     (setq-local display-line-numbers nil
-                truncate-lines nil
+                truncate-lines t
                 show-trailing-whitespace nil
                 inhibit-modification-hooks t
                 cursor-in-non-selected-windows 'box)))
