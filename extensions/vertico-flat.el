@@ -32,13 +32,14 @@
 
 (require 'vertico)
 
-(defcustom vertico-flat-separator
-  (list (propertize "{" 'face 'minibuffer-prompt)
-        (propertize " | " 'face 'minibuffer-prompt)
-        (propertize "}" 'face 'minibuffer-prompt)
-        (propertize "…" 'face 'minibuffer-prompt))
-  "Separator strings."
-  :type '(list string string string string)
+(defcustom vertico-flat-format
+  '(:left      #("{" 0 1 (face minibuffer-prompt))
+    :separator #(" | " 0 3 (face minibuffer-prompt))
+    :right     #("}" 0 1 (face minibuffer-prompt))
+    :ellipsis  #("…" 0 1 (face minibuffer-prompt))
+    :no-match  "[No match]")
+  "Formatting strings."
+  :type 'plist
   :group 'vertico)
 
 (defun vertico-flat--display (candidates)
@@ -48,10 +49,10 @@
    vertico--candidates-ov 'after-string
    (concat #(" " 0 1 (cursor t))
            (if candidates
-               (concat (car vertico-flat-separator)
-                       (string-join candidates (cadr vertico-flat-separator))
-                       (caddr vertico-flat-separator))
-             "[No match]"))))
+               (concat (plist-get vertico-flat-format :left)
+                       (string-join candidates (plist-get vertico-flat-format :separator))
+                       (plist-get vertico-flat-format :right))
+             (plist-get vertico-flat-format :no-match)))))
 
 (defun vertico-flat--format-candidates (_metadata)
   "Format candidates."
@@ -59,9 +60,10 @@
          (count vertico-count)
          (candidates (nthcdr vertico--index vertico--candidates))
          (width (- (window-width) 4
-                   (length (car vertico-flat-separator))
-                   (length (caddr vertico-flat-separator))
-                   (length (cadddr vertico-flat-separator))
+                   (length (plist-get vertico-flat-format :left))
+                   (length (plist-get vertico-flat-format :separator))
+                   (length (plist-get vertico-flat-format :right))
+                   (length (plist-get vertico-flat-format :ellipsis))
                    (car (posn-col-row (posn-at-point (1- (point-max)))))))
          (result))
     (while (and candidates (> width 0) (> count 0))
@@ -74,12 +76,12 @@
                      (vertico--format-candidate cand "" "" index vertico--index))))
         (setq index (1+ index)
               count (1- count)
-              width (- width (string-width cand) (length (cadr vertico-flat-separator))))
+              width (- width (string-width cand) (length (plist-get vertico-flat-format :separator))))
         (when (or (not result) (> width 0))
           (push cand result))
         (pop candidates)))
     (unless (or (= vertico--total 0) (= index vertico--total))
-      (push (cadddr vertico-flat-separator) result))
+      (push (plist-get vertico-flat-format :ellipsis) result))
     (nreverse result)))
 
 ;;;###autoload
