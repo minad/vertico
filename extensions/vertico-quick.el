@@ -35,13 +35,21 @@
 (require 'vertico)
 
 (defface vertico-quick1
-  '((t :weight bold :background "#d5baff" :foreground "black"))
+  '((((class color) (min-colors 88) (background dark))
+     :background "#7042a2" :weight bold :foreground "white")
+    (((class color) (min-colors 88) (background light))
+     :weight bold :background "#d5baff" :foreground "black")
+    (t :background "magenta" :foreground "white"))
   "Face used for the first quick key."
   :group 'vertico
   :group 'faces)
 
 (defface vertico-quick2
-  '((t :weight bold :background "#8ae4f2" :foreground "black"))
+  '((((class color) (min-colors 88) (background dark))
+     :background "#004065" :weight bold :foreground "white")
+    (((class color) (min-colors 88) (background light))
+     :weight bold :background "#8ae4f2" :foreground "black")
+    (t :background "blue" :foreground "white"))
   "Face used for the second quick key."
   :group 'vertico
   :group 'faces)
