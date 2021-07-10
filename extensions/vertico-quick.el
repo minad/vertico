@@ -36,13 +36,13 @@
 
 (defface vertico-quick1
   '((t :weight bold :background "#d5baff" :foreground "black"))
-  "First quick key."
+  "Face used for the first quick key."
   :group 'vertico
   :group 'faces)
 
 (defface vertico-quick2
   '((t :weight bold :background "#8ae4f2" :foreground "black"))
-  "Second quick key."
+  "Face used for the second quick key."
   :group 'vertico
   :group 'faces)
 
