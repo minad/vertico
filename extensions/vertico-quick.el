@@ -64,7 +64,9 @@
   (let* ((fst (length vertico-quick1))
          (snd (length vertico-quick2))
          (len (+ fst snd))
-         (idx (- index start)))
+         (idx (- index start))
+         ;; Ensure that space is not trimmed by `vertico-flat-mode'
+         (sp (propertize "_" 'display `(space :width 1))))
     (funcall orig cand
              (concat
               (if (>= idx fst)
@@ -73,16 +75,16 @@
                     (push (cons (+ (lsh first 16) second) index) vertico-quick--list)
                     (cond
                      ((eq first vertico-quick--first)
-                      (concat " " (propertize (char-to-string second) 'face 'vertico-quick1)))
+                      (concat sp (propertize (char-to-string second) 'face 'vertico-quick1)))
                      (vertico-quick--first
-                      "   ")
+                      (concat sp sp))
                      (t
                       (concat (propertize (char-to-string first) 'face 'vertico-quick1)
                               (propertize (char-to-string second) 'face 'vertico-quick2)))))
                 (let ((first (elt vertico-quick1 (mod idx fst))))
                   (push (cons first index) vertico-quick--list)
                   (if vertico-quick--first
-                      "  "
+                      (concat sp " ")
                     (concat (propertize (char-to-string first) 'face 'vertico-quick1) " "))))
               (make-string (max 1 (- (length prefix) 2)) ?\s))
              suffix index start)))
