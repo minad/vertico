@@ -103,10 +103,8 @@
             (vertico-quick--list))
         (vertico--exhibit))
       (setq key (+ (lsh key 16) (read-key))))
-    (if-let (idx (alist-get key vertico-quick--list))
-        (setq vertico--index idx)
-      (message "Invalid key")
-      nil)))
+    (when-let (idx (alist-get key vertico-quick--list))
+      (setq vertico--index idx))))
 
 ;;;###autoload
 (defun vertico-quick-exit ()
