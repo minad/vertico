@@ -55,7 +55,7 @@
 
 (defun vertico-flat--format-candidates (_metadata)
   "Format candidates."
-  (let* ((index vertico--index)
+  (let* ((index (max 0 vertico--index))
          (count vertico-count)
          (candidates (nthcdr vertico--index vertico--candidates))
          (width (- (window-width) 4

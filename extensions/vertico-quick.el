@@ -56,7 +56,7 @@
   :type 'string
   :group 'vertico)
 
-(defvar-local vertico-quick--list 0)
+(defvar-local vertico-quick--list nil)
 (defvar-local vertico-quick--first nil)
 
 (defun vertico-quick--format-candidate (orig cand prefix suffix index start)
