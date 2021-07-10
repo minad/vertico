@@ -39,11 +39,12 @@
   :group 'vertico
   :group 'faces)
 
-(defvar-local vertico-indexed--start 0)
+(defvar-local vertico-indexed--min 0)
+(defvar-local vertico-indexed--max 0)
 
 (defun vertico-indexed--format-candidate (orig cand prefix suffix index start)
   "Format candidate, see `vertico--format-candidate' for arguments."
-  (setq-local vertico-indexed--start start)
+  (setq vertico-indexed--min start vertico-indexed--max index)
   (funcall orig cand
            (concat (propertize (format "%-2s " (- index start))
                                'face 'vertico-indexed)
@@ -55,7 +56,10 @@
   (let ((vertico--index (if current-prefix-arg
                             (+ vertico-indexed--start (prefix-numeric-value current-prefix-arg))
                           vertico--index)))
-    (funcall orig)))
+    (if (or (< vertico--index vertico-indexed--min)
+            (> vertico--index vertico-indexed--max))
+        (message "Index out of range")
+      (funcall orig))))
 
 ;;;###autoload
 (define-minor-mode vertico-indexed-mode
