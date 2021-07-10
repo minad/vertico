@@ -94,11 +94,10 @@
 (defun vertico-quick-jump ()
   "Jump to candidate using quick keys."
   (interactive)
-  (cl-letf* ((vertico-quick--list nil)
-             (key nil)
-             (orig-format (symbol-function #'vertico--format-candidate))
-             ((symbol-function #'vertico--format-candidate)
-              (apply-partially #'vertico-quick--format-candidate orig-format)))
+  (cl-letf ((vertico-quick--list nil) (key nil)
+            ((symbol-function #'vertico--format-candidate)
+             (apply-partially #'vertico-quick--format-candidate
+                              (symbol-function #'vertico--format-candidate))))
     (vertico--exhibit)
     (setq key (read-key))
     (when (seq-position vertico-quick2 key)

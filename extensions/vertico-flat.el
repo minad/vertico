@@ -35,9 +35,10 @@
 (defcustom vertico-flat-separator
   (list (propertize "{" 'face 'minibuffer-prompt)
         (propertize " | " 'face 'minibuffer-prompt)
-        (propertize "}" 'face 'minibuffer-prompt))
+        (propertize "}" 'face 'minibuffer-prompt)
+        (propertize "…" 'face 'minibuffer-prompt))
   "Separator strings."
-  :type '(list string string string)
+  :type '(list string string string string)
   :group 'vertico)
 
 (defun vertico-flat--display (candidates)
@@ -57,13 +58,11 @@
   (let* ((index vertico--index)
          (count vertico-count)
          (candidates (nthcdr vertico--index vertico--candidates))
-         (width (- (window-width)
+         (width (- (window-width) 4
                    (length (car vertico-flat-separator))
                    (length (caddr vertico-flat-separator))
-                   (point-max)
-                   (if vertico--count-ov
-                       (length (overlay-get vertico--count-ov 'before-string))
-                     0)))
+                   (length (cadddr vertico-flat-separator))
+                   (car (posn-col-row (posn-at-point (1- (point-max)))))))
          (result))
     (while (and candidates (> width 0) (> count 0))
       (let ((cand (car candidates)))
@@ -80,7 +79,7 @@
           (push cand result))
         (pop candidates)))
     (unless (or (= vertico--total 0) (= index vertico--total))
-      (push "…" result))
+      (push (cadddr vertico-flat-separator) result))
     (nreverse result)))
 
 ;;;###autoload
