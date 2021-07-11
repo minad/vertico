@@ -473,8 +473,7 @@ See `resize-mini-windows' for documentation."
            (setq start (or start index))
            (when (string-match-p "\n" cand)
              (setq cand (vertico--truncate-multiline cand max-width)))
-           (setcar line (vertico--format-candidate cand prefix suffix index start))
-           (setq index (1+ index))))
+           (setcar line (vertico--format-candidate cand prefix suffix index start))))
         (pop line)))
     lines))
 
