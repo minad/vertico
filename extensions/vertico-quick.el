@@ -77,7 +77,7 @@
                    (let ((first (elt vertico-quick2 (mod (/ (- idx fst) len) snd)))
                          (second (elt (concat vertico-quick1 vertico-quick2) (mod (- idx fst) len))))
                      (push (cons first t) vertico-quick--list)
-                     (push (cons (+ first (lsh second 16)) index) vertico-quick--list)
+                     (push (cons (+ first (ash second 16)) index) vertico-quick--list)
                      (cond
                       ((eq first vertico-quick--first)
                        (concat " " (propertize (char-to-string second) 'face 'vertico-quick1)))
@@ -112,7 +112,7 @@
       (let ((vertico-quick--first key)
             (vertico-quick--list))
         (vertico--exhibit))
-      (setq key (+ key (lsh (read-key) 16))))
+      (setq key (+ key (ash (read-key) 16))))
     (when-let (idx (alist-get key vertico-quick--list))
       (setq vertico--index idx))))
 

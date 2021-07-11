@@ -73,6 +73,14 @@ See `resize-mini-windows' for documentation."
   "Replacements for multiline strings."
   :type '(cons string string))
 
+(defcustom vertico-sort-override-function nil
+  "Sorting function override, which takes precedence over the `display-sort-function'."
+  :type '(choice (const nil) function))
+
+(defcustom vertico-sort-function #'vertico-sort-recency-length-alpha
+  "Default sorting function, which is used if no `display-sort-function' is specified."
+  :type '(choice (const nil) function))
+
 (defgroup vertico-faces nil
   "Faces used by Vertico."
   :group 'vertico
@@ -110,7 +118,7 @@ See `resize-mini-windows' for documentation."
     map)
   "Vertico minibuffer keymap derived from `minibuffer-local-map'.")
 
-(defvar-local vertico--highlight #'identity
+(defvar-local vertico--highlight-function #'identity
   "Deferred candidate highlighting function.")
 
 (defvar-local vertico--history-hash nil
@@ -155,12 +163,6 @@ See `resize-mini-windows' for documentation."
 (defvar-local vertico--default-missing nil
   "Default candidate is missing from candidates list.")
 
-(defun vertico--sort-predicate (x y)
-  "Sorting predicate which compares X and Y."
-  (or (< (length x) (length y))
-      (and (= (length x) (length y))
-           (string< x y))))
-
 (defun vertico--update-history-hash (base)
   "Update history hash, given current BASE prefix string."
   (unless (and vertico--history-hash (equal vertico--history-base base))
@@ -187,33 +189,51 @@ See `resize-mini-windows' for documentation."
       (setq vertico--history-hash hash
             vertico--history-base base))))
 
-(defun vertico--sort (candidates)
-  "Sort CANDIDATES by history, length and alphabetically."
-  ;; Separate history candidates from candidates first.
-  ;; Move the remaining candidates into buckets according to length.
-  (let* ((max-bucket 40)
-         (buckets (make-vector (1+ max-bucket) nil))
-         (hcands))
-    (dolist (cand candidates)
-      (if-let (idx (gethash cand vertico--history-hash))
-          (push (cons idx cand) hcands)
-        (let ((idx (min max-bucket (length cand))))
-          (aset buckets idx (cons cand (aref buckets idx))))))
-    ;; Sort history candidates
-    (setq hcands (sort hcands #'car-less-than-car))
-    (let ((cand hcands))
-      (while cand
-        (setcar cand (cdar cand))
-        (pop cand)))
-    (nconc
-     ;; Sorted History candidates
-     hcands
-     ;; Sort bucket candidates
-     (mapcan
-      (lambda (bucket) (sort bucket #'string<))
-      (nbutlast (append buckets nil)))
-     ;; Last bucket needs special treatment
-     (sort (aref buckets max-bucket) #'vertico--sort-predicate))))
+(defun vertico--length-string< (x y)
+  "Sorting predicate which compares X and Y first by length then by `string<'."
+  (or (< (length x) (length y))
+      (and (= (length x) (length y))
+           (string< x y))))
+
+(defmacro vertico--define-sort (fun recency bsize bindex bpred pred)
+  "Generate optimized sort FUN.
+The function is configured by RECENCY, BSIZE, BINDEX, BPRED and PRED."
+  `(defun ,fun (candidates)
+     (let* ((buckets (make-vector ,bsize nil))
+            (recent-candidates))
+       ,@(if recency
+             `((dolist (cand candidates)
+                 (if-let (idx (gethash cand vertico--history-hash))
+                     (push (cons idx cand) recent-candidates)
+                   (let ((idx (min ,(1- bsize) ,bindex)))
+                     (aset buckets idx (cons cand (aref buckets idx))))))
+               ;; Sort recent candidates
+               (setq recent-candidates (sort recent-candidates #'car-less-than-car))
+               (let ((cand recent-candidates))
+                 (while cand
+                   (setcar cand (cdar cand))
+                   (pop cand))))
+          `((dolist (cand candidates)
+              (let ((idx (min ,(1- bsize) ,bindex)))
+                (aset buckets idx (cons cand (aref buckets idx)))))))
+       (nconc
+        ;; Sorted recent candidates
+        recent-candidates
+        ;; Sort bucket candidates
+        (mapcan
+         (lambda (bucket) (sort bucket #',bpred))
+         (nbutlast (append buckets nil)))
+        ;; Last bucket needs special treatment
+        (sort (aref buckets ,(1- bsize)) #',pred)))))
+
+(vertico--define-sort vertico-sort-recency-length-alpha
+  'recency 32 (length cand) string< vertico--length-string<)
+(vertico--define-sort vertico-sort-recency-alpha
+  'recency 32 (if (eq cand "") 0 (/ (aref cand 0) 4)) string< string<)
+(vertico--define-sort vertico-sort-length-alpha
+  nil 32 (length cand) string< vertico--length-string<)
+(vertico--define-sort vertico-sort-alpha
+  nil 32 (if (eq cand "") 0 (/ (aref cand 0) 4)) string< string<)
 
 (defun vertico--affixate (metadata candidates)
   "Annotate CANDIDATES with annotation function specified by METADATA."
@@ -298,10 +318,13 @@ See `resize-mini-windows' for documentation."
                             (and completion-ignored-extensions
                                  (concat "\\|" (regexp-opt completion-ignored-extensions) "\\'")))))
         (setq all (cl-delete-if (lambda (x) (string-match-p ignore x)) all))))
-    (setq all (if-let (sort (completion-metadata-get metadata 'display-sort-function))
-                  (funcall sort all)
-                (vertico--update-history-hash (substring content 0 base))
-                (vertico--sort all)))
+    ;; Sort using the `display-sort-function' or the Vertico sort functions
+    (when-let (sort (or (and (not vertico-sort-override-function)
+                             (completion-metadata-get metadata 'display-sort-function))
+                        vertico-sort-override-function vertico-sort-function))
+      (unless (eq sort #'identity)
+        (vertico--update-history-hash (substring content 0 base))
+        (setq all (funcall sort all))))
     ;; Move special candidates: "field" appears at the top, before "field/", before default value
     (when (stringp def)
       (setq all (vertico--move-to-front def all)))
@@ -382,7 +405,7 @@ See `resize-mini-windows' for documentation."
            vertico--index index
            vertico--base base
            vertico--total total
-           vertico--highlight hl
+           vertico--highlight-function hl
            vertico--groups groups
            vertico--all-groups all-groups
            vertico--candidates candidates
@@ -445,7 +468,7 @@ See `resize-mini-windows' for documentation."
            (candidates
             (thread-last (seq-subseq vertico--candidates start
                                      (min (+ start vertico-count) vertico--total))
-              (funcall vertico--highlight)
+              (funcall vertico--highlight-function)
               (vertico--affixate metadata))))
       (dolist (cand candidates)
         (when-let (new-title (and group-format (funcall group-fun (car cand) nil)))
@@ -685,7 +708,7 @@ When the prefix argument is 0, the group order is reset."
           ;; code is already marked with a FIXME. Should this be reported as a bug?
           (vertico--remove-face 0 (length cand) 'completions-common-part cand)
           (concat (substring content 0 vertico--base)
-                  (if hl (car (funcall vertico--highlight (list cand))) cand)))
+                  (if hl (car (funcall vertico--highlight-function (list cand))) cand)))
       content)))
 
 (defun vertico--setup ()

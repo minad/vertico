@@ -68,7 +68,7 @@
          (result))
     (while (and candidates (> width 0) (> count 0))
       (let ((cand (car candidates)))
-        (setq cand (car (funcall vertico--highlight (list cand))))
+        (setq cand (car (funcall vertico--highlight-function (list cand))))
         (when (string-match-p "\n" cand)
           (setq cand (vertico--truncate-multiline cand width)))
         (setq cand (string-trim
