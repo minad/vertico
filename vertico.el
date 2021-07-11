@@ -282,7 +282,7 @@ See `resize-mini-windows' for documentation."
   "Recompute candidates given PT, CONTENT, BOUNDS and METADATA."
   (pcase-let* ((field (substring content (car bounds) (+ pt (cdr bounds))))
                ;; `minibuffer-completing-file-name' has been obsoleted by the completion category
-               (completing-file (eq 'file (completion-metadata-get metadata 'category)))
+               (category (completion-metadata-get metadata 'category))
                (`(,all . ,hl) (vertico--all-completions content
                                                         minibuffer-completion-table
                                                         minibuffer-completion-predicate
@@ -293,19 +293,21 @@ See `resize-mini-windows' for documentation."
     ;; Filter the ignored file extensions. We cannot use modified predicate for this filtering,
     ;; since this breaks the special casing in the `completion-file-name-table' for `file-exists-p'
     ;; and `file-directory-p'.
-    (when completing-file
+    (when (eq category 'file)
       (let ((ignore (concat "\\(?:\\`\\|/\\)\\.?\\./\\'"
                             (and completion-ignored-extensions
                                  (concat "\\|" (regexp-opt completion-ignored-extensions) "\\'")))))
         (setq all (cl-delete-if (lambda (x) (string-match-p ignore x)) all))))
-    (setq all (if-let (sort (completion-metadata-get metadata 'display-sort-function))
-                  (funcall sort all)
-                (vertico--update-history-hash (substring content 0 base))
-                (vertico--sort all)))
+    (if-let (sort (completion-metadata-get metadata 'display-sort-function))
+        (setq all (funcall sort all))
+      (vertico--update-history-hash (substring content 0 base))
+      (setq all (vertico--sort all))
+      (when-let (sort (completion--category-override category 'x-sort-function))
+        (setq all (funcall sort all))))
     ;; Move special candidates: "field" appears at the top, before "field/", before default value
     (when (stringp def)
       (setq all (vertico--move-to-front def all)))
-    (when (and completing-file (not (string-suffix-p "/" field)))
+    (when (and (eq category 'file) (not (string-suffix-p "/" field)))
       (setq all (vertico--move-to-front (concat field "/") all)))
     (setq all (vertico--move-to-front field all))
     (when-let (group-fun (and all (completion-metadata-get metadata 'group-function)))
