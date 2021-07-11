@@ -433,8 +433,8 @@ See `resize-mini-windows' for documentation."
     (add-face-text-property 0 (length cand) 'vertico-current 'append cand))
   cand)
 
-(defun vertico--format-candidates (metadata)
-  "Format current candidates with METADATA."
+(defun vertico--arrange-candidates (metadata)
+  "Arrange candidates given the current METADATA."
   (let ((curr-line 0) (lines))
     ;; Compute group titles
     (let* ((start (min (max 0 (- vertico--index (/ vertico-count 2) (1- (mod vertico-count 2))))
@@ -553,7 +553,7 @@ See `resize-mini-windows' for documentation."
       (vertico--update-candidates pt content bounds metadata))
     (vertico--prompt-selection)
     (vertico--display-count)
-    (vertico--display-candidates (vertico--format-candidates metadata))))
+    (vertico--display-candidates (vertico--arrange-candidates metadata))))
 
 (defun vertico--allow-prompt-selection-p ()
   "Return t if prompt can be selected."

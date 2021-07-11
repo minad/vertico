@@ -54,8 +54,8 @@
                        (plist-get vertico-flat-format :right))
              (plist-get vertico-flat-format :no-match)))))
 
-(defun vertico-flat--format-candidates (_metadata)
-  "Format candidates."
+(defun vertico-flat--arrange-candidates (_metadata)
+  "Arrange candidates."
   (let* ((index (max 0 vertico--index))
          (count vertico-count)
          (candidates (nthcdr vertico--index vertico--candidates))
@@ -91,10 +91,10 @@
   :global t
   (cond
    (vertico-flat-mode
-    (advice-add #'vertico--format-candidates :override #'vertico-flat--format-candidates)
+    (advice-add #'vertico--arrange-candidates :override #'vertico-flat--arrange-candidates)
     (advice-add #'vertico--display-candidates :override #'vertico-flat--display))
    (t
-    (advice-remove #'vertico--format-candidates #'vertico-flat--format-candidates)
+    (advice-remove #'vertico--arrange-candidates #'vertico-flat--arrange-candidates)
     (advice-remove #'vertico--display-candidates #'vertico-flat--display))))
 
 (provide 'vertico-flat)
