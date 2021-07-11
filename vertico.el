@@ -319,9 +319,9 @@ The function is configured by RECENCY, BSIZE, BINDEX, BPRED and PRED."
                                  (concat "\\|" (regexp-opt completion-ignored-extensions) "\\'")))))
         (setq all (cl-delete-if (lambda (x) (string-match-p ignore x)) all))))
     ;; Sort using the `display-sort-function' or the Vertico sort functions
-    (when-let (sort (or (and (not vertico-sort-override-function)
-                             (completion-metadata-get metadata 'display-sort-function))
-                        vertico-sort-override-function vertico-sort-function))
+    (when-let (sort (or vertico-sort-override-function
+                        (completion-metadata-get metadata 'display-sort-function)
+                        vertico-sort-function))
       (unless (eq sort #'identity)
         (vertico--update-history-hash (substring content 0 base))
         (setq all (funcall sort all))))
