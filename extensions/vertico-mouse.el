@@ -67,7 +67,6 @@
 
 (defun vertico-mouse--scroll-up (n)
   "Scroll up by N lines."
-  (setq vertico-mouse--start nil)
   (vertico--goto (max 0 (+ vertico--index n))))
 
 (defun vertico-mouse--scroll-down (n)
