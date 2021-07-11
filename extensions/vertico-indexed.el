@@ -46,7 +46,9 @@
   "Format candidate, see `vertico--format-candidate' for arguments."
   (setq vertico-indexed--min start vertico-indexed--max index)
   (funcall orig cand
-           (concat (propertize (format "%-2s " (- index start))
+           (concat (propertize (format
+                                (format "%%%ds " (if (> vertico-count 10) 2 1))
+                                (- index start))
                                'face 'vertico-indexed)
                    prefix)
            suffix index start))
