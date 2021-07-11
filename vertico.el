@@ -435,18 +435,18 @@ See `resize-mini-windows' for documentation."
 
 (defun vertico--format-candidates (metadata)
   "Format current candidates with METADATA."
-  (let* ((group-fun (completion-metadata-get metadata 'group-function))
-         (group-format (and group-fun vertico-group-format (concat vertico-group-format "\n")))
-         (start (min (max 0 (- vertico--index (/ vertico-count 2) (if group-format -1 0)))
-                     (max 0 (- vertico--total vertico-count))))
-         (candidates
-          (thread-last (seq-subseq vertico--candidates start
-                                   (min (+ start vertico-count) vertico--total))
-            (funcall vertico--highlight)
-            (vertico--affixate metadata)))
-         (curr-line 0) (lines))
+  (let ((curr-line 0) (lines))
     ;; Compute group titles
-    (let ((index start) (title))
+    (let* ((start (min (max 0 (- vertico--index (/ vertico-count 2) (1- (mod vertico-count 2))))
+                       (max 0 (- vertico--total vertico-count))))
+           (index start) (title)
+           (group-fun (completion-metadata-get metadata 'group-function))
+           (group-format (and group-fun vertico-group-format (concat vertico-group-format "\n")))
+           (candidates
+            (thread-last (seq-subseq vertico--candidates start
+                                     (min (+ start vertico-count) vertico--total))
+              (funcall vertico--highlight)
+              (vertico--affixate metadata))))
       (dolist (cand candidates)
         (when-let (new-title (and group-format (funcall group-fun (car cand) nil)))
           (unless (equal title new-title)
