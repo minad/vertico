@@ -195,45 +195,41 @@ See `resize-mini-windows' for documentation."
       (and (= (length x) (length y))
            (string< x y))))
 
-(defmacro vertico--define-sort (fun recency bsize bindex bpred pred)
-  "Generate optimized sort FUN.
-The function is configured by RECENCY, BSIZE, BINDEX, BPRED and PRED."
-  `(defun ,fun (candidates)
+(defmacro vertico--define-sort (by bsize bindex bpred pred)
+  "Generate optimized sorting function.
+The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
+  `(defun ,(intern (mapconcat #'symbol-name `(vertico sort ,@by) "-")) (candidates)
+     ,(concat "Sort candidates by " (mapconcat #'symbol-name by ", ") ".")
      (let* ((buckets (make-vector ,bsize nil))
-            (recent-candidates))
-       ,@(if recency
-             `((dolist (cand candidates)
-                 (if-let (idx (gethash cand vertico--history-hash))
-                     (push (cons idx cand) recent-candidates)
+            (recent-cands))
+       ,@(if (eq (car by) 'recency)
+             `((dolist (% candidates)
+                 ;; Find recent-cands or fill buckets
+                 (if-let (idx (gethash % vertico--history-hash))
+                     (push (cons idx %) recent-cands)
                    (let ((idx (min ,(1- bsize) ,bindex)))
-                     (aset buckets idx (cons cand (aref buckets idx))))))
+                     (aset buckets idx (cons % (aref buckets idx))))))
                ;; Sort recent candidates
-               (setq recent-candidates (sort recent-candidates #'car-less-than-car))
-               (let ((cand recent-candidates))
+               (setq recent-cands (sort recent-cands #'car-less-than-car))
+               (let ((cand recent-cands))
                  (while cand
                    (setcar cand (cdar cand))
                    (pop cand))))
-          `((dolist (cand candidates)
-              (let ((idx (min ,(1- bsize) ,bindex)))
-                (aset buckets idx (cons cand (aref buckets idx)))))))
-       (nconc
-        ;; Sorted recent candidates
-        recent-candidates
-        ;; Sort bucket candidates
-        (mapcan
-         (lambda (bucket) (sort bucket #',bpred))
-         (nbutlast (append buckets nil)))
-        ;; Last bucket needs special treatment
-        (sort (aref buckets ,(1- bsize)) #',pred)))))
+           `((dolist (% candidates)
+               ;; Fill buckets
+               (let ((idx (min ,(1- bsize) ,bindex)))
+                 (aset buckets idx (cons % (aref buckets idx)))))))
+       (nconc recent-cands
+              ;; Sort bucket candidates
+              (mapcan (lambda (bucket) (sort bucket #',bpred))
+                      (nbutlast (append buckets nil)))
+              ;; Last bucket needs special treatment
+              (sort (aref buckets ,(1- bsize)) #',pred)))))
 
-(vertico--define-sort vertico-sort-recency-length-alpha
-  'recency 32 (length cand) string< vertico--length-string<)
-(vertico--define-sort vertico-sort-recency-alpha
-  'recency 32 (if (eq cand "") 0 (/ (aref cand 0) 4)) string< string<)
-(vertico--define-sort vertico-sort-length-alpha
-  nil 32 (length cand) string< vertico--length-string<)
-(vertico--define-sort vertico-sort-alpha
-  nil 32 (if (eq cand "") 0 (/ (aref cand 0) 4)) string< string<)
+(vertico--define-sort (recency length alpha) 32 (length %) string< vertico--length-string<)
+(vertico--define-sort (recency alpha) 32 (if (eq % "") 0 (/ (aref % 0) 4)) string< string<)
+(vertico--define-sort (length alpha) 32 (length %) string< vertico--length-string<)
+(vertico--define-sort (alpha) 32 (if (eq % "") 0 (/ (aref % 0) 4)) string< string<)
 
 (defun vertico--affixate (metadata candidates)
   "Annotate CANDIDATES with annotation function specified by METADATA."
