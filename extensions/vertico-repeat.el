@@ -51,19 +51,6 @@
              (>= vertico--index 0)
              (nth vertico--index vertico--candidates))))
 
-(defun vertico-repeat--save ()
-  "Save Vertico status for `vertico-repeat'."
-  (when vertico--input
-    (unless vertico-repeat--restore
-      (setq vertico-repeat--command (if (boundp 'minibuffer-current-command)
-                                        minibuffer-current-command
-                                      this-command)
-            vertico-repeat--input ""
-            vertico-repeat--candidate nil
-            vertico-repeat--restore nil))
-    (add-hook 'post-command-hook #'vertico-repeat--save-input nil 'local)
-    (add-hook 'minibuffer-exit-hook #'vertico-repeat--save-candidate nil 'local)))
-
 (defun vertico-repeat--restore ()
   "Restore Vertico status for `vertico-repeat'."
   (setq vertico-repeat--restore t)
@@ -76,6 +63,20 @@
                      (setq vertico--index idx
                            vertico--lock-candidate t)
                      (vertico--exhibit))))))
+
+;;;###autoload
+(defun vertico-repeat--save ()
+  "Save Vertico status for `vertico-repeat'."
+  (when vertico--input
+    (unless vertico-repeat--restore
+      (setq vertico-repeat--command (if (boundp 'minibuffer-current-command)
+                                        minibuffer-current-command
+                                      this-command)
+            vertico-repeat--input ""
+            vertico-repeat--candidate nil
+            vertico-repeat--restore nil))
+    (add-hook 'post-command-hook #'vertico-repeat--save-input nil 'local)
+    (add-hook 'minibuffer-exit-hook #'vertico-repeat--save-candidate nil 'local)))
 
 ;;;###autoload
 (defun vertico-repeat ()
