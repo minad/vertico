@@ -65,10 +65,19 @@
                        cand)
   cand)
 
+(defun vertico-mouse--scroll-up (n)
+  "Scroll up by N lines."
+  (setq vertico-mouse--start nil)
+  (vertico--goto (max 0 (+ vertico--index n))))
+
+(defun vertico-mouse--scroll-down (n)
+  "Scroll down by N lines."
+  (vertico-mouse--scroll-up (- n)))
+
 (defun vertico-mouse--setup ()
   "Setup mouse scrolling."
-  (setq-local mwheel-scroll-up-function #'vertico-next
-              mwheel-scroll-down-function #'vertico-previous))
+  (setq-local mwheel-scroll-up-function #'vertico-mouse--scroll-up
+              mwheel-scroll-down-function #'vertico-mouse--scroll-down))
 
 ;;;###autoload
 (define-minor-mode vertico-mouse-mode
