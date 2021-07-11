@@ -51,7 +51,7 @@
                    prefix)
            suffix index start))
 
-(defun vertico-indexed--handle-prefix (orig)
+(defun vertico-indexed--handle-prefix (orig &optional _)
   "Handle prefix argument before calling ORIG function."
   (let ((vertico--index (if current-prefix-arg
                             (+ vertico-indexed--min (prefix-numeric-value current-prefix-arg))
