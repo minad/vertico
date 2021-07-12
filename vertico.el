@@ -77,7 +77,7 @@ See `resize-mini-windows' for documentation."
   "Sorting function override, which takes precedence over the `display-sort-function'."
   :type '(choice (const nil) function))
 
-(defcustom vertico-sort-function #'vertico-sort-recency-length-alpha
+(defcustom vertico-sort-function #'vertico-sort-history-length-alpha
   "Default sorting function, which is used if no `display-sort-function' is specified."
   :type '(choice (const nil) function))
 
@@ -200,18 +200,17 @@ See `resize-mini-windows' for documentation."
 The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   `(defun ,(intern (mapconcat #'symbol-name `(vertico sort ,@by) "-")) (candidates)
      ,(concat "Sort candidates by " (mapconcat #'symbol-name by ", ") ".")
-     (let* ((buckets (make-vector ,bsize nil))
-            (recent-cands))
-       ,@(if (eq (car by) 'recency)
+     (let* ((buckets (make-vector ,bsize nil)) (hcands))
+       ,@(if (eq (car by) 'history)
              `((dolist (% candidates)
-                 ;; Find recent-cands or fill buckets
+                 ;; Find recent candidates or fill buckets
                  (if-let (idx (gethash % vertico--history-hash))
-                     (push (cons idx %) recent-cands)
+                     (push (cons idx %) hcands)
                    (let ((idx (min ,(1- bsize) ,bindex)))
                      (aset buckets idx (cons % (aref buckets idx))))))
                ;; Sort recent candidates
-               (setq recent-cands (sort recent-cands #'car-less-than-car))
-               (let ((cand recent-cands))
+               (setq hcands (sort hcands #'car-less-than-car))
+               (let ((cand hcands))
                  (while cand
                    (setcar cand (cdar cand))
                    (pop cand))))
@@ -219,15 +218,15 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                ;; Fill buckets
                (let ((idx (min ,(1- bsize) ,bindex)))
                  (aset buckets idx (cons % (aref buckets idx)))))))
-       (nconc recent-cands
+       (nconc hcands
               ;; Sort bucket candidates
               (mapcan (lambda (bucket) (sort bucket #',bpred))
                       (nbutlast (append buckets nil)))
               ;; Last bucket needs special treatment
               (sort (aref buckets ,(1- bsize)) #',pred)))))
 
-(vertico--define-sort (recency length alpha) 32 (length %) string< vertico--length-string<)
-(vertico--define-sort (recency alpha) 32 (if (eq % "") 0 (/ (aref % 0) 4)) string< string<)
+(vertico--define-sort (history length alpha) 32 (length %) string< vertico--length-string<)
+(vertico--define-sort (history alpha) 32 (if (eq % "") 0 (/ (aref % 0) 4)) string< string<)
 (vertico--define-sort (length alpha) 32 (length %) string< vertico--length-string<)
 (vertico--define-sort (alpha) 32 (if (eq % "") 0 (/ (aref % 0) 4)) string< string<)
 
