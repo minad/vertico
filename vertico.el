@@ -73,10 +73,6 @@ See `resize-mini-windows' for documentation."
   "Replacements for multiline strings."
   :type '(cons string string))
 
-(defcustom vertico-sort-override-function nil
-  "Sorting function override, which takes precedence over the `display-sort-function'."
-  :type '(choice (const nil) function))
-
 (defcustom vertico-sort-function #'vertico-sort-history-length-alpha
   "Default sorting function, which is used if no `display-sort-function' is specified."
   :type '(choice (const nil) function))
@@ -293,6 +289,10 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
           (cons (apply #'completion-all-completions args) hl))
       (cons (apply #'completion-all-completions args) hl))))
 
+(defun vertico--sort-function (metadata)
+  "Return the sorting function given the completion METADATA."
+  (or (completion-metadata-get metadata 'display-sort-function) vertico-sort-function))
+
 (defun vertico--recompute-candidates (pt content bounds metadata)
   "Recompute candidates given PT, CONTENT, BOUNDS and METADATA."
   (pcase-let* ((field (substring content (car bounds) (+ pt (cdr bounds))))
@@ -304,6 +304,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                                                         pt metadata))
                (base (or (when-let (z (last all)) (prog1 (cdr z) (setcdr z nil))) 0))
                (def (or (car-safe minibuffer-default) minibuffer-default))
+               (sort (vertico--sort-function metadata))
                (groups))
     ;; Filter the ignored file extensions. We cannot use modified predicate for this filtering,
     ;; since this breaks the special casing in the `completion-file-name-table' for `file-exists-p'
@@ -314,12 +315,9 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                                  (concat "\\|" (regexp-opt completion-ignored-extensions) "\\'")))))
         (setq all (cl-delete-if (lambda (x) (string-match-p ignore x)) all))))
     ;; Sort using the `display-sort-function' or the Vertico sort functions
-    (when-let (sort (or vertico-sort-override-function
-                        (completion-metadata-get metadata 'display-sort-function)
-                        vertico-sort-function))
-      (unless (eq sort #'identity)
-        (vertico--update-history-hash (substring content 0 base))
-        (setq all (funcall sort all))))
+    (unless (memq sort '(nil identity))
+      (vertico--update-history-hash (substring content 0 base))
+      (setq all (funcall sort all)))
     ;; Move special candidates: "field" appears at the top, before "field/", before default value
     (when (stringp def)
       (setq all (vertico--move-to-front def all)))
