@@ -41,9 +41,10 @@
   Vertico is available from [[http://elpa.gnu.org/packages/vertico.html][GNU ELPA]], such that it can be installed directly via
   ~package-install~. After installation, the global minor mode can be enabled with
   =M-x vertico-mode=. In order to configure Vertico and other packages in your
-  init.el, you may want to use ~use-package~. I recommend to give orderless
-  completion a try, which is different from the familiar prefix TAB completion.
-  Here is an example configuration:
+  init.el, you may want to use ~use-package~. I recommend to give Orderless
+  completion a try, which is different from the prefix TAB completion used by
+  the basic default completion system or in shells. Here is an example
+  configuration:
 
   #+begin_src emacs-lisp
     ;; Enable vertico
@@ -137,12 +138,20 @@
     (define-key vertico-map (kbd "M-TAB") #'minibuffer-complete)
   #+end_src
 
-  The ~orderless~ completion style does not support TAB prefix completion. In
-  order to enable that you may want to combine ~orderless~ with ~substring~, or not
-  use ~orderless~ at all.
+  The ~orderless~ completion style does not support completion of a common prefix
+  substring, as you may be familiar with from shells or the basic default
+  completion system. The reason is that the Orderless input string is usually
+  not a prefix. In order to support completing prefixes you may want to combine
+  ~orderless~ with ~substring~ in your =completion-styles= configuration.
 
   #+begin_src emacs-lisp
     (setq completion-styles '(substring orderless))
+  #+end_src
+
+  Alternatively you can experiment with the built-in completion-styles, e.g.,
+  adding =partial-completion= or =flex=.
+
+  #+begin_src emacs-lisp
     (setq completion-styles '(basic substring partial-completion flex))
   #+end_src
 
