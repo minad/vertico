@@ -17,9 +17,10 @@
   provide a UI which behaves /correctly/ under all circumstances. By reusing the
   built-in facilities system, Vertico achieves /full compatibility/ with built-in
   Emacs completion commands and completion tables. Vertico only provides the
-  completion UI. Additional enhancements can be installed separately via
-  extensions or complementary packages. The code base is small and maintainable
-  (~vertico.el~ is only about 600 lines of code without whitespace and comments).
+  completion UI but aims to be flexible and extensible. Additional enhancements
+  can be installed separately via extensions or complementary packages. The code
+  base is small and maintainable (~vertico.el~ is only about 600 lines of code
+  without whitespace and comments).
 
 * Features
 
@@ -102,10 +103,9 @@
 * Key bindings
 
   Vertico defines its own local keymap in the minibuffer which is derived from
-  ~minibuffer-local-map~. The keymap mostly keeps the ~fundamental-mode~
-  keybindings intact and remaps and binds only a few commands. Note in particular
-  the binding of =TAB= to ~vertico-insert~ and the bindings of
-  ~vertico-exit/exit-input~.
+  ~minibuffer-local-map~. The keymap mostly keeps the ~fundamental-mode~ keybindings
+  intact and remaps and binds only a few commands. Note in particular the
+  binding of =TAB= to ~vertico-insert~ and the bindings of ~vertico-exit/exit-input~.
 
   - ~beginning-of-buffer~, ~minibuffer-beginning-of-buffer~ -> ~vertico-first~
   - ~end-of-buffer~ -> ~vertico-last~
@@ -138,8 +138,8 @@
   #+end_src
 
   The ~orderless~ completion style does not support TAB prefix completion. In
-  order to enable that you may want to combine ~orderless~ with ~substring~, or
-  not use ~orderless~ at all.
+  order to enable that you may want to combine ~orderless~ with ~substring~, or not
+  use ~orderless~ at all.
 
   #+begin_src emacs-lisp
     (setq completion-styles '(substring orderless))
@@ -216,20 +216,20 @@
   There are many alternative completion UIs, each UI with its own advantages and
   disadvantages.
 
-  Vertico aims to be 100% compliant with all Emacs commands and achieves that with
-  a minimal code base, relying purely on ~completing-read~ while avoiding to
-  invent its own APIs. Inventing a custom API as Helm or Ivy is explicitly avoided
-  in order to increase flexibility and package reuse. Due to its small code base
-  and reuse of the Emacs built-in facilities, bugs are less likely to occur in
-  comparison to completion UIs or full completion systems, which reimplement a lot
-  of functionality.
+  Vertico aims to be 100% compliant with all Emacs commands and achieves that
+  with a minimal code base, relying purely on ~completing-read~ while avoiding to
+  invent its own APIs. Inventing a custom API as Helm or Ivy is explicitly
+  avoided in order to increase flexibility and package reuse. Due to its small
+  code base and reuse of the Emacs built-in facilities, bugs are less likely to
+  occur in comparison to completion UIs or full completion systems, which
+  reimplement a lot of functionality.
 
-  Since Vertico only provides the UI, you may want to combine it with some of the
-  complementary packages, to give a full-featured completion experience similar to
-  Ivy. Vertico is targeted at users interested in crafting their Emacs precisely
-  to their liking - completion plays an integral part in how the users interacts
-  with Emacs. There are at least two other interactive completion UIs, which
-  follow a similar philosophy:
+  Since Vertico only provides the UI, you may want to combine it with some of
+  the complementary packages, to give a full-featured completion experience
+  similar to Ivy. Vertico is targeted at users interested in crafting their
+  Emacs precisely to their liking - completion plays an integral part in how the
+  users interacts with Emacs. There are at least two other interactive
+  completion UIs, which follow a similar philosophy:
 
   - [[https://github.com/raxod502/selectrum][Selectrum]]: Selectrum has a similar UI as Vertico. Selectrum is more complex
     and not fully compatible with every Emacs completion command ([[https://github.com/raxod502/selectrum/issues/481][Issue #481]]),
@@ -256,10 +256,10 @@
 ** ~org-set-tags-command~
 
    ~org-set-tags-command~ implements a completion table which relies on the ~basic~
-   completion style and TAB completion. This table does not work well with Vertico
-   and Icomplete. The issue can be mitigated by deactivating most of the Vertico UI
-   and relying purely on TAB completion. The UI is still enhanced by Vertico, since
-   Vertico shows the available tags.
+   completion style and TAB completion. This table does not work well with
+   Vertico and Icomplete. The issue can be mitigated by deactivating most of the
+   Vertico UI and relying purely on TAB completion. The UI is still enhanced by
+   Vertico, since Vertico shows the available tags.
 
    #+begin_src emacs-lisp
      (defun disable-selection ()
