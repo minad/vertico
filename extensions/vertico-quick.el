@@ -76,19 +76,19 @@
          (keys (if (>= idx fst)
                    (let ((first (elt vertico-quick2 (mod (/ (- idx fst) len) snd)))
                          (second (elt (concat vertico-quick1 vertico-quick2) (mod (- idx fst) len))))
-                     (push (cons first t) vertico-quick--list)
-                     (push (cons (+ first (ash second 16)) index) vertico-quick--list)
                      (cond
                       ((eq first vertico-quick--first)
+                       (push (cons second index) vertico-quick--list)
                        (concat " " (propertize (char-to-string second) 'face 'vertico-quick1)))
                       (vertico-quick--first "  ")
                       (t
+                       (push (cons first (list first)) vertico-quick--list)
                        (concat (propertize (char-to-string first) 'face 'vertico-quick1)
                                (propertize (char-to-string second) 'face 'vertico-quick2)))))
                  (let ((first (elt vertico-quick1 (mod idx fst))))
-                   (push (cons first index) vertico-quick--list)
                    (if vertico-quick--first
                        "  "
+                     (push (cons first index) vertico-quick--list)
                      (concat (propertize (char-to-string first) 'face 'vertico-quick1) " "))))))
     (if (bound-and-true-p vertico-flat-mode)
         (setq keys (replace-regexp-in-string " " "" keys)
@@ -97,26 +97,25 @@
       (setq keys (concat keys (make-string (max 1 (- (length prefix) 2)) ?\s))))
     (funcall orig cand keys suffix index start)))
 
+(defun vertico-quick--read (&optional first)
+  "Read quick key given FIRST pressed key."
+  (cl-letf (((symbol-function #'vertico--format-candidate)
+             (apply-partially #'vertico-quick--format-candidate
+                              (symbol-function #'vertico--format-candidate)))
+            (vertico-quick--first first)
+            (vertico-quick--list))
+    (vertico--exhibit)
+    (alist-get (read-key) vertico-quick--list)))
+
 ;;;###autoload
 (defun vertico-quick-jump ()
   "Jump to candidate using quick keys."
   (interactive)
   (if (= vertico--total 0)
       (and (minibuffer-message "No match") nil)
-    (cl-letf ((vertico-quick--list nil) (key nil)
-              ((symbol-function #'vertico--format-candidate)
-               (apply-partially #'vertico-quick--format-candidate
-                                (symbol-function #'vertico--format-candidate))))
-      (vertico--exhibit)
-      (setq key (read-key))
-      (when (and (alist-get key vertico-quick--list)
-                 (seq-position vertico-quick2 key))
-        (let ((vertico-quick--first key)
-              (vertico-quick--list))
-          (vertico--exhibit))
-        (setq key (+ key (ash (read-key) 16))))
-      (when-let (idx (alist-get key vertico-quick--list))
-        (setq vertico--index idx)))))
+    (let ((idx (vertico-quick--read)))
+      (when (consp idx) (setq idx (vertico-quick--read (car idx))))
+      (when idx (setq vertico--index idx)))))
 
 ;;;###autoload
 (defun vertico-quick-exit ()
