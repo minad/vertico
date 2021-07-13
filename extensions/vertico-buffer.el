@@ -37,12 +37,29 @@
 (defvar-local vertico-buffer--overlay nil)
 (defvar-local vertico-buffer--buffer nil)
 
+(defface vertico-buffer-background
+  '((((class color) (min-colors 88) (background dark))
+     :background "#191a1b")
+    (((class color) (min-colors 88) (background light))
+     :background "#f0f0f0")
+    (t :background "gray"))
+  "Face used to for the buffer background.")
+
 (defvar vertico-buffer-action
   `(display-buffer-in-side-window
+    (window-parameters (mode-line-format . none))
     (window-height . ,(+ 3 vertico-count))
     (side . top)
     (slot . -1))
   "Display action for the Vertico buffer.")
+
+(defvar vertico-buffer--parameters
+  '((face-remapping-alist . ((default :inherit vertico-buffer-background)))
+    (display-line-numbers . nil)
+    (truncate-lines . t)
+    (show-trailing-whitespace . nil)
+    (inhibit-modification-hooks . t)
+    (cursor-in-non-selected-windows . box)))
 
 (defun vertico-buffer--display (lines)
   "Display LINES in buffer."
@@ -93,11 +110,8 @@
                                   (format " *Vertico-%s*" (1- (recursion-depth))))))
   (with-current-buffer vertico-buffer--buffer
     (add-hook 'window-selection-change-functions 'vertico-buffer--select nil 'local)
-    (setq-local display-line-numbers nil
-                truncate-lines t
-                show-trailing-whitespace nil
-                inhibit-modification-hooks t
-                cursor-in-non-selected-windows 'box)))
+    (dolist (var vertico-buffer--parameters)
+      (set (make-local-variable (car var)) (cdr var)))))
 
 ;;;###autoload
 (define-minor-mode vertico-buffer-mode
