@@ -53,15 +53,16 @@
     (with-current-buffer vertico-buffer--buffer
       (erase-buffer)
       (insert (propertize (concat count prompt) 'face 'minibuffer-prompt)
-              content "\n" (string-join lines))
-      (setq-local truncate-lines (< (point) (* 0.8 (window-width)))))
+              content "\n" (string-join lines)))
     (let ((win (or (get-buffer-window vertico-buffer--buffer)
                    (display-buffer vertico-buffer--buffer vertico-buffer-action))))
       (overlay-put vertico--candidates-ov 'window win)
       (when vertico--count-ov
         (overlay-put vertico--count-ov 'window win))
       (set-window-point win (max (+ 1 (length prompt) (length count))
-                                 (+ (point) (length count)))))))
+                                 (+ (point) (length count))))
+      (with-current-buffer vertico-buffer--buffer
+        (setq-local truncate-lines (< (window-point win) (* 0.8 (window-width win))))))))
 
 (defun vertico-buffer--select (_)
   "Ensure that cursor is only shown if minibuffer is selected."
