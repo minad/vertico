@@ -46,7 +46,7 @@
 
 (defun vertico-buffer--display (lines)
   "Display LINES in buffer."
-  (move-overlay vertico-buffer--overlay (point-min) (point-max))
+  (set-window-vscroll nil 100)
   (let ((count (vertico--format-count))
         (prompt (minibuffer-prompt))
         (content (minibuffer-contents)))
@@ -56,14 +56,12 @@
               content "\n" (string-join lines))
       (setq-local truncate-lines (< (point) (* 0.8 (window-width)))))
     (let ((win (or (get-buffer-window vertico-buffer--buffer)
-                   (display-buffer vertico-buffer--buffer vertico-buffer-action)))
-          (pt (point)))
+                   (display-buffer vertico-buffer--buffer vertico-buffer-action))))
       (overlay-put vertico--candidates-ov 'window win)
       (when vertico--count-ov
         (overlay-put vertico--count-ov 'window win))
-      (with-selected-window win
-        (goto-char (max (+ (point-min) (length prompt) (length count))
-                        (+ pt (length count))))))))
+      (set-window-point win (max (+ 1 (length prompt) (length count))
+                                 (+ (point) (length count)))))))
 
 (defun vertico-buffer--select (_)
   "Ensure that cursor is only shown if minibuffer is selected."
@@ -76,6 +74,7 @@
 
 (defun vertico-buffer--destroy ()
   "Destroy Vertico buffer."
+  (set-window-vscroll nil 0)
   (kill-buffer vertico-buffer--buffer))
 
 (defun vertico-buffer--setup ()
@@ -83,10 +82,10 @@
   (add-hook 'window-selection-change-functions 'vertico-buffer--select nil 'local)
   (add-hook 'minibuffer-exit-hook 'vertico-buffer--destroy nil 'local)
   (setq-local cursor-type '(bar . 0))
-  (setq vertico-buffer--overlay (make-overlay (point-max) (point-max)))
+  (setq vertico-buffer--overlay (make-overlay (point-max) (point-max) nil t t))
   (overlay-put vertico-buffer--overlay 'window (selected-window))
   (overlay-put vertico-buffer--overlay 'priority 1000)
-  (overlay-put vertico-buffer--overlay 'invisible t)
+  (overlay-put vertico-buffer--overlay 'before-string "\n\n")
   (setq vertico-buffer--buffer (get-buffer-create
                                 (if (= 1 (recursion-depth))
                                     " *Vertico*"
