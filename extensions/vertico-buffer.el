@@ -53,7 +53,8 @@
     (with-current-buffer vertico-buffer--buffer
       (erase-buffer)
       (insert (propertize (concat count prompt) 'face 'minibuffer-prompt)
-              content "\n" (string-join lines)))
+              content "\n" (string-join lines))
+      (setq-local truncate-lines (< (point) (* 0.8 (window-width)))))
     (let ((win (or (get-buffer-window vertico-buffer--buffer)
                    (display-buffer vertico-buffer--buffer vertico-buffer-action)))
           (pt (point)))

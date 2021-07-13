@@ -502,7 +502,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (defun vertico--resize-window (height)
   "Resize active minibuffer window to HEIGHT."
-  (setq-local truncate-lines (< (point-max) (- (window-width) 4)))
+  (setq-local truncate-lines (< (point) (* 0.8 (window-width))))
   (unless (frame-root-window-p (active-minibuffer-window))
     (unless vertico-resize
       (setq height (max height vertico-count)))
@@ -713,7 +713,7 @@ When the prefix argument is 0, the group order is reset."
                                (make-overlay (point-min) (point-min) nil t t)))
   (setq-local resize-mini-windows 'grow-only
               max-mini-window-height 1.0
-              truncate-lines (< (point-max) (- (window-width) 4))
+              truncate-lines t
               completion-auto-help nil
               completion-show-inline-help nil)
   (use-local-map vertico-map)
