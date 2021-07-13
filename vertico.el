@@ -266,6 +266,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 ;; See below `vertico--candidate'.
 (defun vertico--all-completions (&rest args)
   "Compute all completions for ARGS with deferred highlighting."
+  (if (fboundp 'completion-deferred-completions)
+      (or (apply #'completion-deferred-completions args) '(0 identity))
   (cl-letf* ((orig-pcm (symbol-function #'completion-pcm--hilit-commonality))
              (orig-flex (symbol-function #'completion-flex-all-completions))
              ((symbol-function #'completion-flex-all-completions)
@@ -288,16 +290,23 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                            (condition-case nil
                                (completion-pcm--hilit-commonality pattern x)
                              (t x))))
-                cands)))
-    ;; Only advise orderless after it has been loaded to avoid load order issues
-    (if (and (fboundp 'orderless-highlight-matches) (fboundp 'orderless-pattern-compiler))
-        (cl-letf (((symbol-function 'orderless-highlight-matches)
-                   (lambda (pattern cands)
-                     (let ((regexps (orderless-pattern-compiler pattern)))
-                       (setq hl (lambda (x) (orderless-highlight-matches regexps x))))
-                     cands)))
-          (cons (apply #'completion-all-completions args) hl))
-      (cons (apply #'completion-all-completions args) hl))))
+                cands))
+             (result
+              ;; Only advise orderless after it has been loaded to avoid load order issues
+              (if (and (fboundp 'orderless-highlight-matches) (fboundp 'orderless-pattern-compiler))
+                  (cl-letf (((symbol-function 'orderless-highlight-matches)
+                             (lambda (pattern cands)
+                               (let ((regexps (orderless-pattern-compiler pattern)))
+                                 (setq hl (lambda (x) (orderless-highlight-matches regexps x))))
+                               cands)))
+                    (apply #'completion-all-completions args))
+                (apply #'completion-all-completions args) hl)))
+    (if result
+        (let* ((last (last result))
+               (base (or (cdr last) 0)))
+          (setcdr last nil)
+          `(,base ,hl . ,result))
+      '(0 identity)))))
 
 (defun vertico--sort-function (metadata)
   "Return the sorting function given the completion METADATA."
@@ -319,11 +328,10 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   (pcase-let* ((field (substring content (car bounds) (+ pt (cdr bounds))))
                ;; `minibuffer-completing-file-name' has been obsoleted by the completion category
                (completing-file (eq 'file (completion-metadata-get metadata 'category)))
-               (`(,all . ,hl) (vertico--all-completions content
-                                                        minibuffer-completion-table
-                                                        minibuffer-completion-predicate
-                                                        pt metadata))
-               (base (or (when-let (z (last all)) (prog1 (cdr z) (setcdr z nil))) 0))
+               (`(,base ,hl . ,all) (vertico--all-completions content
+                                                              minibuffer-completion-table
+                                                              minibuffer-completion-predicate
+                                                              pt metadata))
                (base-str (substring content 0 base))
                (def (or (car-safe minibuffer-default) minibuffer-default))
                (sort (vertico--sort-function metadata))
