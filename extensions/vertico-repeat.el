@@ -30,26 +30,48 @@
 ;; Vertico session via the `vertico-repeat' command.
 ;;
 ;; (global-set-key "\M-r" #'vertico-repeat)
+;; (global-set-key "\M-R" #'vertico-repeat-history)
 
 ;;; Code:
 
 (require 'vertico)
 
+(defcustom vertico-repeat-filter
+  '("^vertico-repeat-"
+    execute-extended-command)
+  "Filter commands from the `vertico-repeat' command history."
+  :type '(repeat regexp)
+  :group 'vertico)
+
 (defvar-local vertico-repeat--restore nil)
 (defvar vertico-repeat--input nil)
 (defvar vertico-repeat--command nil)
 (defvar vertico-repeat--candidate nil)
+(defvar vertico-repeat--history nil)
 
 (defun vertico-repeat--save-input ()
   "Save current minibuffer content for `vertico-repeat'."
-  (setq vertico-repeat--input (minibuffer-contents)))
+  (setq vertico-repeat--input (minibuffer-contents-no-properties)))
 
 (defun vertico-repeat--save-candidate ()
   "Save currently selected candidate for `vertico-repeat'."
   (setq vertico-repeat--candidate
         (and vertico--lock-candidate
              (>= vertico--index 0)
-             (nth vertico--index vertico--candidates))))
+             (substring-no-properties (nth vertico--index vertico--candidates))))
+  (unless (string-match-p (string-join
+                           (mapcar (lambda (x)
+                                     (if (stringp x) x (format "\\`%s\\'" x)))
+                                   vertico-repeat-filter)
+                           "\\|")
+                          (symbol-name vertico-repeat--command))
+    (let ((elem (list vertico-repeat--candidate vertico-repeat--command vertico-repeat--input)))
+      (cond
+       ((not (equal (cdr elem) (cdar vertico-repeat--history)))
+        (setq vertico-repeat--history (delete elem vertico-repeat--history))
+        (add-to-history 'vertico-repeat--history elem))
+       ((and (car vertico-repeat--history) vertico-repeat--candidate)
+        (setf (caar vertico-repeat--history) vertico-repeat--candidate))))))
 
 (defun vertico-repeat--restore ()
   "Restore Vertico status for `vertico-repeat'."
@@ -90,6 +112,40 @@
 
 ;;;###autoload
 (add-hook 'minibuffer-setup-hook #'vertico-repeat--save)
+
+(defun vertico-repeat-history ()
+  "Select from command history and call `vertico-repeat'."
+  (interactive)
+  (let* ((cands (or
+                 (delete-dups
+                  (mapcar (lambda (elem)
+                            (cons (concat
+                                   (symbol-name (cadr elem))
+                                   (propertize " " 'display '(space :align-to (+ left 40))) ;; TODO compute aligment
+                                   (propertize (string-trim (caddr elem))
+                                               'face 'font-lock-string-face)
+                                   (propertize " " 'display '(space :align-to (+ left 80))) ;; TODO compute aligment
+                                   (when (car elem)
+                                     (propertize (string-trim
+                                                  (replace-regexp-in-string "[\x100000-\x10FFFD]*" "" (car elem))) ;; TODO consult hack
+                                                 'face 'font-lock-comment-face)))
+                                  elem))
+                          vertico-repeat--history))
+                 (user-error "Command history is empty")))
+         (elem (cdr (assoc (completing-read
+                            "Repeat: "
+                            (lambda (str pred action)
+                              (if (eq action 'metadata)
+                                  '(metadata (display-sort-function . identity)
+                                             (cycle-sort-function . identity))
+                                (complete-with-action action cands str pred)))
+                            nil t nil t)
+                           cands))))
+    (when elem
+      (setq vertico-repeat--candidate (car elem)
+            vertico-repeat--command (cadr elem)
+            vertico-repeat--input (caddr elem))
+      (vertico-repeat))))
 
 (provide 'vertico-repeat)
 ;;; vertico-repeat.el ends here
