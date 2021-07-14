@@ -191,31 +191,33 @@ See `resize-mini-windows' for documentation."
       (and (= (length x) (length y))
            (string< x y))))
 
+(defun vertico--sort-decorated (list)
+  "Sort decorated LIST and remove decorations."
+  (setq list (sort list #'car-less-than-car))
+  (let ((item list))
+    (while item
+      (setcar item (cdar item))
+      (pop item)))
+  list)
+
 (defmacro vertico--define-sort (by bsize bindex bpred pred)
   "Generate optimized sorting function.
 The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   `(defun ,(intern (mapconcat #'symbol-name `(vertico sort ,@by) "-")) (candidates)
      ,(concat "Sort candidates by " (mapconcat #'symbol-name by ", ") ".")
-     (let* ((buckets (make-vector ,bsize nil)) (hcands))
-       ,@(if (eq (car by) 'history)
-             `((dolist (% candidates)
-                 ;; Find recent candidates or fill buckets
-                 (if-let (idx (gethash % vertico--history-hash))
-                     (push (cons idx %) hcands)
-                   (let ((idx (min ,(1- bsize) ,bindex)))
-                     (aset buckets idx (cons % (aref buckets idx))))))
-               ;; Sort recent candidates
-               (setq hcands (sort hcands #'car-less-than-car))
-               (let ((cand hcands))
-                 (while cand
-                   (setcar cand (cdar cand))
-                   (pop cand))))
-           `((dolist (% candidates)
-               ;; Fill buckets
-               (let ((idx (min ,(1- bsize) ,bindex)))
-                 (aset buckets idx (cons % (aref buckets idx)))))))
-       (nconc hcands
-              ;; Sort bucket candidates
+     (let* ((buckets (make-vector ,bsize nil))
+            ,@(and (eq (car by) 'history) '((hcands))))
+       (dolist (% candidates)
+         ,(if (eq (car by) 'history)
+              ;; Find recent candidates or fill buckets
+              `(if-let (idx (gethash % vertico--history-hash))
+                   (push (cons idx %) hcands)
+                 (let ((idx (min ,(1- bsize) ,bindex)))
+                   (aset buckets idx (cons % (aref buckets idx)))))
+             ;; Fill buckets
+            `(let ((idx (min ,(1- bsize) ,bindex)))
+               (aset buckets idx (cons % (aref buckets idx))))))
+       (nconc ,@(and (eq (car by) 'history) '((vertico--sort-decorated hcands)))
               (mapcan (lambda (bucket) (sort bucket #',bpred))
                       (nbutlast (append buckets nil)))
               ;; Last bucket needs special treatment
