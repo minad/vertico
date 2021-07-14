@@ -85,10 +85,10 @@
   (cond
    (vertico-mouse-mode
     (advice-add #'vertico--format-candidate :around #'vertico-mouse--format-candidate)
-    (advice-add #'vertico--setup :after #'vertico-mouse--setup))
+    (add-hook 'vertico--minibuffer-mode-hook #'vertico-mouse--setup))
    (t
     (advice-remove #'vertico--format-candidate #'vertico-mouse--format-candidate)
-    (advice-remove #'vertico--setup #'vertico-reverse--setup))))
+    (remove-hook 'vertico--minibuffer-mode-hook #'vertico-mouse--setup))))
 
 (provide 'vertico-mouse)
 ;;; vertico-mouse.el ends here

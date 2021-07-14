@@ -106,10 +106,10 @@
   (cond
    (vertico-buffer-mode
     (advice-add #'vertico--display-candidates :override #'vertico-buffer--display)
-    (advice-add #'vertico--setup :after #'vertico-buffer--setup))
+    (add-hook 'vertico--minibuffer-mode-hook #'vertico-buffer--setup))
    (t
     (advice-remove #'vertico--display-candidates #'vertico-buffer--display)
-    (advice-remove #'vertico--setup #'vertico-buffer--setup))))
+    (remove-hook 'vertico--minibuffer-mode-hook #'vertico-buffer--setup))))
 
 (provide 'vertico-buffer)
 ;;; vertico-buffer.el ends here

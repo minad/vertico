@@ -100,5 +100,10 @@
                  (eq ?/ (char-before (- (point) 2)))))
     (delete-region (overlay-start rfn-eshadow-overlay) (overlay-end rfn-eshadow-overlay))))
 
+;; Emacs 28: Do not show Vertico commands with M-X
+(dolist (sym '(vertico-directory-up vertico-directory-enter
+               vertico-directory-delete-char vertico-directory-delete-word))
+  (put sym 'command-modes '(vertico--minibuffer-mode)))
+
 (provide 'vertico-directory)
 ;;; vertico-directory.el ends here

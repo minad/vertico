@@ -70,10 +70,10 @@
   (cond
    (vertico-reverse-mode
     (advice-add #'vertico--display-candidates :override #'vertico-reverse--display)
-    (advice-add #'vertico--setup :after #'vertico-reverse--setup))
+    (add-hook 'vertico--minibuffer-mode-hook #'vertico-reverse--setup))
    (t
     (advice-remove #'vertico--display-candidates #'vertico-reverse--display)
-    (advice-remove #'vertico--setup #'vertico-reverse--setup))))
+    (remove-hook 'vertico--minibuffer-mode-hook #'vertico-reverse--setup))))
 
 (provide 'vertico-reverse)
 ;;; vertico-reverse.el ends here

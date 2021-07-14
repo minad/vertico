@@ -707,8 +707,9 @@ When the prefix argument is 0, the group order is reset."
       (vertico--remove-face 0 (length content) 'vertico-current content)
       content)))
 
-(defun vertico--setup ()
-  "Setup completion UI."
+(define-minor-mode vertico--minibuffer-mode
+  "Mode used in the Vertico minibuffer."
+  :interactive nil
   (setq vertico--input t
         vertico--candidates-ov (make-overlay (point-max) (point-max) nil t t)
         vertico--count-ov (and vertico-count-format
@@ -726,7 +727,7 @@ When the prefix argument is 0, the group order is reset."
 
 (defun vertico--advice (orig &rest args)
   "Advice for ORIG completion function, receiving ARGS."
-  (minibuffer-with-setup-hook #'vertico--setup (apply orig args)))
+  (minibuffer-with-setup-hook #'vertico--minibuffer-mode (apply orig args)))
 
 ;;;###autoload
 (define-minor-mode vertico-mode
@@ -738,6 +739,12 @@ When the prefix argument is 0, the group order is reset."
         (advice-add #'completing-read-multiple :around #'vertico--advice))
     (advice-remove #'completing-read-default #'vertico--advice)
     (advice-remove #'completing-read-multiple #'vertico--advice)))
+
+;; Emacs 28: Do not show Vertico commands with M-X
+(dolist (sym '(vertico-next vertico-next-group vertico-previous vertico-previous-group
+               vertico-scroll-down vertico-scroll-up vertico-exit vertico-insert
+               vertico-exit-input vertico-save vertico-first vertico-last))
+  (put sym 'command-modes '(vertico--minibuffer-mode)))
 
 (provide 'vertico)
 ;;; vertico.el ends here

@@ -131,5 +131,9 @@
   (when (vertico-quick-jump)
     (vertico-insert)))
 
+;; Emacs 28: Do not show Vertico commands with M-X
+(dolist (sym '(vertico-quick-jump  vertico-quick-exit vertico-quick-insert))
+  (put sym 'command-modes '(vertico--minibuffer-mode)))
+
 (provide 'vertico-quick)
 ;;; vertico-quick.el ends here
