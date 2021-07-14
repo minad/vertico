@@ -739,5 +739,15 @@ When the prefix argument is 0, the group order is reset."
     (advice-remove #'completing-read-default #'vertico--advice)
     (advice-remove #'completing-read-multiple #'vertico--advice)))
 
+;; Emacs 28: Do not show Vertico commands with M-X
+(dolist (sym '(vertico-next vertico-next-group vertico-previous vertico-previous-group
+               vertico-scroll-down vertico-scroll-up vertico-exit vertico-insert
+               vertico-exit-input vertico-save vertico-first vertico-last))
+  (put sym 'completion-predicate #'vertico--command-p))
+
+(defun vertico--command-p (_sym buffer)
+  "Return non-nil if Vertico is active in BUFFER."
+  (buffer-local-value 'vertico--input buffer))
+
 (provide 'vertico)
 ;;; vertico.el ends here
