@@ -34,8 +34,9 @@
 ;;; Code:
 
 (require 'seq)
-(require 'cl-lib)
-(eval-when-compile (require 'subr-x))
+(eval-when-compile
+  (require 'cl-lib)
+  (require 'subr-x))
 
 (defgroup vertico nil
   "VERTical Interactive COmpletion."
@@ -295,6 +296,13 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Return the sorting function given the completion METADATA."
   (or (completion-metadata-get metadata 'display-sort-function) vertico-sort-function))
 
+(defun vertico--filter-files (files)
+  "Filter FILES by `completion-ignored-extensions'."
+  (let ((re (concat "\\(?:\\(?:\\`\\|/\\)\\.\\.?/\\|"
+                    (regexp-opt completion-ignored-extensions)
+                    "\\)\\'")))
+    (or (seq-remove (lambda (x) (string-match-p re x)) files) files)))
+
 (defun vertico--recompute-candidates (pt content bounds metadata)
   "Recompute candidates given PT, CONTENT, BOUNDS and METADATA."
   (pcase-let* ((field (substring content (car bounds) (+ pt (cdr bounds))))
@@ -312,10 +320,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     ;; since this breaks the special casing in the `completion-file-name-table' for `file-exists-p'
     ;; and `file-directory-p'.
     (when completing-file
-      (let ((ignore (concat "\\(?:\\`\\|/\\)\\.?\\./\\'"
-                            (and completion-ignored-extensions
-                                 (concat "\\|" (regexp-opt completion-ignored-extensions) "\\'")))))
-        (setq all (cl-delete-if (lambda (x) (string-match-p ignore x)) all))))
+      (setq all (vertico--filter-files all)))
     ;; Sort using the `display-sort-function' or the Vertico sort functions
     (unless (memq sort '(nil identity))
       (vertico--update-history-hash (substring content 0 base))
