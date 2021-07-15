@@ -460,14 +460,14 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Arrange candidates given the current METADATA."
   (let ((curr-line 0) (lines))
     ;; Compute group titles
-    (let* ((start (min (max 0 (- vertico--index (/ vertico-count 2) (1- (mod vertico-count 2))))
+    (let* ((index (min (max 0 (- vertico--index (/ vertico-count 2) (1- (mod vertico-count 2))))
                        (max 0 (- vertico--total vertico-count))))
-           (index start) (title)
+           (title)
            (group-fun (completion-metadata-get metadata 'group-function))
            (group-format (and group-fun vertico-group-format (concat vertico-group-format "\n")))
            (candidates
-            (thread-last (seq-subseq vertico--candidates start
-                                     (min (+ start vertico-count) vertico--total))
+            (thread-last (seq-subseq vertico--candidates index
+                                     (min (+ index vertico-count) vertico--total))
               (funcall vertico--highlight-function)
               (vertico--affixate metadata))))
       (dolist (cand candidates)
