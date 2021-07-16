@@ -18,7 +18,7 @@
   built-in facilities system, Vertico achieves /full compatibility/ with built-in
   Emacs completion commands and completion tables. Vertico only provides the
   completion UI but aims to be flexible and extensible. Additional enhancements
-  can be installed separately via extensions or complementary packages. The code
+  can be installed separately via [[#extensions][extensions]] or [[#complementary-packages][complementary packages]]. The code
   base is small and maintainable (~vertico.el~ is only about 600 lines of code
   without whitespace and comments).
 
@@ -172,6 +172,9 @@
   #+end_src
 
 * Extensions
+  :properties:
+  :custom_id: extensions
+  :end:
 
   We maintain a few small extension packages to Vertico in this repository in
   the subdirectory [[https://github.com/minad/vertico/tree/main/extensions][extensions/]]. The extensions can be installed additionally to
@@ -191,6 +194,9 @@
   =vertico-flat= plus =vertico-directory= resembles Ido in look and feel.
 
 * Complementary packages
+  :properties:
+  :custom_id: complementary-packages
+  :end:
 
   Vertico works well together with a few complementary packages, which enrich the
   completion UI. These packages are fully supported:
