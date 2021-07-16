@@ -160,31 +160,31 @@ See `resize-mini-windows' for documentation."
 (defvar-local vertico--default-missing nil
   "Default candidate is missing from candidates list.")
 
-(defun vertico--update-history-hash (base)
-  "Update history hash, given current BASE prefix string."
-  (unless (and vertico--history-hash (equal vertico--history-base base))
-    (let* ((index 0)
-           (base-size (length base))
-           ;; History disabled if `minibuffer-history-variable' eq `t'.
-           (hist (and (not (eq minibuffer-history-variable t))
-                      (symbol-value minibuffer-history-variable)))
-           (hash (make-hash-table :test #'equal :size (length hist))))
-      (if (= base-size 0)
-          ;; Put history elements into the hash
+(defun vertico--history-hash ()
+  "Recompute history hash table and return it."
+  (or vertico--history-hash
+      (let* ((index 0)
+             (base vertico--history-base)
+             (base-size (length base))
+             ;; History disabled if `minibuffer-history-variable' eq `t'.
+             (hist (and (not (eq minibuffer-history-variable t))
+                        (symbol-value minibuffer-history-variable)))
+             (hash (make-hash-table :test #'equal :size (length hist))))
+        (if (= base-size 0)
+            ;; Put history elements into the hash
+            (dolist (elem hist)
+              (unless (gethash elem hash)
+                (puthash elem index hash))
+              (setq index (1+ index)))
+          ;; Drop base string from history elements, before putting them into the hash
           (dolist (elem hist)
-            (unless (gethash elem hash)
-              (puthash elem index hash))
-            (setq index (1+ index)))
-        ;; Drop base string from history elements, before putting them into the hash
-        (dolist (elem hist)
-          (when (and (>= (length elem) base-size)
-                     (eq t (compare-strings base 0 base-size elem 0 base-size)))
-            (setq elem (substring elem base-size))
-            (unless (gethash elem hash)
-              (puthash elem index hash)))
-          (setq index (1+ index))))
-      (setq vertico--history-hash hash
-            vertico--history-base base))))
+            (when (and (>= (length elem) base-size)
+                       (eq t (compare-strings base 0 base-size elem 0 base-size)))
+              (setq elem (substring elem base-size))
+              (unless (gethash elem hash)
+                (puthash elem index hash)))
+            (setq index (1+ index))))
+        (setq vertico--history-hash hash))))
 
 (defun vertico--length-string< (x y)
   "Sorting predicate which compares X and Y first by length then by `string<'."
@@ -207,11 +207,11 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   `(defun ,(intern (mapconcat #'symbol-name `(vertico sort ,@by) "-")) (candidates)
      ,(concat "Sort candidates by " (mapconcat #'symbol-name by ", ") ".")
      (let* ((buckets (make-vector ,bsize nil))
-            ,@(and (eq (car by) 'history) '((hcands))))
+            ,@(and (eq (car by) 'history) '((hhash (vertico--history-hash)) (hcands))))
        (dolist (% candidates)
          ,(if (eq (car by) 'history)
               ;; Find recent candidates or fill buckets
-              `(if-let (idx (gethash % vertico--history-hash))
+              `(if-let (idx (gethash % hhash))
                    (push (cons idx %) hcands)
                  (let ((idx (min ,(1- bsize) ,bindex)))
                    (aset buckets idx (cons % (aref buckets idx)))))
@@ -313,9 +313,13 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                                                         minibuffer-completion-predicate
                                                         pt metadata))
                (base (or (when-let (z (last all)) (prog1 (cdr z) (setcdr z nil))) 0))
+               (base-str (substring content 0 base))
                (def (or (car-safe minibuffer-default) minibuffer-default))
                (sort (vertico--sort-function metadata))
                (groups))
+    ;; Reset the history hash table
+    (unless (equal base-str vertico--history-base)
+      (setq vertico--history-base base-str vertico--history-hash nil))
     ;; Filter the ignored file extensions. We cannot use modified predicate for this filtering,
     ;; since this breaks the special casing in the `completion-file-name-table' for `file-exists-p'
     ;; and `file-directory-p'.
@@ -323,7 +327,6 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
       (setq all (vertico--filter-files all)))
     ;; Sort using the `display-sort-function' or the Vertico sort functions
     (unless (memq sort '(nil identity))
-      (vertico--update-history-hash (substring content 0 base))
       (setq all (funcall sort all)))
     ;; Move special candidates: "field" appears at the top, before "field/", before default value
     (when (stringp def)
