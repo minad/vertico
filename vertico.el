@@ -292,6 +292,17 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
           (cons (apply #'completion-all-completions args) hl))
       (cons (apply #'completion-all-completions args) hl))))
 
+(defun vertico--history-group (cand transform)
+  (if transform
+      cand
+    (if (gethash cand (vertico--history-hash))
+        "History"
+      "Rest")))
+
+(defun vertico--group-function (metadata)
+  "Return the grouping function given the completion METADATA."
+  (or (completion-metadata-get metadata 'group-function) #'vertico--history-group))
+
 (defun vertico--sort-function (metadata)
   "Return the sorting function given the completion METADATA."
   (or (completion-metadata-get metadata 'display-sort-function) vertico-sort-function))
@@ -334,7 +345,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (when (and completing-file (not (string-suffix-p "/" field)))
       (setq all (vertico--move-to-front (concat field "/") all)))
     (setq all (vertico--move-to-front field all))
-    (when-let (group-fun (and all (completion-metadata-get metadata 'group-function)))
+    (when-let (group-fun (and all (vertico--group-function metadata)))
       (setq groups (vertico--group-by group-fun all) all (car groups)))
     (list base (length all)
           ;; Default value is missing from collection
@@ -466,7 +477,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (let* ((index (min (max 0 (- vertico--index (/ vertico-count 2) (1- (mod vertico-count 2))))
                        (max 0 (- vertico--total vertico-count))))
            (title)
-           (group-fun (completion-metadata-get metadata 'group-function))
+           (group-fun (vertico--group-function metadata))
            (group-format (and group-fun vertico-group-format (concat vertico-group-format "\n")))
            (candidates
             (thread-last (seq-subseq vertico--candidates index
