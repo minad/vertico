@@ -266,8 +266,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 ;; See below `vertico--candidate'.
 (defun vertico--all-completions (&rest args)
   "Compute all completions for ARGS with deferred highlighting."
-  (if (fboundp 'completion-deferred-completions)
-      (or (apply #'completion-deferred-completions args) '(:base 0 :highlight identity))
+  (if (fboundp 'completion-filtered-completions)
+      (or (apply #'completion-filtered-completions args) '(:base 0 :highlight identity))
   (cl-letf* ((orig-pcm (symbol-function #'completion-pcm--hilit-commonality))
              (orig-flex (symbol-function #'completion-flex-all-completions))
              ((symbol-function #'completion-flex-all-completions)
