@@ -267,7 +267,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 (defun vertico--all-completions (&rest args)
   "Compute all completions for ARGS with deferred highlighting."
   (if (fboundp 'completion-deferred-completions)
-      (or (apply #'completion-deferred-completions args) '(0 identity))
+      (or (apply #'completion-deferred-completions args) '(:base 0 :highlight identity))
   (cl-letf* ((orig-pcm (symbol-function #'completion-pcm--hilit-commonality))
              (orig-flex (symbol-function #'completion-flex-all-completions))
              ((symbol-function #'completion-flex-all-completions)
@@ -305,8 +305,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
         (let* ((last (last result))
                (base (or (cdr last) 0)))
           (setcdr last nil)
-          `(,base ,hl . ,result))
-      '(0 identity)))))
+          `(:base ,base :highlight ,hl :completions ,result))
+      '(:base 0 :completions identity)))))
 
 (defun vertico--sort-function (metadata)
   "Return the sorting function given the completion METADATA."
@@ -325,17 +325,20 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   ;; visible before the expensive candidate recomputation is performed (Issue #89).
   ;; Do not redisplay during initialization, since this leads to flicker.
   (when (consp vertico--input) (redisplay))
-  (pcase-let* ((field (substring content (car bounds) (+ pt (cdr bounds))))
-               ;; `minibuffer-completing-file-name' has been obsoleted by the completion category
-               (completing-file (eq 'file (completion-metadata-get metadata 'category)))
-               (`(,base ,hl . ,all) (vertico--all-completions content
-                                                              minibuffer-completion-table
-                                                              minibuffer-completion-predicate
-                                                              pt metadata))
-               (base-str (substring content 0 base))
-               (def (or (car-safe minibuffer-default) minibuffer-default))
-               (sort (vertico--sort-function metadata))
-               (groups))
+  (let* ((field (substring content (car bounds) (+ pt (cdr bounds))))
+         ;; `minibuffer-completing-file-name' has been obsoleted by the completion category
+         (completing-file (eq 'file (completion-metadata-get metadata 'category)))
+         (result (vertico--all-completions content
+                                           minibuffer-completion-table
+                                           minibuffer-completion-predicate
+                                           pt metadata))
+         (base (plist-get result :base))
+         (hl (plist-get result :highlight))
+         (all (plist-get result :completions))
+         (base-str (substring content 0 base))
+         (def (or (car-safe minibuffer-default) minibuffer-default))
+         (sort (vertico--sort-function metadata))
+         (groups))
     ;; Reset the history hash table
     (unless (equal base-str vertico--history-base)
       (setq vertico--history-base base-str vertico--history-hash nil))
