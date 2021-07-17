@@ -267,7 +267,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 (defun vertico--all-completions (&rest args)
   "Compute all completions for ARGS with deferred highlighting."
   (if (fboundp 'completion-filtered-completions)
-      (or (apply #'completion-filtered-completions args) '(:base 0 :highlight identity))
+      (or (apply #'completion-filtered-completions args) '((base . 0) (highlight . identity)))
   (cl-letf* ((orig-pcm (symbol-function #'completion-pcm--hilit-commonality))
              (orig-flex (symbol-function #'completion-flex-all-completions))
              ((symbol-function #'completion-flex-all-completions)
@@ -305,8 +305,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
         (let* ((last (last result))
                (base (or (cdr last) 0)))
           (setcdr last nil)
-          `(:base ,base :highlight ,hl :completions ,result))
-      '(:base 0 :completions identity)))))
+          `((base . ,base) (highlight . ,hl) (completions . ,result)))
+      '((base . 0) (highlight . identity))))))
 
 (defun vertico--sort-function (metadata)
   "Return the sorting function given the completion METADATA."
@@ -332,9 +332,9 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                                            minibuffer-completion-table
                                            minibuffer-completion-predicate
                                            pt metadata))
-         (base (plist-get result :base))
-         (hl (plist-get result :highlight))
-         (all (plist-get result :completions))
+         (base (alist-get 'base result))
+         (hl (alist-get 'highlight result))
+         (all (alist-get 'completions result))
          (base-str (substring content 0 base))
          (def (or (car-safe minibuffer-default) minibuffer-default))
          (sort (vertico--sort-function metadata))
