@@ -59,16 +59,6 @@
       ;; (setq vertico-cycle t)
       )
 
-    ;; Configure directory extension
-    (use-package vertico-directory
-      ;; More convenient directory navigation commands
-      :bind (:map vertico-map
-                  ("RET" . vertico-directory-enter)
-                  ("DEL" . vertico-directory-delete-char)
-                  ("M-DEL" . vertico-directory-delete-word))
-      ;; Tidy shadowed file names
-      :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
-
     ;; Use the `orderless' completion style.
     ;; Enable `partial-completion' for files to allow path expansion.
     ;; You may prefer to use `initials' instead of `partial-completion'.
@@ -192,6 +182,21 @@
   With these extensions it is possible to adapt Vertico heavily such that it
   matches your preference or behaves similar to familiar UIs. The combination
   =vertico-flat= plus =vertico-directory= resembles Ido in look and feel.
+
+  Configuration example for =vertico-directory.el=:
+
+  #+begin_src emacs-lisp
+    ;; Configure directory extension.
+    ;; NOTE: The file `vertico-directory.el' must be installed manually.
+    (use-package vertico-directory
+      ;; More convenient directory navigation commands
+      :bind (:map vertico-map
+                  ("RET" . vertico-directory-enter)
+                  ("DEL" . vertico-directory-delete-char)
+                  ("M-DEL" . vertico-directory-delete-word))
+      ;; Tidy shadowed file names
+      :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
+  #+end_src
 
 * Complementary packages
   :properties:
