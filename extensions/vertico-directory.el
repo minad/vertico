@@ -69,9 +69,9 @@
              (vertico-directory--completing-file-p))
     (save-excursion
       (goto-char (1- (point)))
-      (when (search-backward "/" (point-min) t)
-        (delete-region (1+ (point)) (point-max))))
-    t))
+      (when (search-backward "/" (minibuffer-prompt-end) t)
+        (delete-region (1+ (point)) (point-max))
+        t))))
 
 ;;;###autoload
 (defun vertico-directory-delete-char ()
