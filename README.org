@@ -211,8 +211,31 @@
   - [[https://github.com/oantolin/embark][Embark]]: Minibuffer actions and context menu
   - [[https://github.com/oantolin/orderless][Orderless]]: Advanced completion style
 
-  In case you want to use Vertico for completion-at-point/completion-in-region,
-  you can use the function ~consult-completion-in-region~ provided by the Consult
+  In order to get accustomed with the package ecosystem the following approach
+  is recommended:
+
+  1. Start with plain Emacs.
+  2. Install and enable Vertico to get incremental minibuffer completion.
+  3. Install Orderless and/or configure the built-in completion styles
+     for more flexible minibuffer filtering.
+  4. Install Marginalia if you like rich minibuffer annotations.
+  5. Install Embark and add two keybindings for ~embark-dwim~ and ~embark-act~.
+     I am using =M-.= and =C-.=. These commands allow you to act on the object
+     at point or in the minibuffer.
+  6. Install Consult if you want additional featureful completion commands,
+     e.g, the buffer switcher ~consult-buffer~ with preview or the line-based
+     search ~consult-line~.
+
+  You don't have to use all of these components. Use only the ones you like and
+  the ones which fit well into your setup. In steps 1. to 4. no new commands are
+  introduced over plain Emacs. In step 5. the new commands ~embark-act~ and
+  ~embark-dwim~ are introduced. In step 6. you get the Consult commands, some offer
+  new functionality not present in Emacs already (e.g., ~consult-line~) and
+  some are substitutes (e.g., ~consult-buffer~ for ~switch-to-buffer~).
+
+  There are some special setting you may want to add to your configuration. In
+  case you want to use Vertico for completion-at-point/completion-in-region, you
+  can use the function ~consult-completion-in-region~ provided by the Consult
   package.
 
   #+begin_src emacs-lisp
@@ -251,10 +274,16 @@
 
   Since Vertico only provides the UI, you may want to combine it with some of
   the complementary packages, to give a full-featured completion experience
-  similar to Ivy. Vertico is targeted at users interested in crafting their
-  Emacs precisely to their liking - completion plays an integral part in how the
-  users interacts with Emacs. There are at least two other interactive
-  completion UIs, which follow a similar philosophy:
+  similar to Helm or Ivy. Overall the packages in the spirit of Vertico have a
+  different style than Helm or Ivy. The idea is to have smaller independent
+  components, which one can add and understand step by step. Each component
+  tries to be focused on its niche and tries to be as non-intrusive as possible.
+  Vertico is targeted at users interested in crafting their Emacs precisely to
+  their liking - completion plays an integral part in how the users interacts
+  with Emacs.
+
+  There are at least two other interactive completion UIs, which follow a
+  similar philosophy:
 
   - [[https://github.com/raxod502/selectrum][Selectrum]]: Selectrum has a similar UI as Vertico. Selectrum is more complex
     and not fully compatible with every Emacs completion command ([[https://github.com/raxod502/selectrum/issues/481][Issue #481]]),
@@ -267,9 +296,6 @@
     the current candidate always appears at the top. From my perspective,
     candidate rotation feels a bit less intuitive than the UI of Vertico or
     Selectrum. Note that Emacs 28 offers a built-in ~icomplete-vertical-mode~.
-
-  See also the [[https://github.com/raxod502/selectrum][Selectrum readme]], which gives an extensive comparison of many
-  available completion systems from the perspective of Selectrum.
 
 * Problematic completion commands
 
