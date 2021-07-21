@@ -575,7 +575,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                                                 minibuffer-completion-predicate
                                                 after)
                        (t (cons 0 (length after)))))))
-    (unless (equal vertico--input (cons content pt))
+    (unless (or (input-pending-p) (equal vertico--input (cons content pt)))
       (vertico--update-candidates pt content bounds metadata))
     (vertico--prompt-selection)
     (vertico--display-count)
