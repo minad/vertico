@@ -41,6 +41,7 @@
 (defgroup vertico nil
   "VERTical Interactive COmpletion."
   :group 'convenience
+  :group 'minibuffer
   :prefix "vertico-")
 
 (defcustom vertico-count-format (cons "%-6s " "%s/%s")
