@@ -56,8 +56,7 @@
 
 (defun vertico-flat--arrange-candidates (_metadata)
   "Arrange candidates."
-  (let* ((index (max 0 vertico--index))
-         (count vertico-count)
+  (let* ((index (max 0 vertico--index)) (count vertico-count)
          (candidates (nthcdr vertico--index vertico--candidates))
          (width (- (window-width) 4
                    (length (plist-get vertico-flat-format :left))
@@ -65,8 +64,9 @@
                    (length (plist-get vertico-flat-format :right))
                    (length (plist-get vertico-flat-format :ellipsis))
                    (car (posn-col-row (posn-at-point (1- (point-max)))))))
-         (result))
-    (while (and candidates (> width 0) (> count 0))
+         (result) (wrapped))
+    (while (and candidates (not (eq wrapped (car candidates)))
+                (> width 0) (> count 0))
       (let ((cand (car candidates)))
         (setq cand (car (funcall vertico--highlight-function (list cand))))
         (when (string-match-p "\n" cand)
@@ -80,8 +80,13 @@
               width (- width (string-width cand) (length (plist-get vertico-flat-format :separator))))
         (when (or (not result) (> width 0))
           (push cand result))
-        (pop candidates)))
-    (unless (or (= vertico--total 0) (= index vertico--total))
+        (pop candidates)
+        (when (and vertico-cycle (not candidates))
+          (setq candidates vertico--candidates index 0
+                wrapped (nth vertico--index vertico--candidates)))))
+    (when (if wrapped
+              (> vertico--total (- vertico-count count))
+            (and (/= vertico--total 0) (/= index vertico--total)))
       (push (plist-get vertico-flat-format :ellipsis) result))
     (nreverse result)))
 
