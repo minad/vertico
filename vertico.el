@@ -305,6 +305,9 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (defun vertico--recompute-candidates (pt content bounds metadata)
   "Recompute candidates given PT, CONTENT, BOUNDS and METADATA."
+  ;; Redisplay the minibuffer such that the input becomes immediately
+  ;; visible before the expensive candidate recomputation is performed (Issue #89).
+  (redisplay)
   (pcase-let* ((field (substring content (car bounds) (+ pt (cdr bounds))))
                ;; `minibuffer-completing-file-name' has been obsoleted by the completion category
                (completing-file (eq 'file (completion-metadata-get metadata 'category)))
