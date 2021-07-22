@@ -20,7 +20,7 @@
   completion UI but aims to be flexible and extensible. Additional enhancements
   can be installed separately via [[#extensions][extensions]] or [[#complementary-packages][complementary packages]]. The code
   base is small and maintainable (~vertico.el~ is only about 600 lines of code
-  without whitespace and comments).
+  without white space and comments).
 
 * Features
 
@@ -323,7 +323,7 @@
 
    *Update:* ~org-set-tags-command~ is changed to use ~completing-read-multiple~ in
    the current Org development version (9.5) as has been [[https://lists.gnu.org/archive/html/emacs-orgmode/2020-07/msg00222.html][proposed before]]. This
-   fix improves the compatibilty with many completion UIs, including Vertico.
+   fix improves the compatibility with many completion UIs, including Vertico.
    See the recent [[https://lists.gnu.org/archive/html/emacs-orgmode/2021-07/msg00287.html][mailing list discussion]].
 
 ** ~org-refile~
