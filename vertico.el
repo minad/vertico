@@ -46,15 +46,14 @@
 
 (defcustom vertico-count-format (cons "%-6s " "%s/%s")
   "Format string used for the candidate count."
-  :type '(choice (const nil) (cons string string)))
+  :type '(choice (const :tag "No candidate count" nil) (cons string string)))
 
 (defcustom vertico-group-format
-  (concat
-   #("    " 0 4 (face vertico-group-separator))
-   #(" %s " 0 4 (face vertico-group-title))
-   #(" " 0 1 (face vertico-group-separator display (space :align-to right))))
+  (concat #("    " 0 4 (face vertico-group-separator))
+          #(" %s " 0 4 (face vertico-group-title))
+          #(" " 0 1 (face vertico-group-separator display (space :align-to right))))
   "Format string used for the group title."
-  :type '(choice (const nil) string))
+  :type '(choice (const :tag "No group titles" nil) string))
 
 (defcustom vertico-count 10
   "Maximal number of candidates to show."
@@ -63,21 +62,28 @@
 (defcustom vertico-resize resize-mini-windows
   "How to resize the Vertico minibuffer window.
 See `resize-mini-windows' for documentation."
-  :type '(choice (const nil) (const t) (const grow-only)))
+  :type '(choice (const :tag "Fixed" nil)
+                 (const :tag "Shrink and grow" t)
+                 (const :tag "Grow-only" grow-only)))
 
 (defcustom vertico-cycle nil
   "Enable cycling for `vertico-next' and `vertico-previous'."
   :type 'boolean)
 
 (defcustom vertico-multiline
-  (cons #("⤶" 0 1 (face vertico-multiline))
-        #("…" 0 1 (face vertico-multiline)))
+  (cons #("⤶" 0 1 (face vertico-multiline)) #("…" 0 1 (face vertico-multiline)))
   "Replacements for multiline strings."
   :type '(cons string string))
 
 (defcustom vertico-sort-function #'vertico-sort-history-length-alpha
   "Default sorting function, which is used if no `display-sort-function' is specified."
-  :type '(choice (const nil) function))
+  :type `(choice
+          (const :tag "No sorting" nil)
+          (const :tag "By history, length and alpha" ,#'vertico-sort-history-length-alpha)
+          (const :tag "By history and alpha" ,#'vertico-sort-history-alpha)
+          (const :tag "By length and alpha" ,#'vertico-sort-length-alpha)
+          (const :tag "Alphabetically" ,#'vertico-sort-alpha)
+          (function :tag "Custom function")))
 
 (defgroup vertico-faces nil
   "Faces used by Vertico."
