@@ -73,7 +73,7 @@ See `resize-mini-windows' for documentation."
 (defcustom vertico-multiline
   (cons #("⤶" 0 1 (face vertico-multiline)) #("…" 0 1 (face vertico-multiline)))
   "Replacements for multiline strings."
-  :type '(cons string string))
+  :type '(cons (string :tag "Newline") (string :tag "Truncation")))
 
 (defcustom vertico-sort-function #'vertico-sort-history-length-alpha
   "Default sorting function, which is used if no `display-sort-function' is specified."
