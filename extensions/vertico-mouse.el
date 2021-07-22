@@ -35,8 +35,7 @@
 (defface vertico-mouse
   '((t :inherit highlight))
   "Face used for mouse highlighting."
-  :group 'vertico
-  :group 'faces)
+  :group 'vertico-faces)
 
 (defun vertico--mouse-candidate-map (index)
   "Return keymap for candidate with INDEX."

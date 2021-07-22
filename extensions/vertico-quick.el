@@ -41,8 +41,7 @@
      :weight bold :background "#d5baff" :foreground "black")
     (t :background "magenta" :foreground "white"))
   "Face used for the first quick key."
-  :group 'vertico
-  :group 'faces)
+  :group 'vertico-faces)
 
 (defface vertico-quick2
   '((((class color) (min-colors 88) (background dark))
@@ -51,8 +50,7 @@
      :weight bold :background "#8ae4f2" :foreground "black")
     (t :background "blue" :foreground "white"))
   "Face used for the second quick key."
-  :group 'vertico
-  :group 'faces)
+  :group 'vertico-faces)
 
 (defcustom vertico-quick1 "asdfgh"
   "Single level quick keys."

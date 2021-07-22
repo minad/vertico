@@ -36,8 +36,7 @@
 (defface vertico-indexed
   '((t :height 0.75 :inherit font-lock-comment-face))
   "Face used for the candidate index prefix."
-  :group 'vertico
-  :group 'faces)
+  :group 'vertico-faces)
 
 (defvar-local vertico-indexed--min 0)
 (defvar-local vertico-indexed--max 0)
