@@ -49,7 +49,8 @@
   (set-window-vscroll nil 100)
   (let ((count (vertico--format-count))
         (prompt (minibuffer-prompt))
-        (content (minibuffer-contents)))
+        (content (minibuffer-contents))
+        (mk (and (region-active-p) (mark))))
     (with-current-buffer vertico-buffer--buffer
       (erase-buffer)
       (insert (propertize (concat count prompt) 'face 'minibuffer-prompt)
@@ -62,6 +63,8 @@
       (set-window-point win (max (+ 1 (length prompt) (length count))
                                  (+ (point) (length count))))
       (with-current-buffer vertico-buffer--buffer
+        (when mk
+          (add-face-text-property (+ mk (length count)) (window-point win) 'region 'append))
         (setq-local truncate-lines (< (window-point win) (* 0.8 (window-width win))))))))
 
 (defun vertico-buffer--select (_)
