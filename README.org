@@ -12,11 +12,11 @@
 
 * Introduction
 
-  Vertico provides a performant and minimalistic vertical completion UI, which
-  is based on the default completion system. The main focus of Vertico is to
-  provide a UI which behaves /correctly/ under all circumstances. By reusing the
-  built-in facilities system, Vertico achieves /full compatibility/ with built-in
-  Emacs completion commands and completion tables. Vertico only provides the
+  Vertico provides a performant and minimalistic vertical completion UI based on
+  the default completion system. The main focus of Vertico is to provide a UI
+  which behaves /correctly/ under all circumstances. By reusing the built-in
+  facilities system, Vertico achieves /full compatibility/ with built-in Emacs
+  completion commands and completion tables. Vertico only provides the
   completion UI but aims to be flexible and extensible. Additional enhancements
   can be installed separately via [[#extensions][extensions]] or [[#complementary-packages][complementary packages]]. The code
   base is small and maintainable (~vertico.el~ is only about 600 lines of code
@@ -60,7 +60,7 @@
       )
 
     ;; Use the `orderless' completion style.
-    ;; Enable `partial-completion' for files to allow path expansion.
+    ;; Enable `partial-completion' for fil path expansion.
     ;; You may prefer to use `initials' instead of `partial-completion'.
     (use-package orderless
       :init
@@ -99,9 +99,10 @@
 * Key bindings
 
   Vertico defines its own local keymap in the minibuffer which is derived from
-  ~minibuffer-local-map~. The keymap mostly keeps the ~fundamental-mode~ keybindings
-  intact and remaps and binds only a few commands. Note in particular the
-  binding of =TAB= to ~vertico-insert~ and the bindings of ~vertico-exit/exit-input~.
+  ~minibuffer-local-map~. The keymap keeps most of the ~fundamental-mode~
+  keybindings intact and remaps and binds only a handful of commands. Note in
+  particular the binding of =TAB= to ~vertico-insert~ and the bindings of
+  ~vertico-exit/exit-input~.
 
   - ~beginning-of-buffer~, ~minibuffer-beginning-of-buffer~ -> ~vertico-first~
   - ~end-of-buffer~ -> ~vertico-last~
@@ -166,8 +167,8 @@
   :custom_id: extensions
   :end:
 
-  We maintain a few small extension packages to Vertico in this repository in
-  the subdirectory [[https://github.com/minad/vertico/tree/main/extensions][extensions/]]. The extensions can be installed additionally to
+  We maintain small extension packages to Vertico in this repository in the
+  subdirectory [[https://github.com/minad/vertico/tree/main/extensions][extensions/]]. The extensions can be installed additionally to
   Vertico. Currently these extensions are available:
 
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-buffer.el][vertico-buffer.el]]: =vertico-buffer-mode= to display Vertico in a separate buffer
@@ -203,11 +204,11 @@
   :custom_id: complementary-packages
   :end:
 
-  Vertico works well together with a few complementary packages, which enrich the
+  Vertico works well together with complementary packages, which enrich the
   completion UI. These packages are fully supported:
 
   - [[https://github.com/minad/marginalia][Marginalia]]: Rich annotations in the minibuffer
-  - [[https://github.com/minad/consult][Consult]]: Many useful search and navigation commands
+  - [[https://github.com/minad/consult][Consult]]: Useful search and navigation commands
   - [[https://github.com/oantolin/embark][Embark]]: Minibuffer actions and context menu
   - [[https://github.com/oantolin/orderless][Orderless]]: Advanced completion style
 
@@ -227,11 +228,11 @@
      search ~consult-line~.
 
   You don't have to use all of these components. Use only the ones you like and
-  the ones which fit well into your setup. In steps 1. to 4. no new commands are
-  introduced over plain Emacs. In step 5. the new commands ~embark-act~ and
-  ~embark-dwim~ are introduced. In step 6. you get the Consult commands, some offer
-  new functionality not present in Emacs already (e.g., ~consult-line~) and
-  some are substitutes (e.g., ~consult-buffer~ for ~switch-to-buffer~).
+  the ones which fit well into your setup. The steps 1. to 4. introduce no new
+  commands over plain Emacs. Step 5. introduces the new commands ~embark-act~ and
+  ~embark-dwim~. In step 6. you get the Consult commands, some offer new
+  functionality not present in Emacs already (e.g., ~consult-line~) and some are
+  substitutes (e.g., ~consult-buffer~ for ~switch-to-buffer~).
 
   There are some special setting you may want to add to your configuration. In
   case you want to use Vertico for completion-at-point/completion-in-region, you
@@ -279,10 +280,9 @@
   similar to Helm or Ivy. Overall the packages in the spirit of Vertico have a
   different style than Helm or Ivy. The idea is to have smaller independent
   components, which one can add and understand step by step. Each component
-  tries to be focused on its niche and tries to be as non-intrusive as possible.
-  Vertico is targeted at users interested in crafting their Emacs precisely to
-  their liking - completion plays an integral part in how the users interacts
-  with Emacs.
+  focuses on its niche and tries to be as non-intrusive as possible. Vertico
+  targets users interested in crafting their Emacs precisely to their liking -
+  completion plays an integral part in how the users interacts with Emacs.
 
   There are at least two other interactive completion UIs, which follow a
   similar philosophy:
@@ -294,14 +294,15 @@
     to cycle over candidates, offers more commands for grouping support and
     comes with optional [[#extensions][extensions]].
   - [[https://github.com/oantolin/icomplete-vertical][Icomplete-vertical]]: This package enhances the Emacs builtin Icomplete with a
-    vertical display. In contrast to Vertico, the candidates are rotated such that
-    the current candidate always appears at the top. From my perspective,
-    candidate rotation feels a bit less intuitive than the UI of Vertico or
-    Selectrum. Note that Emacs 28 offers a built-in ~icomplete-vertical-mode~.
+    vertical display. In contrast to Vertico, Icomplete rotates the candidates
+    such that the current candidate always appears at the top. From my
+    perspective, candidate rotation feels a bit less intuitive than the UI of
+    Vertico or Selectrum. Note that Emacs 28 offers a built-in
+    ~icomplete-vertical-mode~.
 
 * Problematic completion commands
 
-  Vertico works well and is robust in most scenarios. However a few completion
+  Vertico works well and is robust in most scenarios. However some completion
   commands make certain assumptions about the completion styles and the
   completion UI. Some of these assumptions may not hold in Vertico and as such
   require minor workarounds.
