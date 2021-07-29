@@ -162,6 +162,57 @@
           read-buffer-completion-ignore-case t)
   #+end_src
 
+* Tramp hostname completion and wildcard completion
+
+  In combination with Orderless, hostnames are not made available for
+  completion after entering =/ssh:=. In order to avoid this problem, the =basic=
+  completion style should be specified for the file completion category.
+
+  #+begin_src emacs-lisp
+    (setq completion-styles '(orderless)
+          completion-category-overrides '((file (styles basic partial-completion))))
+  #+end_src
+
+  For users who are familiar with the =completion-style= machinery: You may also
+  define a custom completion style which sets in only for remote files. We may
+  even write a completion style which supports filtering files using wildcards.
+  You may wonder why one wants wildcards if we got regular expressions as in
+  Orderless. There is one reason - ~find-file~ can actually open multiple times
+  at once using wildcards!
+
+  #+begin_src emacs-lisp
+    (defun wildcard-remote-path-p (path)
+      "Return t if PATH is a remote path."
+      (string-match-p "\\`/[^/|:]+:" (substitute-in-file-name path)))
+
+    (defun wildcard-try-completion (string table pred point)
+      ;; Try basic completion for remote paths.
+      (when (wildcard-remote-path-p string)
+        (completion-basic-try-completion string table pred point)))
+
+    (defun wildcard-all-completions (string table pred point)
+      ;; First try basic completion for remote paths.
+      ;; This ensures that tramp host completion works.
+      (if (wildcard-remote-path-p string)
+          (completion-basic-all-completions string table pred point)
+        ;; Try to match against wildcards.
+        (let* ((bounds (completion-boundaries (substring string 0 point)
+                                              table pred
+                                              (substring string point)))
+               (prefix (substring string (car bounds)))
+               (regexp (wildcard-to-regexp prefix))
+               (completion-regexp-list (list regexp))
+               (completions (and (not (equal regexp (concat "\\`" (regexp-quote prefix) "\\'")))
+                                 (all-completions (substring string 0 (car bounds)) table pred))))
+          (and completions (nconc completions (car bounds))))))
+
+    (add-to-list
+     'completion-styles-alist
+     '(wildcard wildcard-try-completion wildcard-all-completions nil))
+    (setq completion-styles '(orderless)
+          completion-category-overrides '((file (styles wildcard partial-completion))))
+  #+end_src
+
 * Extensions
   :properties:
   :custom_id: extensions
@@ -357,34 +408,6 @@
 
    #+begin_src emacs-lisp
      (advice-add #'tmm-add-prompt :after #'minibuffer-hide-completions)
-   #+end_src
-
-** Tramp hostname completion
-
-   In combination with Orderless, hostnames are not made available for
-   completion after entering =/ssh:=. In order to avoid this problem, the =basic=
-   completion style should be specified for the file completion category.
-
-   #+begin_src emacs-lisp
-     (setq completion-styles '(orderless)
-           completion-category-overrides '((file (styles basic partial-completion))))
-   #+end_src
-
-   For users who are familiar with the =completion-style= machinery: You may also
-   define a custom completion style which sets in only for remote files!
-
-   #+begin_src emacs-lisp
-     (defun basic-remote-try-completion (string table pred point)
-       (and (vertico--remote-p string)
-            (completion-basic-try-completion string table pred point)))
-     (defun basic-remote-all-completions (string table pred point)
-       (and (vertico--remote-p string)
-            (completion-basic-all-completions string table pred point)))
-     (add-to-list
-      'completion-styles-alist
-      '(basic-remote basic-remote-try-completion basic-remote-all-completions nil))
-     (setq completion-styles '(orderless)
-           completion-category-overrides '((file (styles basic-remote partial-completion))))
    #+end_src
 
 * Contributions
