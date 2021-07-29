@@ -59,9 +59,11 @@
       ;; (setq vertico-cycle t)
       )
 
-    ;; Use the `orderless' completion style.
-    ;; Enable `partial-completion' for file path expansion.
-    ;; You may prefer to use `initials' instead of `partial-completion'.
+    ;; Use the `orderless' completion style. Additionally enable
+    ;; `partial-completion' for file path expansion. `partial-completion' is
+    ;; important for wildcard support. Multiple files can be opened at once
+    ;; with `find-file' if you enter a wildcard. You may also give the
+    ;; `initials' completion style a try.
     (use-package orderless
       :init
       (setq completion-styles '(orderless)
@@ -145,7 +147,9 @@
   #+end_src
 
   Alternatively you can experiment with the built-in completion-styles, e.g.,
-  adding =partial-completion= or =flex=.
+  adding =partial-completion= or =flex=. The =partial-completion= style is important
+  to add if you want to open multiple files at once with ~find-file~ using
+  wildcards.
 
   #+begin_src emacs-lisp
     (setq completion-styles '(basic substring partial-completion flex))
