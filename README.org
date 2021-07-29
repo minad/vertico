@@ -119,7 +119,7 @@
   - =<C-return>= -> ~vertico-exit-input~
   - =TAB= -> ~vertico-insert~
 
-* TAB completion
+* Completion styles and TAB completion
 
   The bindings of the ~minibuffer-local-completion-map~ are not available in
   Vertico by default. This means that TAB works differently from what you may
@@ -149,7 +149,8 @@
   Alternatively you can experiment with the built-in completion-styles, e.g.,
   adding =partial-completion= or =flex=. The =partial-completion= style is important
   to add if you want to open multiple files at once with ~find-file~ using
-  wildcards.
+  wildcards. In order to open multiple files at once, you have to move to the
+  prompt and then press =RET=.
 
   #+begin_src emacs-lisp
     (setq completion-styles '(basic substring partial-completion flex))
