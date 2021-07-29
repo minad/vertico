@@ -310,15 +310,13 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                     "\\)\\'")))
     (or (seq-remove (lambda (x) (string-match-p re x)) files) files)))
 
-(defun vertico--recompute-candidates (pt content bounds metadata)
-  "Recompute candidates given PT, CONTENT, BOUNDS and METADATA."
+(defun vertico--recompute-candidates (pt content bounds metadata completing-file)
+  "Recompute candidates given PT, CONTENT, BOUNDS, METADATA and COMPLETING-FILE."
   ;; Redisplay the minibuffer such that the input becomes immediately
   ;; visible before the expensive candidate recomputation is performed (Issue #89).
   ;; Do not redisplay during initialization, since this leads to flicker.
   (when (consp vertico--input) (redisplay))
   (pcase-let* ((field (substring content (car bounds) (+ pt (cdr bounds))))
-               ;; `minibuffer-completing-file-name' has been obsoleted by the completion category
-               (completing-file (eq 'file (completion-metadata-get metadata 'category)))
                (`(,all . ,hl) (vertico--all-completions content
                                                         minibuffer-completion-table
                                                         minibuffer-completion-predicate
@@ -401,43 +399,57 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Return t if PATH is a remote path."
   (string-match-p "\\`/[^/|:]+:" (substitute-in-file-name path)))
 
+(defun vertico--wildcard-p (str)
+  (let ((re (wildcard-to-regexp str)))
+    (unless (equal re (concat "\\`" (regexp-quote str) "\\'"))
+      (catch 'mismatch
+        (dolist (file vertico--candidates)
+          (unless (string-match-p re file)
+            (throw 'mismatch nil)))
+        t))))
+
 (defun vertico--update-candidates (pt content bounds metadata)
   "Preprocess candidates given PT, CONTENT, BOUNDS and METADATA."
-  (pcase
-      ;; If Tramp is used, do not compute the candidates in an interruptible fashion,
-      ;; since this will break the Tramp password and user name prompts (See #23).
-      (if (and (eq 'file (completion-metadata-get metadata 'category))
-               (or (vertico--remote-p content) (vertico--remote-p default-directory)))
-          (vertico--recompute-candidates pt content bounds metadata)
-        ;; bug#38024: Icomplete uses `while-no-input-ignore-events' to repair updating issues
-        (let ((while-no-input-ignore-events '(selection-request))
-              (non-essential t))
-          (while-no-input (vertico--recompute-candidates pt content bounds metadata))))
-    ('nil (abort-recursive-edit))
-    (`(,base ,total ,def-missing ,index ,candidates ,groups ,all-groups ,hl)
-     (setq vertico--input (cons content pt)
-           vertico--index index
-           vertico--base base
-           vertico--total total
-           vertico--highlight-function hl
-           vertico--groups groups
-           vertico--all-groups all-groups
-           vertico--candidates candidates
-           vertico--default-missing def-missing)
-     ;; If the current index is nil, compute new index. Select the prompt:
-     ;; * If there are no candidates
-     ;; * If the default is missing from the candidate list.
-     ;; * For matching content, as long as the full content after the boundary is empty,
-     ;;   including content after point.
-     (unless vertico--index
-       (setq vertico--lock-candidate nil
-             vertico--index
-             (if (or vertico--default-missing
-                     (= 0 vertico--total)
-                     (and (= (car bounds) (length content))
-                          (test-completion content minibuffer-completion-table
-                                           minibuffer-completion-predicate)))
-                 -1 0))))))
+  ;; `minibuffer-completing-file-name' has been obsoleted by the completion category
+  (let ((completing-file (eq 'file (completion-metadata-get metadata 'category))))
+    (pcase
+        ;; If Tramp is used, do not compute the candidates in an interruptible fashion,
+        ;; since this will break the Tramp password and user name prompts (See #23).
+        (if (and completing-file
+                 (or (vertico--remote-p content) (vertico--remote-p default-directory)))
+            (vertico--recompute-candidates pt content bounds metadata completing-file)
+          ;; bug#38024: Icomplete uses `while-no-input-ignore-events' to repair updating issues
+          (let ((while-no-input-ignore-events '(selection-request))
+                (non-essential t))
+            (while-no-input (vertico--recompute-candidates pt content bounds metadata completing-file))))
+      ('nil (abort-recursive-edit))
+      (`(,base ,total ,def-missing ,index ,candidates ,groups ,all-groups ,hl)
+       (setq vertico--input (cons content pt)
+             vertico--index index
+             vertico--base base
+             vertico--total total
+             vertico--highlight-function hl
+             vertico--groups groups
+             vertico--all-groups all-groups
+             vertico--candidates candidates
+             vertico--default-missing def-missing)
+       ;; If the current index is nil, compute new index. Select the prompt:
+       ;; * If there are no candidates
+       ;; * If the default is missing from the candidate list.
+       ;; * For matching content, as long as the full content after the boundary is empty,
+       ;;   including content after point.
+       ;; * When filtering files and the input is a wildcard.
+       (unless vertico--index
+         (setq vertico--lock-candidate nil
+               vertico--index
+               (if (or vertico--default-missing
+                       (= 0 vertico--total)
+                       (and (= (car bounds) (length content))
+                            (test-completion content minibuffer-completion-table
+                                             minibuffer-completion-predicate))
+                       (and completing-file
+                            (vertico--wildcard-p (substring content (car bounds))))
+                   -1 0)))))))
 
 (defun vertico--flatten-string (prop str)
   "Flatten STR with display or invisible PROP."
