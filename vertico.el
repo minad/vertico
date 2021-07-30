@@ -491,7 +491,12 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
               (setq title new-title)
               ;; Restore group title highlighting for prefix titles
               (when (string-prefix-p title str)
-                (setq title (substring str 0 (length title)))
+                (setq title (substring
+                             (car (funcall
+                                   vertico--highlight-function
+                                   ;; Remove all properties from the title
+                                   (list (propertize str 'face 'vertico-group-title))))
+                             0 (length title)))
                 (vertico--remove-face 0 (length title) 'completions-first-difference title))
               (push (format group-format title) lines))
             (setcar cand (funcall group-fun str 'transform))))
