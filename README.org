@@ -231,6 +231,8 @@
   6. Install Consult if you want additional featureful completion commands,
      e.g, the buffer switcher ~consult-buffer~ with preview or the line-based
      search ~consult-line~.
+  7. Install Embark-Consult and Wgrep for export from =consult-line= to =occur-mode=
+     buffers and from =consult-grep= to editable =grep-mode= buffers.
 
   You don't have to use all of these components. Use only the ones you like and
   the ones which fit well into your setup. The steps 1. to 4. introduce no new
