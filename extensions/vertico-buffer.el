@@ -37,12 +37,37 @@
 (defvar-local vertico-buffer--overlay nil)
 (defvar-local vertico-buffer--buffer nil)
 
-(defvar vertico-buffer-action
+(defcustom vertico-buffer-display-action
   `(display-buffer-in-side-window
     (window-height . ,(+ 3 vertico-count))
-    (side . top)
-    (slot . -1))
-  "Display action for the Vertico buffer.")
+    (side . top))
+  "Display action for the Vertico buffer."
+  :type `(choice
+          (const :tag "Reuse some window"
+                 (display-buffer-reuse-window))
+          (const :tag "Below target buffer"
+                 (display-buffer-below-selected
+                  (window-height . ,(+ 3 vertico-count))))
+          (const :tag "Bottom of frame"
+                 (display-buffer-at-bottom
+                  (window-height . ,(+ 3 vertico-count))))
+          (const :tag "Side window on the right"
+                 (display-buffer-in-side-window
+                  (side . right)
+                  (window-width . 0.3)))
+          (const :tag "Side window on the left"
+                 (display-buffer-in-side-window
+                  (side . left)
+                  (window-width . 0.3)))
+          (const :tag "Side window at the top"
+                 (display-buffer-in-side-window
+                  (window-height . ,(+ 3 vertico-count))
+                  (side . top)))
+          (const :tag "Side window at the bottom"
+                 (display-buffer-in-side-window
+                  (window-height . ,(+ 3 vertico-count))
+                  (side . bottom)))
+          (sexp :tag "Other")))
 
 (defun vertico-buffer--display (lines)
   "Display LINES in buffer."
@@ -55,7 +80,7 @@
       (insert (propertize (concat count prompt) 'face 'minibuffer-prompt)
               content "\n" (string-join lines)))
     (let ((win (or (get-buffer-window vertico-buffer--buffer)
-                   (display-buffer vertico-buffer--buffer vertico-buffer-action))))
+                   (display-buffer vertico-buffer--buffer vertico-buffer-display-action))))
       (overlay-put vertico--candidates-ov 'window win)
       (when vertico--count-ov
         (overlay-put vertico--count-ov 'window win))
