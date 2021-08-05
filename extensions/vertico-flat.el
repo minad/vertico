@@ -32,6 +32,11 @@
 
 (require 'vertico)
 
+(defcustom vertico-flat-max-lines 1
+  "Maximal number of lines to use."
+  :type 'integer
+  :group 'vertico)
+
 (defcustom vertico-flat-format
   '(:left      #("{" 0 1 (face minibuffer-prompt))
     :separator #(" | " 0 3 (face minibuffer-prompt))
@@ -44,6 +49,7 @@
 
 (defun vertico-flat--display (candidates)
   "Display CANDIDATES horizontally."
+  (setq-local truncate-lines nil)
   (move-overlay vertico--candidates-ov (point-max) (point-max))
   (overlay-put
    vertico--candidates-ov 'after-string
@@ -58,7 +64,7 @@
   "Arrange candidates."
   (let* ((index (max 0 vertico--index)) (count vertico-count)
          (candidates (nthcdr vertico--index vertico--candidates))
-         (width (- (window-width) 4
+         (width (- (* vertico-flat-max-lines (- (window-width) 4))
                    (length (plist-get vertico-flat-format :left))
                    (length (plist-get vertico-flat-format :separator))
                    (length (plist-get vertico-flat-format :right))
