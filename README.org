@@ -172,6 +172,10 @@
   :custom_id: extensions
   :end:
 
+  *NOTE*: The extensions currently require manual installation, e.g., via
+  ~package-install-file~. Please ensure that you are using the /newest/ Vertico
+  commit when using extensions.
+
   We maintain small extension packages to Vertico in this repository in the
   subdirectory [[https://github.com/minad/vertico/tree/main/extensions][extensions/]]. The extensions can be installed additionally to
   Vertico. Currently these extensions are available:
