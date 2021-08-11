@@ -264,10 +264,10 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 ;; bug#47711: Deferred highlighting for `completion-all-completions'
 ;; XXX There is one complication: `completion--twq-all' already adds `completions-common-part'.
 ;; See below `vertico--candidate'.
-(defun vertico--all-completions (&rest args)
+(defun vertico--filter-completions (&rest args)
   "Compute all completions for ARGS with deferred highlighting."
-  (if (fboundp 'completion-filtered-completions)
-      (or (apply #'completion-filtered-completions args) '((base . 0) (highlight . identity)))
+  (if (fboundp 'completion-filter-completions)
+      (or (apply #'completion-filter-completions args) '((base . 0) (highlight . identity)))
   (cl-letf* ((orig-pcm (symbol-function #'completion-pcm--hilit-commonality))
              (orig-flex (symbol-function #'completion-flex-all-completions))
              ((symbol-function #'completion-flex-all-completions)
@@ -328,10 +328,10 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   (let* ((field (substring content (car bounds) (+ pt (cdr bounds))))
          ;; `minibuffer-completing-file-name' has been obsoleted by the completion category
          (completing-file (eq 'file (completion-metadata-get metadata 'category)))
-         (result (vertico--all-completions content
-                                           minibuffer-completion-table
-                                           minibuffer-completion-predicate
-                                           pt metadata))
+         (result (vertico--filter-completions content
+                                              minibuffer-completion-table
+                                              minibuffer-completion-predicate
+                                              pt metadata))
          (base (alist-get 'base result))
          (hl (alist-get 'highlight result))
          (all (alist-get 'completions result))
