@@ -742,6 +742,7 @@ When the prefix argument is 0, the group order is reset."
           ;; This is a hack in Emacs and should better be fixed in Emacs itself, the corresponding
           ;; code is already marked with a FIXME. Should this be reported as a bug?
           (vertico--remove-face 0 (length cand) 'completions-common-part cand)
+          (vertico--remove-face 0 (length cand) 'completions-first-difference cand)
           (concat (substring content 0 vertico--base)
                   (if hl (car (funcall vertico--highlight-function (list cand))) cand)))
       ;; Remove prompt face
