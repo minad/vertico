@@ -332,16 +332,14 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                                               minibuffer-completion-table
                                               minibuffer-completion-predicate
                                               pt metadata))
-         (base (alist-get 'base result))
-         (hl (alist-get 'highlight result))
          (all (alist-get 'completions result))
-         (base-str (substring content 0 base))
+         (base (substring content 0 (alist-get 'base result)))
          (def (or (car-safe minibuffer-default) minibuffer-default))
          (sort (vertico--sort-function metadata))
          (groups))
     ;; Reset the history hash table
-    (unless (equal base-str vertico--history-base)
-      (setq vertico--history-base base-str vertico--history-hash nil))
+    (unless (equal base vertico--history-base)
+      (setq vertico--history-base base vertico--history-hash nil))
     ;; Filter the ignored file extensions. We cannot use modified predicate for this filtering,
     ;; since this breaks the special casing in the `completion-file-name-table' for `file-exists-p'
     ;; and `file-directory-p'.
@@ -358,7 +356,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (setq all (vertico--move-to-front field all))
     (when-let (group-fun (and all (completion-metadata-get metadata 'group-function)))
       (setq groups (vertico--group-by group-fun all) all (car groups)))
-    (list base (length all)
+    (list (length base) (length all)
           ;; Default value is missing from collection
           (and def (equal content "") (not (member def all)))
           ;; Find position of old candidate in the new list.
@@ -366,7 +364,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
             (if (< vertico--index 0)
                 vertico--index
               (seq-position all (nth vertico--index vertico--candidates))))
-          all (cadr groups) (or (caddr groups) vertico--all-groups) hl)))
+          all (cadr groups) (or (caddr groups) vertico--all-groups)
+          (alist-get 'highlight result))))
 
 (defun vertico--cycle (list n)
   "Rotate LIST to position N."
