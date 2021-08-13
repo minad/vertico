@@ -283,7 +283,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                 (setq hl (lambda (x) (nconc (completion-hilit-commonality x prefix base) nil)))
                 (and cands (nconc cands base))))
              ((symbol-function #'completion-pcm--hilit-commonality)
-              (lambda (pattern cands)
+              (lambda (pattern cands &rest _)
                 (setq hl (lambda (x)
                            ;; `completion-pcm--hilit-commonality' sometimes throws an internal error
                            ;; for example when entering "/sudo:://u".
