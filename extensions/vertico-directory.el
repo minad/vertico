@@ -97,7 +97,7 @@
              (overlay-buffer rfn-eshadow-overlay)
              (= (point) (point-max))
              (or (>= (- (point) (overlay-end rfn-eshadow-overlay)) 2)
-                 (eq ?/ (char-before (- (point) 2)))))
+                 (seq-contains-p [?/ ?~] (char-before (- (point) 2)))))
     (delete-region (overlay-start rfn-eshadow-overlay) (overlay-end rfn-eshadow-overlay))))
 
 ;; Emacs 28: Do not show Vertico commands in M-X
