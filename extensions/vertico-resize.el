@@ -36,9 +36,6 @@
 (defun vertico-resize--minibuffer ()
   "Advice to enable a resizable vertico mini-buffer.
 Note that a full minibuffer can only be grown in size."
-  (if-let ((orig (get 'vertico-count 'original)))
-      (setq vertico-count orig)
-    (put 'vertico-count 'original vertico-count))
   (add-hook 'window-size-change-functions
 	    (lambda (win)
 	      (let ((height (window-height win)))
