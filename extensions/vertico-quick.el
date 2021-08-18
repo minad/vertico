@@ -33,6 +33,9 @@
 ;;; Code:
 
 (require 'vertico)
+(eval-when-compile
+  (require 'cl-lib)
+  (require 'subr-x))
 
 (defface vertico-quick1
   '((((class color) (min-colors 88) (background dark))
