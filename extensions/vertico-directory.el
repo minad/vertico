@@ -66,7 +66,8 @@
   "Delete directory before point."
   (interactive)
   (when (and (eq (char-before) ?/)
-             (vertico-directory--completing-file-p))
+             (vertico-directory--completing-file-p)
+             (not (eq (point) (minibuffer-prompt-end))))
     (save-excursion
       (goto-char (1- (point)))
       (when (search-backward "/" (minibuffer-prompt-end) t)
