@@ -65,7 +65,8 @@
 (defun vertico-directory-up ()
   "Delete directory before point."
   (interactive)
-  (when (and (eq (char-before) ?/)
+  (when (and (> (point) (minibuffer-prompt-end))
+             (eq (char-before) ?/)
              (vertico-directory--completing-file-p))
     (save-excursion
       (goto-char (1- (point)))
