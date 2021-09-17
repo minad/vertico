@@ -56,7 +56,10 @@
   "Enter directory or exit completion with current candidate."
   (interactive)
   (if (and (>= vertico--index 0)
-           (string-suffix-p "/" (vertico--candidate))
+           (let ((cand (vertico--candidate)))
+	     (or (string-suffix-p "/" cand)
+		 (and (vertico--remote-p cand)
+		      (string-suffix-p ":" cand))))
            (vertico-directory--completing-file-p))
       (vertico-insert)
     (vertico-exit)))
