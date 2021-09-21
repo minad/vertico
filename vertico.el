@@ -143,6 +143,9 @@ See `resize-mini-windows' for documentation."
 (defvar-local vertico--input nil
   "Cons of last minibuffer contents and point or t.")
 
+(defvar-local vertico--initial-update nil
+  "Non-nil if this is the first update and pending input should be ignored.")
+
 (defvar-local vertico--candidates nil
   "List of candidates.")
 
@@ -412,7 +415,9 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
         ;; bug#38024: Icomplete uses `while-no-input-ignore-events' to repair updating issues
         (let ((while-no-input-ignore-events '(selection-request))
               (non-essential t))
-          (while-no-input (vertico--recompute-candidates pt content bounds metadata))))
+          (if vertico--initial-update
+              (vertico--recompute-candidates pt content bounds metadata)
+            (while-no-input (vertico--recompute-candidates pt content bounds metadata)))))
     ('nil (abort-recursive-edit))
     (`(,base ,total ,def-missing ,index ,candidates ,groups ,all-groups ,hl)
      (setq vertico--input (cons content pt)
@@ -597,8 +602,10 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                                                 minibuffer-completion-predicate
                                                 after)
                        (t (cons 0 (length after)))))))
-    (unless (or (input-pending-p) (equal vertico--input (cons content pt)))
-      (vertico--update-candidates pt content bounds metadata))
+    (unless (and (not vertico--initial-update)
+                 (or (input-pending-p) (equal vertico--input (cons content pt))))
+      (vertico--update-candidates pt content bounds metadata)
+      (setq vertico--initial-update nil))
     (vertico--prompt-selection)
     (vertico--display-count)
     (vertico--display-candidates (vertico--arrange-candidates metadata))))
@@ -740,6 +747,7 @@ When the prefix argument is 0, the group order is reset."
 (defun vertico--setup ()
   "Setup completion UI."
   (setq vertico--input t
+        vertico--initial-update t
         vertico--candidates-ov (make-overlay (point-max) (point-max) nil t t)
         vertico--count-ov (and vertico-count-format
                                (make-overlay (point-min) (point-min) nil t t)))
