@@ -434,7 +434,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
              vertico--index
              (if (or vertico--default-missing
                      (= 0 vertico--total)
-                     (and (> (car bounds) 0) (= (car bounds) (length content))
+                     (and (= (car bounds) (length content))
                           (test-completion content minibuffer-completion-table
                                            minibuffer-completion-predicate)))
                  -1 0))))))
