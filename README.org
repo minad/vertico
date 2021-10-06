@@ -67,6 +67,8 @@
     ;; wildcard. You may also give the `initials' completion style a try.
     (use-package orderless
       :init
+      ;; Configure a custom style dispatcher (see the Consult wiki)
+      ;; (setq orderless-style-dispatchers '(+orderless-dispatch))
       (setq completion-styles '(orderless)
             completion-category-defaults nil
             completion-category-overrides '((file (styles partial-completion)))))
