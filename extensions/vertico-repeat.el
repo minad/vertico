@@ -69,6 +69,8 @@
   "Save Vertico status for `vertico-repeat'."
   (when vertico--input
     (unless vertico-repeat--restore
+      ;; On Emacs 28, current-minibuffer-command is better than this-command.
+      ;; It is consistent if a command prompts multiple times.
       (setq vertico-repeat--command (if (boundp 'current-minibuffer-command)
                                         current-minibuffer-command
                                       this-command)
