@@ -66,7 +66,7 @@
 ;;;###autoload
 (define-minor-mode vertico-reverse-mode
   "Reverse the Vertico display."
-  :global t
+  :global t :group 'vertico
   (cond
    (vertico-reverse-mode
     (advice-add #'vertico--display-candidates :override #'vertico-reverse--display)

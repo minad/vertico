@@ -66,7 +66,7 @@
 ;;;###autoload
 (define-minor-mode vertico-indexed-mode
   "Prefix candidates with indices."
-  :global t
+  :global t :group 'vertico
   (cond
    (vertico-indexed-mode
     (advice-add #'vertico--format-candidate :around #'vertico-indexed--format-candidate)

@@ -99,7 +99,7 @@
 ;;;###autoload
 (define-minor-mode vertico-flat-mode
   "Flat, horizontal display for Vertico."
-  :global t
+  :global t :group 'vertico
   (cond
    (vertico-flat-mode
     ;; Shrink current minibuffer window

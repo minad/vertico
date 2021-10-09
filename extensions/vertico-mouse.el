@@ -80,7 +80,7 @@
 ;;;###autoload
 (define-minor-mode vertico-mouse-mode
   "Mouse support for Vertico."
-  :global t
+  :global t :group 'vertico
   (cond
    (vertico-mouse-mode
     (advice-add #'vertico--format-candidate :around #'vertico-mouse--format-candidate)

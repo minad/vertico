@@ -127,7 +127,7 @@
 ;;;###autoload
 (define-minor-mode vertico-buffer-mode
   "Display Vertico in a buffer instead of the minibuffer."
-  :global t
+  :global t :group 'vertico
   (cond
    (vertico-buffer-mode
     (advice-add #'vertico--display-candidates :override #'vertico-buffer--display)

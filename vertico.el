@@ -761,7 +761,7 @@ When the prefix argument is 0, the group order is reset."
 ;;;###autoload
 (define-minor-mode vertico-mode
   "VERTical Interactive COmpletion."
-  :global t
+  :global t :group 'vertico
   (if vertico-mode
       (progn
         (advice-add #'completing-read-default :around #'vertico--advice)
