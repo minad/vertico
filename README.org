@@ -119,7 +119,7 @@
   - ~backward-paragraph~ -> ~vertico-previous-group~
   - ~exit-minibuffer~ -> ~vertico-exit~
   - ~kill-ring-save~ -> ~vertico-save~
-  - =<C-return>= -> ~vertico-exit-input~
+  - =C-<return>= -> ~vertico-exit-input~
   - =TAB= -> ~vertico-insert~
 
 * Completion styles and TAB completion
@@ -167,7 +167,8 @@
 
   #+begin_src emacs-lisp
     (setq read-file-name-completion-ignore-case t
-          read-buffer-completion-ignore-case t)
+          read-buffer-completion-ignore-case t
+          completion-ignore-case t)
   #+end_src
 
 * Extensions
