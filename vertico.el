@@ -573,9 +573,9 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 (defun vertico--remove-face (beg end face &optional obj)
   "Remove FACE between BEG and END from OBJ."
   (while (< beg end)
-    (let ((val (get-text-property beg 'face obj))
-          (next (next-single-property-change beg 'face obj end)))
-      (put-text-property beg next 'face (remq face (if (listp val) val (list val))) obj)
+    (let ((next (next-single-property-change beg 'face obj end)))
+      (when-let (val (get-text-property beg 'face obj))
+        (put-text-property beg next 'face (remq face (if (listp val) val (list val))) obj))
       (setq beg next))))
 
 (defun vertico--exhibit ()
@@ -726,7 +726,7 @@ When the prefix argument is 0, the group order is reset."
   "Return current candidate string with optional highlighting if HL is non-nil."
   (let ((content (minibuffer-contents)))
     (if (>= vertico--index 0)
-        (let ((cand (nth vertico--index vertico--candidates)))
+        (let ((cand (substring (nth vertico--index vertico--candidates))))
           ;;; XXX Drop the completions-common-part face which is added by `completion--twq-all'.
           ;; This is a hack in Emacs and should better be fixed in Emacs itself, the corresponding
           ;; code is already marked with a FIXME. Should this be reported as a bug?
