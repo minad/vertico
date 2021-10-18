@@ -60,7 +60,7 @@
                        (plist-get vertico-flat-format :right))
              (plist-get vertico-flat-format :no-match)))))
 
-(defun vertico-flat--arrange-candidates (_metadata)
+(defun vertico-flat--arrange-candidates ()
   "Arrange candidates."
   (let* ((index (max 0 vertico--index)) (count vertico-count)
          (candidates (nthcdr vertico--index vertico--candidates))

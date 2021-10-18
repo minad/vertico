@@ -146,6 +146,9 @@ See `resize-mini-windows' for documentation."
 (defvar-local vertico--candidates nil
   "List of candidates.")
 
+(defvar-local vertico--metadata nil
+  "Completion metadata.")
+
 (defvar-local vertico--base 0
   "Size of the base string, which is concatenated with the candidate.")
 
@@ -236,12 +239,12 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 (vertico--define-sort (length alpha) 32 (length %) string< vertico--length-string<)
 (vertico--define-sort (alpha) 32 (if (eq % "") 0 (/ (aref % 0) 4)) string< string<)
 
-(defun vertico--affixate (metadata candidates)
-  "Annotate CANDIDATES with annotation function specified by METADATA."
-  (if-let (aff (or (completion-metadata-get metadata 'affixation-function)
+(defun vertico--affixate (candidates)
+  "Annotate CANDIDATES with annotation function."
+  (if-let (aff (or (completion-metadata-get vertico--metadata 'affixation-function)
                    (plist-get completion-extra-properties :affixation-function)))
       (funcall aff candidates)
-    (if-let (ann (or (completion-metadata-get metadata 'annotation-function)
+    (if-let (ann (or (completion-metadata-get vertico--metadata 'annotation-function)
                      (plist-get completion-extra-properties :annotation-function)))
         (mapcar (lambda (cand)
                   (let ((suffix (or (funcall ann cand) "")))
@@ -412,43 +415,47 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Return t if PATH is a remote path."
   (string-match-p "\\`/[^/|:]+:" (substitute-in-file-name path)))
 
-(defun vertico--update-candidates (pt content metadata)
-  "Preprocess candidates given PT, CONTENT and METADATA."
-  (pcase
-      ;; If Tramp is used, do not compute the candidates in an interruptible fashion,
-      ;; since this will break the Tramp password and user name prompts (See #23).
-      (if (and (eq 'file (completion-metadata-get metadata 'category))
-               (or (vertico--remote-p content) (vertico--remote-p default-directory)))
-          (vertico--recompute-candidates pt content metadata)
-        ;; bug#38024: Icomplete uses `while-no-input-ignore-events' to repair updating issues
-        (let ((while-no-input-ignore-events '(selection-request))
-              (non-essential t))
-          (while-no-input (vertico--recompute-candidates pt content metadata))))
-    ('nil (abort-recursive-edit))
-    (`(,base ,total ,def-missing ,index ,candidates ,groups ,all-groups ,hl)
-     (setq vertico--input (cons content pt)
-           vertico--index index
-           vertico--base base
-           vertico--total total
-           vertico--highlight-function hl
-           vertico--groups groups
-           vertico--all-groups all-groups
-           vertico--candidates candidates
-           vertico--default-missing def-missing)
-     ;; If the current index is nil, compute new index. Select the prompt:
-     ;; * If there are no candidates
-     ;; * If the default is missing from the candidate list.
-     ;; * For matching content, as long as the full content after the boundary is empty,
-     ;;   including content after point.
-     (unless vertico--index
-       (setq vertico--lock-candidate nil
-             vertico--index
-             (if (or vertico--default-missing
-                     (= 0 vertico--total)
-                     (and (= base (length content))
-                          (test-completion content minibuffer-completion-table
-                                           minibuffer-completion-predicate)))
-                 -1 0))))))
+(defun vertico--update-candidates (pt content)
+  "Preprocess candidates given PT and CONTENT."
+  (let ((metadata (completion-metadata (substring content 0 pt)
+                                       minibuffer-completion-table
+                                       minibuffer-completion-predicate)))
+    (pcase
+        ;; If Tramp is used, do not compute the candidates in an interruptible fashion,
+        ;; since this will break the Tramp password and user name prompts (See #23).
+        (if (and (eq 'file (completion-metadata-get metadata 'category))
+                 (or (vertico--remote-p content) (vertico--remote-p default-directory)))
+            (vertico--recompute-candidates pt content metadata)
+          ;; bug#38024: Icomplete uses `while-no-input-ignore-events' to repair updating issues
+          (let ((while-no-input-ignore-events '(selection-request))
+                (non-essential t))
+            (while-no-input (vertico--recompute-candidates pt content metadata))))
+      ('nil (abort-recursive-edit))
+      (`(,base ,total ,def-missing ,index ,candidates ,groups ,all-groups ,hl)
+       (setq vertico--input (cons content pt)
+             vertico--index index
+             vertico--base base
+             vertico--total total
+             vertico--highlight-function hl
+             vertico--groups groups
+             vertico--all-groups all-groups
+             vertico--candidates candidates
+             vertico--default-missing def-missing
+             vertico--metadata metadata)
+       ;; If the current index is nil, compute new index. Select the prompt:
+       ;; * If there are no candidates
+       ;; * If the default is missing from the candidate list.
+       ;; * For matching content, as long as the full content after the boundary is empty,
+       ;;   including content after point.
+       (unless vertico--index
+         (setq vertico--lock-candidate nil
+               vertico--index
+               (if (or vertico--default-missing
+                       (= 0 vertico--total)
+                       (and (= base (length content))
+                            (test-completion content minibuffer-completion-table
+                                             minibuffer-completion-predicate)))
+                   -1 0)))))))
 
 (defun vertico--flatten-string (prop str)
   "Flatten STR with display or invisible PROP."
@@ -481,20 +488,20 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (add-face-text-property 0 (length cand) 'vertico-current 'append cand))
   cand)
 
-(defun vertico--arrange-candidates (metadata)
-  "Arrange candidates given the current METADATA."
+(defun vertico--arrange-candidates ()
+  "Arrange candidates."
   (let ((curr-line 0) (lines))
     ;; Compute group titles
     (let* ((index (min (max 0 (- vertico--index (/ vertico-count 2) (1- (mod vertico-count 2))))
                        (max 0 (- vertico--total vertico-count))))
            (title)
-           (group-fun (completion-metadata-get metadata 'group-function))
+           (group-fun (completion-metadata-get vertico--metadata 'group-function))
            (group-format (and group-fun vertico-group-format (concat vertico-group-format "\n")))
            (candidates
             (thread-last (seq-subseq vertico--candidates index
                                      (min (+ index vertico-count) vertico--total))
               (funcall vertico--highlight-function)
-              (vertico--affixate metadata))))
+              (vertico--affixate))))
       (dolist (cand candidates)
         (let ((str (car cand)))
           (when-let (new-title (and group-format (funcall group-fun str nil)))
@@ -593,15 +600,12 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Exhibit completion UI."
   (let* ((buffer-undo-list t) ;; Overlays affect point position and undo list!
          (pt (max 0 (- (point) (minibuffer-prompt-end))))
-         (content (minibuffer-contents-no-properties))
-         (metadata (completion-metadata (substring content 0 pt)
-                                        minibuffer-completion-table
-                                        minibuffer-completion-predicate)))
+         (content (minibuffer-contents-no-properties)))
     (unless (or (input-pending-p) (equal vertico--input (cons content pt)))
-      (vertico--update-candidates pt content metadata))
+      (vertico--update-candidates pt content))
     (vertico--prompt-selection)
     (vertico--display-count)
-    (vertico--display-candidates (vertico--arrange-candidates metadata))))
+    (vertico--display-candidates (vertico--arrange-candidates))))
 
 (defun vertico--allow-prompt-selection-p ()
   "Return t if prompt can be selected."
