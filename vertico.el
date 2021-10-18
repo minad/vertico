@@ -310,13 +310,24 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                     "\\)\\'")))
     (or (seq-remove (lambda (x) (string-match-p re x)) files) files)))
 
-(defun vertico--recompute-candidates (pt content bounds metadata)
-  "Recompute candidates given PT, CONTENT, BOUNDS and METADATA."
+(defun vertico--recompute-candidates (pt content metadata)
+  "Recompute candidates given PT, CONTENT and METADATA."
   ;; Redisplay the minibuffer such that the input becomes immediately
   ;; visible before the expensive candidate recomputation is performed (Issue #89).
   ;; Do not redisplay during initialization, since this leads to flicker.
   (when (consp vertico--input) (redisplay))
-  (pcase-let* ((field (substring content (car bounds) (+ pt (cdr bounds))))
+  (pcase-let* ((before (substring content 0 pt))
+               (after (substring content pt))
+               ;; bug#47678: `completion-boundaries` fails for `partial-completion`
+               ;; if the cursor is moved between the slashes of "~//".
+               ;; See also marginalia.el which has the same issue.
+               (bounds (or (condition-case nil
+                               (completion-boundaries before
+                                                      minibuffer-completion-table
+                                                      minibuffer-completion-predicate
+                                                      after)
+                             (t (cons 0 (length after))))))
+               (field (substring content (car bounds) (+ pt (cdr bounds))))
                ;; `minibuffer-completing-file-name' has been obsoleted by the completion category
                (completing-file (eq 'file (completion-metadata-get metadata 'category)))
                (`(,all . ,hl) (vertico--all-completions content
@@ -401,18 +412,18 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Return t if PATH is a remote path."
   (string-match-p "\\`/[^/|:]+:" (substitute-in-file-name path)))
 
-(defun vertico--update-candidates (pt content bounds metadata)
-  "Preprocess candidates given PT, CONTENT, BOUNDS and METADATA."
+(defun vertico--update-candidates (pt content metadata)
+  "Preprocess candidates given PT, CONTENT and METADATA."
   (pcase
       ;; If Tramp is used, do not compute the candidates in an interruptible fashion,
       ;; since this will break the Tramp password and user name prompts (See #23).
       (if (and (eq 'file (completion-metadata-get metadata 'category))
                (or (vertico--remote-p content) (vertico--remote-p default-directory)))
-          (vertico--recompute-candidates pt content bounds metadata)
+          (vertico--recompute-candidates pt content metadata)
         ;; bug#38024: Icomplete uses `while-no-input-ignore-events' to repair updating issues
         (let ((while-no-input-ignore-events '(selection-request))
               (non-essential t))
-          (while-no-input (vertico--recompute-candidates pt content bounds metadata))))
+          (while-no-input (vertico--recompute-candidates pt content metadata))))
     ('nil (abort-recursive-edit))
     (`(,base ,total ,def-missing ,index ,candidates ,groups ,all-groups ,hl)
      (setq vertico--input (cons content pt)
@@ -434,7 +445,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
              vertico--index
              (if (or vertico--default-missing
                      (= 0 vertico--total)
-                     (and (= (car bounds) (length content))
+                     (and (= base (length content))
                           (test-completion content minibuffer-completion-table
                                            minibuffer-completion-predicate)))
                  -1 0))))))
@@ -583,22 +594,11 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   (let* ((buffer-undo-list t) ;; Overlays affect point position and undo list!
          (pt (max 0 (- (point) (minibuffer-prompt-end))))
          (content (minibuffer-contents-no-properties))
-         (before (substring content 0 pt))
-         (after (substring content pt))
-         (metadata (completion-metadata before
+         (metadata (completion-metadata (substring content 0 pt)
                                         minibuffer-completion-table
-                                        minibuffer-completion-predicate))
-         ;; bug#47678: `completion-boundaries` fails for `partial-completion`
-         ;; if the cursor is moved between the slashes of "~//".
-         ;; See also marginalia.el which has the same issue.
-         (bounds (or (condition-case nil
-                         (completion-boundaries before
-                                                minibuffer-completion-table
-                                                minibuffer-completion-predicate
-                                                after)
-                       (t (cons 0 (length after)))))))
+                                        minibuffer-completion-predicate)))
     (unless (or (input-pending-p) (equal vertico--input (cons content pt)))
-      (vertico--update-candidates pt content bounds metadata))
+      (vertico--update-candidates pt content metadata))
     (vertico--prompt-selection)
     (vertico--display-count)
     (vertico--display-candidates (vertico--arrange-candidates metadata))))
