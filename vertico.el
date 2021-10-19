@@ -59,6 +59,10 @@
   "Maximal number of candidates to show."
   :type 'integer)
 
+(defcustom vertico-highlight-directories nil
+  "Enable displaying directories using a different face."
+  :type 'boolean)
+
 (defcustom vertico-resize resize-mini-windows
   "How to resize the Vertico minibuffer window.
 See `resize-mini-windows' for documentation."
@@ -101,6 +105,9 @@ See `resize-mini-windows' for documentation."
 
 (defface vertico-current '((t :inherit highlight :extend t))
   "Face used to highlight the currently selected candidate.")
+
+(defface vertico-directory '((t :inherit dired-directory))
+  "Face used to highlight directories in file candidate lists.")
 
 (defvar vertico-map
   (let ((map (make-composed-keymap nil minibuffer-local-map)))
@@ -482,6 +489,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (defun vertico--format-candidate (cand prefix suffix index _start)
   "Format CAND given PREFIX, SUFFIX and INDEX."
+  (when (and vertico-highlight-directories (string-suffix-p "/" cand))
+    (add-face-text-property 0 (length cand) 'vertico-directory 'append cand))
   (setq cand (concat prefix cand suffix "\n")
         cand (vertico--flatten-string 'invisible (vertico--flatten-string 'display cand)))
   (when (= index vertico--index)
