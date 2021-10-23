@@ -250,10 +250,11 @@
   functionality not present in Emacs already (e.g., ~consult-line~) and some are
   substitutes (e.g., ~consult-buffer~ for ~switch-to-buffer~).
 
-  There are some special setting you may want to add to your configuration. In
-  case you want to use Vertico for completion-at-point/completion-in-region, you
-  can use the function ~consult-completion-in-region~ provided by the Consult
-  package.
+* Completion-at-point and completion-in-region
+
+  The =completion-at-point= command is usually bound to =M-TAB= or =TAB=. In case you
+  want to use Vertico for completion-at-point/completion-in-region, you can use
+  the function ~consult-completion-in-region~ provided by the Consult package.
 
   #+begin_src emacs-lisp
     ;; Use `consult-completion-in-region' if Vertico is enabled.
@@ -266,17 +267,19 @@
                    args)))
   #+end_src
 
-  Furthermore Consult offers an enhanced =completing-read-multiple= implementation,
-  which works well with Vertico.
+  You may also want to look into my [[https://github.com/minad/corfu][Corfu]] package, which provides a minimal
+  completion system for completion-in-region using overlays. Corfu is developed in
+  the same spirit as Vertico.
+
+* Completing-read-multiple (CRM)
+
+  Consult offers an enhanced =completing-read-multiple= implementation which you
+  can use with Vertico.
 
   #+begin_src emacs-lisp
     (advice-add #'completing-read-multiple
                 :override #'consult-completing-read-multiple)
   #+end_src
-
-  You may also want to look into my [[https://github.com/minad/corfu][Corfu]] package, which provides a minimal
-  completion system for completion-in-region using overlays. Corfu is developed in
-  the same spirit as Vertico.
 
 * Alternatives
 
