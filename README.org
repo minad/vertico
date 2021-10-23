@@ -36,6 +36,27 @@
 
   [[https://github.com/minad/vertico/blob/main/screenshot.svg?raw=true]]
 
+* Key bindings
+
+  Vertico defines its own local keymap in the minibuffer which is derived from
+  ~minibuffer-local-map~. The keymap keeps most of the ~fundamental-mode~
+  keybindings intact and remaps and binds only a handful of commands. Note in
+  particular the binding of =TAB= to ~vertico-insert~ and the bindings of
+  ~vertico-exit/exit-input~.
+
+  - ~beginning-of-buffer~, ~minibuffer-beginning-of-buffer~ -> ~vertico-first~
+  - ~end-of-buffer~ -> ~vertico-last~
+  - ~scroll-down-command~ -> ~vertico-scroll-down~
+  - ~scroll-up-command~ -> ~vertico-scroll-up~
+  - ~next-line~, ~next-line-or-history-element~ -> ~vertico-next~
+  - ~previous-line~, ~previous-line-or-history-element~ -> ~vertico-previous~
+  - ~forward-paragraph~ -> ~vertico-next-group~
+  - ~backward-paragraph~ -> ~vertico-previous-group~
+  - ~exit-minibuffer~ -> ~vertico-exit~
+  - ~kill-ring-save~ -> ~vertico-save~
+  - =C-<return>= -> ~vertico-exit-input~
+  - =TAB= -> ~vertico-insert~
+
 * Configuration
 
   Vertico is available from [[http://elpa.gnu.org/packages/vertico.html][GNU ELPA]], such that it can be installed directly via
@@ -102,28 +123,7 @@
       (setq enable-recursive-minibuffers t))
   #+end_src
 
-* Key bindings
-
-  Vertico defines its own local keymap in the minibuffer which is derived from
-  ~minibuffer-local-map~. The keymap keeps most of the ~fundamental-mode~
-  keybindings intact and remaps and binds only a handful of commands. Note in
-  particular the binding of =TAB= to ~vertico-insert~ and the bindings of
-  ~vertico-exit/exit-input~.
-
-  - ~beginning-of-buffer~, ~minibuffer-beginning-of-buffer~ -> ~vertico-first~
-  - ~end-of-buffer~ -> ~vertico-last~
-  - ~scroll-down-command~ -> ~vertico-scroll-down~
-  - ~scroll-up-command~ -> ~vertico-scroll-up~
-  - ~next-line~, ~next-line-or-history-element~ -> ~vertico-next~
-  - ~previous-line~, ~previous-line-or-history-element~ -> ~vertico-previous~
-  - ~forward-paragraph~ -> ~vertico-next-group~
-  - ~backward-paragraph~ -> ~vertico-previous-group~
-  - ~exit-minibuffer~ -> ~vertico-exit~
-  - ~kill-ring-save~ -> ~vertico-save~
-  - =C-<return>= -> ~vertico-exit-input~
-  - =TAB= -> ~vertico-insert~
-
-* Completion styles and TAB completion
+** Completion styles and TAB completion
 
   The bindings of the ~minibuffer-local-completion-map~ are not available in
   Vertico by default. This means that TAB works differently from what you may
@@ -170,6 +170,37 @@
     (setq read-file-name-completion-ignore-case t
           read-buffer-completion-ignore-case t
           completion-ignore-case t)
+  #+end_src
+
+** Completion-at-point and completion-in-region
+
+  The =completion-at-point= command is usually bound to =M-TAB= or =TAB=. In case you
+  want to use Vertico for completion-at-point/completion-in-region, you can use
+  the function ~consult-completion-in-region~ provided by the Consult package.
+
+  #+begin_src emacs-lisp
+    ;; Use `consult-completion-in-region' if Vertico is enabled.
+    ;; Otherwise use the default `completion--in-region' function.
+    (setq completion-in-region-function
+          (lambda (&rest args)
+            (apply (if vertico-mode
+                       #'consult-completion-in-region
+                     #'completion--in-region)
+                   args)))
+  #+end_src
+
+  You may also want to look into my [[https://github.com/minad/corfu][Corfu]] package, which provides a minimal
+  completion system for completion-in-region using overlays. Corfu is developed in
+  the same spirit as Vertico.
+
+** Completing-read-multiple (CRM)
+
+  Consult offers an enhanced =completing-read-multiple= implementation which you
+  can use with Vertico.
+
+  #+begin_src emacs-lisp
+    (advice-add #'completing-read-multiple
+                :override #'consult-completing-read-multiple)
   #+end_src
 
 * Extensions
@@ -249,37 +280,6 @@
   ~embark-dwim~. In step 6. you get the Consult commands, some offer new
   functionality not present in Emacs already (e.g., ~consult-line~) and some are
   substitutes (e.g., ~consult-buffer~ for ~switch-to-buffer~).
-
-* Completion-at-point and completion-in-region
-
-  The =completion-at-point= command is usually bound to =M-TAB= or =TAB=. In case you
-  want to use Vertico for completion-at-point/completion-in-region, you can use
-  the function ~consult-completion-in-region~ provided by the Consult package.
-
-  #+begin_src emacs-lisp
-    ;; Use `consult-completion-in-region' if Vertico is enabled.
-    ;; Otherwise use the default `completion--in-region' function.
-    (setq completion-in-region-function
-          (lambda (&rest args)
-            (apply (if vertico-mode
-                       #'consult-completion-in-region
-                     #'completion--in-region)
-                   args)))
-  #+end_src
-
-  You may also want to look into my [[https://github.com/minad/corfu][Corfu]] package, which provides a minimal
-  completion system for completion-in-region using overlays. Corfu is developed in
-  the same spirit as Vertico.
-
-* Completing-read-multiple (CRM)
-
-  Consult offers an enhanced =completing-read-multiple= implementation which you
-  can use with Vertico.
-
-  #+begin_src emacs-lisp
-    (advice-add #'completing-read-multiple
-                :override #'consult-completing-read-multiple)
-  #+end_src
 
 * Alternatives
 
