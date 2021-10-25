@@ -189,6 +189,8 @@
                    args)))
   #+end_src
 
+  This also affects completion in the minibuffer when =M-:= (~eval-expression~) is used.
+  
   You may also want to look into my [[https://github.com/minad/corfu][Corfu]] package, which provides a minimal
   completion system for completion-in-region using overlays. Corfu is developed in
   the same spirit as Vertico.
