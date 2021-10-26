@@ -39,14 +39,14 @@
 
 (defun vertico-mouse-exit (event)
   "Exit after mouse EVENT."
-  (interactive "e")
+  (interactive "@e")
   (when-let* ((obj (posn-string (event-start event)))
               (vertico--index (get-text-property (cdr obj) 'vertico--mouse-index (car obj))))
     (vertico-exit)))
 
 (defun vertico-mouse-insert (event)
   "Insert after mouse EVENT."
-  (interactive "e")
+  (interactive "@e")
   (when-let* ((obj (posn-string (event-start event)))
               (vertico--index (get-text-property (cdr obj) 'vertico--mouse-index (car obj))))
     (vertico-insert)))
