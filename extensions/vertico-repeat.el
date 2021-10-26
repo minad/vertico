@@ -30,6 +30,11 @@
 ;; Vertico session via the `vertico-repeat' command.
 ;;
 ;; (global-set-key "\M-r" #'vertico-repeat)
+;;
+;; It is necessary to register a minibuffer setup hook, which saves the
+;; Vertico state for repetition.
+;;
+;; (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
 
 ;;; Code:
 
@@ -64,19 +69,6 @@
                            vertico--lock-candidate t)
                      (vertico--exhibit))))))
 
-;;;###autoload
-(defun vertico-repeat--save ()
-  "Save Vertico status for `vertico-repeat'."
-  (when vertico--input
-    (unless vertico-repeat--restore
-      (setq vertico-repeat--command this-command
-            vertico-repeat--input ""
-            vertico-repeat--candidate nil
-            vertico-repeat--restore nil))
-    (add-hook 'post-command-hook #'vertico-repeat--save-input nil 'local)
-    (add-hook 'minibuffer-exit-hook #'vertico-repeat--save-candidate nil 'local)))
-
-;;;###autoload
 (defun vertico-repeat ()
   "Repeat last Vertico completion session."
   (interactive)
@@ -87,7 +79,17 @@
     (command-execute (setq this-command vertico-repeat--command))))
 
 ;;;###autoload
-(add-hook 'minibuffer-setup-hook #'vertico-repeat--save)
+(defun vertico-repeat-save ()
+  "Save Vertico status for `vertico-repeat'.
+This function must be registered as `minibuffer-setup-hook'."
+  (when vertico--input
+    (unless vertico-repeat--restore
+      (setq vertico-repeat--command this-command
+            vertico-repeat--input ""
+            vertico-repeat--candidate nil
+            vertico-repeat--restore nil))
+    (add-hook 'post-command-hook #'vertico-repeat--save-input nil 'local)
+    (add-hook 'minibuffer-exit-hook #'vertico-repeat--save-candidate nil 'local)))
 
 (provide 'vertico-repeat)
 ;;; vertico-repeat.el ends here
