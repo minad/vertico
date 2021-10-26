@@ -37,14 +37,6 @@
   "Face used for mouse highlighting."
   :group 'vertico-faces)
 
-(defvar vertico-mouse-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map [mouse-1] #'vertico-mouse-exit)
-    (define-key map [mouse-3] #'vertico-mouse-insert)
-    map)
-  "Mouse keymap bound to candidates.")
-(fset 'vertico-mouse-map vertico-mouse-map)
-
 (defun vertico-mouse-exit (event)
   "Exit after mouse EVENT."
   (interactive "e")
@@ -69,7 +61,7 @@
     (when (= index vertico--index)
       (add-face-text-property 0 (length cand) 'vertico-current 'append cand)))
   (add-text-properties 0 (1- (length cand))
-                       `(mouse-face vertico-mouse keymap vertico-mouse-map vertico--mouse-index ,index)
+                       `(mouse-face vertico-mouse vertico--mouse-index ,index)
                        cand)
   cand)
 
@@ -92,9 +84,13 @@
   :global t :group 'vertico
   (cond
    (vertico-mouse-mode
+    (define-key vertico-map [mouse-1] #'vertico-mouse-exit)
+    (define-key vertico-map [mouse-3] #'vertico-mouse-insert)
     (advice-add #'vertico--format-candidate :around #'vertico-mouse--format-candidate)
     (advice-add #'vertico--setup :after #'vertico-mouse--setup))
    (t
+    (assq-delete-all 'mouse-1 vertico-map)
+    (assq-delete-all 'mouse-3 vertico-map)
     (advice-remove #'vertico--format-candidate #'vertico-mouse--format-candidate)
     (advice-remove #'vertico--setup #'vertico-reverse--setup))))
 
