@@ -76,7 +76,7 @@ See `resize-mini-windows' for documentation."
   :type '(cons (string :tag "Newline") (string :tag "Truncation")))
 
 (defcustom vertico-sort-function #'vertico-sort-history-length-alpha
-  "Default sorting function, which is used if no `display-sort-function' is specified."
+  "Default sorting function, used if no `display-sort-function' is specified."
   :type `(choice
           (const :tag "No sorting" nil)
           (const :tag "By history, length and alpha" ,#'vertico-sort-history-length-alpha)
