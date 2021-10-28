@@ -189,8 +189,8 @@
                    args)))
   #+end_src
 
-  This also affects completion in the minibuffer when =M-:= (~eval-expression~) is used.
-  
+  This also affects TAB completion in the minibuffer when =M-:= (~eval-expression~) is used.
+
   You may also want to look into my [[https://github.com/minad/corfu][Corfu]] package, which provides a minimal
   completion system for completion-in-region using overlays. Corfu is developed in
   the same spirit as Vertico.
@@ -283,6 +283,20 @@
   functionality not present in Emacs already (e.g., ~consult-line~) and some are
   substitutes (e.g., ~consult-buffer~ for ~switch-to-buffer~).
 
+* Child frames and Popups
+
+An often requested feature is the ability to display the completions in a child
+frame popup. I do not recommend this, since from my experience it introduces
+more problems than it solves. Child frames can feel slow and are prone to
+flicker. On the other hand the completions are shown right in your focus at the
+center of the screen, leading to a modern-looking IDE-like UI. Please give these
+packages a try and judge for yourself.
+
+- [[https://github.com/muffinmad/emacs-mini-frame][mini-frame]]: Display the entire minibuffer in a child frame.
+- [[https://github.com/minad/mini-popup][mini-popup]]: Slightly simpler alternative to mini-frame.
+- [[https://github.com/tumashu/vertico-posframe][vertico-posframe]]: Display only the Vertico candidates in a child frame
+  using the posframe library.
+
 * Alternatives
 
   There are many alternative completion UIs, each UI with its own advantages and
@@ -305,8 +319,7 @@
   targets users interested in crafting their Emacs precisely to their liking -
   completion plays an integral part in how the users interacts with Emacs.
 
-  There are at least two other interactive completion UIs, which follow a
-  similar philosophy:
+  There are other interactive completion UIs, which follow a similar philosophy:
 
   - [[https://github.com/raxod502/selectrum][Selectrum]]: Selectrum has a similar UI as Vertico. Selectrum is more complex
     and not fully compatible with every Emacs completion command ([[https://github.com/raxod502/selectrum/issues/481][Issue #481]]),
@@ -320,6 +333,9 @@
     perspective, candidate rotation feels a bit less intuitive than the UI of
     Vertico or Selectrum. Note that Emacs 28 offers a built-in
     ~icomplete-vertical-mode~.
+  - [[https://gitlab.com/protesilaos/mct][Mct]]: Minibuffer and Completions in Tandem. Reuses the default completions
+    buffer and enhances it with automatic updates and additional keybindings,
+    to select a candidate and move between minibuffer and completions buffer.
 
 * Problematic completion commands
 
