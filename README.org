@@ -287,15 +287,15 @@
 
 An often requested feature is the ability to display the completions in a child
 frame popup. I do not recommend this, since from my experience it introduces
-more problems than it solves. Child frames can feel slow and are prone to
-flicker. On the other hand the completions are shown right in your focus at the
-center of the screen, leading to a modern-looking IDE-like UI. Please give these
-packages a try and judge for yourself.
+more problems than it solves. Child frames can feel slow and sometimes flicker.
+On the other hand the completions are shown right in your focus at the center of
+the screen, leading to a modern feel. Please give these packages a try and judge
+for yourself.
 
 - [[https://github.com/muffinmad/emacs-mini-frame][mini-frame]]: Display the entire minibuffer in a child frame.
 - [[https://github.com/minad/mini-popup][mini-popup]]: Slightly simpler alternative to mini-frame.
-- [[https://github.com/tumashu/vertico-posframe][vertico-posframe]]: Display only the Vertico candidates in a child frame
-  using the posframe library.
+- [[https://github.com/tumashu/vertico-posframe][vertico-posframe]]: Display only the Vertico minibuffer in a child frame using
+  the posframe library.
 
 * Alternatives
 
