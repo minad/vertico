@@ -38,6 +38,8 @@
   "Face used for the candidate index prefix."
   :group 'vertico-faces)
 
+(defvar vertico-indexed--commands
+  '(vertico-insert vertico-exit vertico-directory-enter))
 (defvar-local vertico-indexed--min 0)
 (defvar-local vertico-indexed--max 0)
 
@@ -52,16 +54,16 @@
                    prefix)
            suffix index start))
 
-(defun vertico-indexed--handle-prefix (orig &rest args)
-  "Handle prefix argument before calling ORIG function."
-  (if current-prefix-arg
+(defun vertico-indexed--handle-prefix (&rest orig)
+  "Handle prefix argument before applying ORIG function."
+  (if (and current-prefix-arg (called-interactively-p t))
       (let ((vertico--index (+ vertico-indexed--min (prefix-numeric-value current-prefix-arg))))
         (if (or (< vertico--index vertico-indexed--min)
                 (> vertico--index vertico-indexed--max)
                 (= vertico--total 0))
             (minibuffer-message "Out of range")
-          (funcall orig)))
-    (apply orig args)))
+          (apply orig)))
+    (apply orig)))
 
 ;;;###autoload
 (define-minor-mode vertico-indexed-mode
@@ -70,12 +72,12 @@
   (cond
    (vertico-indexed-mode
     (advice-add #'vertico--format-candidate :around #'vertico-indexed--format-candidate)
-    (advice-add #'vertico-insert :around #'vertico-indexed--handle-prefix)
-    (advice-add #'vertico-exit :around #'vertico-indexed--handle-prefix))
+    (dolist (cmd vertico-indexed--commands)
+      (advice-add cmd :around #'vertico-indexed--handle-prefix)))
    (t
     (advice-remove #'vertico--format-candidate #'vertico-indexed--format-candidate)
-    (advice-remove #'vertico-insert #'vertico-indexed--handle-prefix)
-    (advice-remove #'vertico-exit #'vertico-indexed--handle-prefix))))
+    (dolist (cmd vertico-indexed--commands)
+      (advice-remove cmd #'vertico-indexed--handle-prefix)))))
 
 (provide 'vertico-indexed)
 ;;; vertico-indexed.el ends here
