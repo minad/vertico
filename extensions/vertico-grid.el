@@ -37,9 +37,10 @@
   :type 'integer
   :group 'vertico)
 
-(defcustom vertico-grid-padding 2
-  "Padding between columns."
-  :type 'integer
+(defcustom vertico-grid-separator
+  #("  |  " 2 3 (display (space :width (1)) face (:inverse-video t)))
+  "Separator between columns."
+  :type 'string
   :group 'vertico)
 
 (defcustom vertico-grid-rows 6
@@ -51,9 +52,9 @@
   "Arrange candidates."
   (let* ((count (* vertico-grid-rows vertico-grid-columns))
          (start (* count (floor (max 0 vertico--index) count)))
-         (width (- (/ (window-width) vertico-grid-columns) vertico-grid-padding))
-         (pad (make-string vertico-grid-padding ?\s))
-         (candidates
+         (sep (length vertico-grid-separator))
+         (width (- (/ (window-width) vertico-grid-columns) sep))
+         (cands
           (seq-map-indexed (lambda (cand index)
                              (setq index (+ index start))
                              (when (string-match-p "\n" cand)
@@ -64,19 +65,29 @@
                                 "[ \t]+" (if (= index vertico--index)
                                              #(" " 0 1 (face vertico-current)) " ")
                                 (vertico--format-candidate cand "" "" index start)))
-                              width 0 ?\s))
-          (funcall vertico--highlight-function
-                   (seq-subseq vertico--candidates start
-                               (min (+ start count)
-                                    vertico--total)))))
+                              width))
+                           (funcall vertico--highlight-function
+                                    (seq-subseq vertico--candidates start
+                                                (min (+ start count)
+                                                     vertico--total)))))
+         (width (make-vector vertico-grid-columns 0))
          (lines))
+    (dotimes (col vertico-grid-columns)
+      (dotimes (row vertico-grid-rows)
+        (aset width col (max
+                         (aref width col)
+                         (string-width (or (nth (+ row (* col vertico-grid-rows)) cands) ""))))))
     (dotimes (row vertico-grid-rows)
       (let ((line))
+        (push "\n" line)
         (dotimes (col vertico-grid-columns)
-          (setq line (concat line
-                             (nth (+ row (* col vertico-grid-rows)) candidates)
-                             pad)))
-        (push (concat line "\n") lines)))
+          (let ((n (- vertico-grid-columns col 1)))
+            (when-let (cand (nth (+ row (* n vertico-grid-rows)) cands))
+              (push (make-string (- (aref width n) (string-width cand)) ?\s) line)
+              (push cand line)
+              (when (< col (1- vertico-grid-columns))
+                (push vertico-grid-separator line)))))
+        (push (string-join line) lines)))
     (nreverse lines)))
 
 (defun vertico-grid-left (&optional n)
