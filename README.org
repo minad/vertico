@@ -18,9 +18,9 @@
   facilities system, Vertico achieves /full compatibility/ with built-in Emacs
   completion commands and completion tables. Vertico only provides the
   completion UI but aims to be flexible and extensible. Additional enhancements
-  can be installed separately via [[#extensions][extensions]] or [[#complementary-packages][complementary packages]]. The code
-  base is small and maintainable (~vertico.el~ is only about 600 lines of code
-  without white space and comments).
+  are available as [[#extensions][extensions]] or [[#complementary-packages][complementary packages]]. The code base is small
+  and maintainable (~vertico.el~ is only about 600 lines of code without white
+  space and comments).
 
 * Features
 
@@ -59,13 +59,13 @@
 
 * Configuration
 
-  Vertico is available from [[http://elpa.gnu.org/packages/vertico.html][GNU ELPA]], such that it can be installed directly via
-  ~package-install~. After installation, the global minor mode can be enabled with
-  =M-x vertico-mode=. In order to configure Vertico and other packages in your
-  init.el, you may want to use ~use-package~. I recommend to give Orderless
-  completion a try, which is different from the prefix TAB completion used by
-  the basic default completion system or in shells. Here is an example
-  configuration:
+  Vertico is available from [[http://elpa.gnu.org/packages/vertico.html][GNU ELPA]]. You can install it directly via
+  ~package-install~. After installation, you can activate the global minor mode
+  with =M-x vertico-mode=. In order to configure Vertico and other packages in
+  your init.el, you may want to take advantage of ~use-package~. I recommend to
+  give Orderless completion a try, which is different from the prefix TAB
+  completion used by the basic default completion system or in shells. Here is
+  an example configuration:
 
   #+begin_src emacs-lisp
     ;; Enable vertico
@@ -131,7 +131,7 @@
 
   If you prefer to have the default completion commands a key press away you can
   add new bindings or even replace the Vertico bindings. Then the default
-  completion commands will work as usual. For example you can use =M-TAB= to cycle
+  completion commands behave as usual. For example you can use =M-TAB= to cycle
   between candidates if you have set ~completion-cycle-threshold~.
 
   #+begin_src emacs-lisp
@@ -252,7 +252,7 @@
   :custom_id: complementary-packages
   :end:
 
-  Vertico works well together with complementary packages, which enrich the
+  Vertico integrates well with complementary packages, which enrich the
   completion UI. These packages are fully supported:
 
   - [[https://github.com/minad/marginalia][Marginalia]]: Rich annotations in the minibuffer
@@ -260,8 +260,8 @@
   - [[https://github.com/oantolin/embark][Embark]]: Minibuffer actions and context menu
   - [[https://github.com/oantolin/orderless][Orderless]]: Advanced completion style
 
-  In order to get accustomed with the package ecosystem the following approach
-  is recommended:
+  In order to get accustomed with the package ecosystem, I recommed the
+  following approach:
 
   1. Start with plain Emacs.
   2. Install and enable Vertico to get incremental minibuffer completion.
@@ -289,9 +289,9 @@
 An often requested feature is the ability to display the completions in a child
 frame popup. I do not recommend this, since from my experience it introduces
 more problems than it solves. Child frames can feel slow and sometimes flicker.
-On the other hand the completions are shown right in your focus at the center of
-the screen, leading to a modern feel. Please give these packages a try and judge
-for yourself.
+On the other hand the completion display appears right in your focus at the
+center of the screen, leading to a modern look and feel. Please give these
+packages a try and judge for yourself.
 
 - [[https://github.com/muffinmad/emacs-mini-frame][mini-frame]]: Display the entire minibuffer in a child frame.
 - [[https://github.com/minad/mini-popup][mini-popup]]: Slightly simpler alternative to mini-frame.
@@ -307,9 +307,9 @@ for yourself.
   with a minimal code base, relying purely on ~completing-read~ while avoiding to
   invent its own APIs. Inventing a custom API as Helm or Ivy is explicitly
   avoided in order to increase flexibility and package reuse. Due to its small
-  code base and reuse of the Emacs built-in facilities, bugs are less likely to
-  occur in comparison to completion UIs or full completion systems, which
-  reimplement a lot of functionality.
+  code base and reuse of the Emacs built-in facilities, bugs and compatibility
+  issues are less likely to occur in comparison to completion UIs or full
+  completion systems, which reimplement a lot of functionality.
 
   Since Vertico only provides the UI, you may want to combine it with some of
   the complementary packages, to give a full-featured completion experience
@@ -326,39 +326,39 @@ for yourself.
     and not fully compatible with every Emacs completion command ([[https://github.com/raxod502/selectrum/issues/481][Issue #481]]),
     since it uses its own filtering infrastructure, which deviates from the
     standard Emacs completion facilities. Vertico additionally has the ability
-    to cycle over candidates, offers more commands for grouping support and
-    comes with optional [[#extensions][extensions]].
+    to cycle over candidates, offers commands for grouping support and comes
+    with a rich set of [[#extensions][extensions]].
   - [[https://github.com/oantolin/icomplete-vertical][Icomplete-vertical]]: This package enhances the Emacs builtin Icomplete with a
     vertical display. In contrast to Vertico, Icomplete rotates the candidates
     such that the current candidate always appears at the top. From my
     perspective, candidate rotation feels a bit less intuitive than the UI of
     Vertico or Selectrum. Note that Emacs 28 offers a built-in
     ~icomplete-vertical-mode~.
-  - [[https://gitlab.com/protesilaos/mct][Mct]]: Minibuffer and Completions in Tandem. Reuses the default completions
-    buffer and enhances it with automatic updates and additional keybindings,
-    to select a candidate and move between minibuffer and completions buffer.
+  - [[https://gitlab.com/protesilaos/mct][Mct]]: Minibuffer and Completions in Tandem. Mct reuses the default completions
+    buffer and enhances it with automatic updates and additional keybindings, to
+    select a candidate and move between minibuffer and completions buffer.
 
 * Problematic completion commands
 
-  Vertico works well and is robust in most scenarios. However some completion
-  commands make certain assumptions about the completion styles and the
-  completion UI. Some of these assumptions may not hold in Vertico and as such
-  require minor workarounds.
+  Vertico is robust in most scenarios. However some completion commands make
+  certain assumptions about the completion styles and the completion UI. Some of
+  these assumptions may not hold in Vertico or other UIs and require minor
+  workarounds.
 
 ** ~org-refile~
 
    ~org-refile~ uses ~org-olpath-completing-read~ to complete the outline path
    in steps, when ~org-refile-use-outline-path~ is non-nil.
 
-   Unfortunately the implementation of this Org completion table is broken. In
-   order to fix the issue at the root, the completion table should make use of
-   completion boundaries and should be written in the same way as the built-in
-   file completion table.
+   Unfortunately the implementation of this Org completion table assumes that
+   the default completion UI is used. In order to fix the issue at the root, the
+   completion table should make use of completion boundaries similar to the
+   built-in file completion table.
 
-   In order to workaround the issues with the current implementation it is
-   recommended to disable the outline path completion in steps. The completion
-   on the full path is also faster since the input string matches directly
-   against the full path, which works very well with Orderless.
+   In order to workaround the issues with the current implementation I recommend
+   to disable the outline path completion in steps. The completion on the full
+   path is also faster since the input string matches directly against the full
+   path, which is particularily useful with Orderless.
 
    #+begin_src emacs-lisp
      (setq org-refile-use-outline-path 'file
@@ -368,8 +368,8 @@ for yourself.
 ** ~tmm-menubar~
 
    The text menu bar works well with Vertico but always shows a =*Completions*=
-   buffer, which is unwanted if you are using the Vertico UI. This completion
-   buffer can be disabled as follows.
+   buffer, which is unwanted if you use the Vertico UI. This completion buffer
+   can be disabled as follows.
 
    #+begin_src emacs-lisp
      (advice-add #'tmm-add-prompt :after #'minibuffer-hide-completions)
