@@ -76,9 +76,10 @@
         (prompt (minibuffer-prompt))
         (content (minibuffer-contents)))
     (with-current-buffer vertico-buffer--buffer
-      (erase-buffer)
-      (insert (propertize (concat count prompt) 'face 'minibuffer-prompt)
-              content "\n" (string-join lines)))
+      (with-silent-modifications
+        (erase-buffer)
+        (insert (propertize (concat count prompt) 'face 'minibuffer-prompt)
+                content "\n" (string-join lines))))
     (let ((win (or (get-buffer-window vertico-buffer--buffer)
                    (display-buffer vertico-buffer--buffer vertico-buffer-display-action))))
       (overlay-put vertico--candidates-ov 'window win)
@@ -121,7 +122,7 @@
     (setq-local display-line-numbers nil
                 truncate-lines t
                 show-trailing-whitespace nil
-                inhibit-modification-hooks t
+                buffer-read-only t
                 cursor-in-non-selected-windows 'box)))
 
 ;;;###autoload
