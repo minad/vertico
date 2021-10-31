@@ -34,6 +34,16 @@
 (eval-when-compile
   (require 'cl-lib))
 
+(defcustom vertico-demand-delay 1.0
+  "Show Vertico after this many seconds."
+  :type 'float
+  :group 'vertico)
+
+(defcustom vertico-demand-input 3
+  "Minimal input necessary to show Vertico."
+  :type 'integer
+  :group 'vertico)
+
 (defvar vertico-demand-map
   (let ((map (make-composed-keymap nil minibuffer-local-map)))
     (define-key map [remap next-line] #'vertico-demand-show)
@@ -46,6 +56,9 @@
     (define-key map [C-return] #'vertico-exit-input)
     map)
   "Vertico demand minibuffer keymap derived from `minibuffer-local-map'.")
+
+(defvar-local vertico-demand--start nil)
+(defvar-local vertico-demand--timer nil)
 
 (defun vertico-demand-complete ()
   "Complete minibuffer input or open Vertico UI."
@@ -63,12 +76,24 @@
 (defun vertico-demand-show (&rest _)
   "Show Vertico UI."
   (interactive)
+  (cancel-timer vertico-demand--timer)
+  (remove-hook 'post-command-hook #'vertico-demand--auto 'local)
   (vertico--setup))
+
+(defun vertico-demand--auto ()
+  "Show Vertico after a delay and minimal input automatically."
+  (when (and (>= (- (float-time) vertico-demand--start) vertico-demand-delay)
+             (>= (- (point-max) (minibuffer-prompt-end)) vertico-demand-input))
+    (vertico-demand-show)))
 
 (defun vertico-demand--setup ()
   "Setup Vertico demand mode in the minibuffer."
   (setq-local completion-show-inline-help nil
-              completion-auto-help t)
+              completion-auto-help t
+              vertico-demand--start (float-time)
+              vertico-demand--timer
+              (run-at-time vertico-demand-delay nil #'vertico-demand--auto))
+  (add-hook 'post-command-hook #'vertico-demand--auto nil 'local)
   (use-local-map vertico-demand-map))
 
 (defun vertico-demand--advice (&rest args)
