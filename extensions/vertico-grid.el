@@ -32,8 +32,8 @@
 
 (require 'vertico)
 
-(defcustom vertico-grid-columns 4
-  "Number of grid columns."
+(defcustom vertico-grid-max-columns 8
+  "Maximal number of grid columns."
   :type 'integer
   :group 'vertico)
 
@@ -48,12 +48,29 @@
   :type 'integer
   :group 'vertico)
 
+(defcustom vertico-grid-lookahead 200
+  "Number of candidates to lookahead for column number computation.
+When scrolling beyond this limit, candidates may be truncated."
+  :type 'integer
+  :group 'vertico)
+
+(defvar-local vertico-grid--columns 1
+  "Current number of grid columns.")
+
 (defun vertico-grid--arrange-candidates ()
   "Arrange candidates."
-  (let* ((count (* vertico-grid-rows vertico-grid-columns))
+  (when (<= vertico--index 0)
+    (let ((cand vertico--candidates) (w 1) (n 0))
+      (while (and cand (< n vertico-grid-lookahead))
+        (setq w (max w (length (car cand))) n (1+ n))
+        (pop cand))
+      (setq vertico-grid--columns
+            (max 1 (min vertico-grid-max-columns
+                        (floor (window-width) (+ w (length vertico-grid-separator))))))))
+  (let* ((sep (length vertico-grid-separator))
+         (count (* vertico-grid-rows vertico-grid--columns))
          (start (* count (floor (max 0 vertico--index) count)))
-         (sep (length vertico-grid-separator))
-         (width (- (/ (window-width) vertico-grid-columns) sep))
+         (width (- (/ (window-width) vertico-grid--columns) sep))
          (cands
           (seq-map-indexed (lambda (cand index)
                              (setq index (+ index start))
@@ -70,9 +87,9 @@
                                     (seq-subseq vertico--candidates start
                                                 (min (+ start count)
                                                      vertico--total)))))
-         (width (make-vector vertico-grid-columns 0))
+         (width (make-vector vertico-grid--columns 0))
          (lines))
-    (dotimes (col vertico-grid-columns)
+    (dotimes (col vertico-grid--columns)
       (dotimes (row vertico-grid-rows)
         (aset width col (max
                          (aref width col)
@@ -80,12 +97,12 @@
     (dotimes (row vertico-grid-rows)
       (let ((line))
         (push "\n" line)
-        (dotimes (col vertico-grid-columns)
-          (let ((n (- vertico-grid-columns col 1)))
+        (dotimes (col vertico-grid--columns)
+          (let ((n (- vertico-grid--columns col 1)))
             (when-let (cand (nth (+ row (* n vertico-grid-rows)) cands))
               (push (make-string (- (aref width n) (string-width cand)) ?\s) line)
               (push cand line)
-              (when (< col (1- vertico-grid-columns))
+              (when (< col (1- vertico-grid--columns))
                 (push vertico-grid-separator line)))))
         (push (string-join line) lines)))
     (nreverse lines)))
@@ -98,14 +115,14 @@
 (defun vertico-grid-right (&optional n)
   "Move N columns to the right in the grid."
   (interactive "p")
-  (let* ((page (* vertico-grid-rows vertico-grid-columns))
+  (let* ((page (* vertico-grid-rows vertico-grid--columns))
          (p (/ vertico--index page))
          (q (mod vertico--index page))
          (x (/ q vertico-grid-rows))
          (y (mod q vertico-grid-rows))
-         (z (+ (* p page) (* vertico-grid-columns y) x (or n 1))))
-    (setq x (mod z vertico-grid-columns)
-          y (/ z vertico-grid-columns))
+         (z (+ (* p page) (* vertico-grid--columns y) x (or n 1))))
+    (setq x (mod z vertico-grid--columns)
+          y (/ z vertico-grid--columns))
     (vertico--goto (+ (* x vertico-grid-rows) (mod y vertico-grid-rows)
                       (* (/ y vertico-grid-rows) page)))))
 
