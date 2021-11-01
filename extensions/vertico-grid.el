@@ -150,5 +150,9 @@ When scrolling beyond this limit, candidates may be truncated."
     (assq-delete-all 'right-char (assq 'remap vertico-map))
     (advice-remove #'vertico--arrange-candidates #'vertico-grid--arrange-candidates))))
 
+;; Emacs 28: Do not show Vertico commands in M-X
+(dolist (sym '(vertico-grid-left vertico-grid-right))
+  (put sym 'completion-predicate #'vertico--command-p))
+
 (provide 'vertico-grid)
 ;;; vertico-grid.el ends here

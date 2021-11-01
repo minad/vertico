@@ -133,7 +133,7 @@
     (vertico-insert)))
 
 ;; Emacs 28: Do not show Vertico commands in M-X
-(dolist (sym '(vertico-quick-jump  vertico-quick-exit vertico-quick-insert))
+(dolist (sym '(vertico-quick-jump vertico-quick-exit vertico-quick-insert))
   (put sym 'completion-predicate #'vertico--command-p))
 
 (provide 'vertico-quick)
