@@ -54,16 +54,16 @@
                    prefix)
            suffix index start))
 
-(defun vertico-indexed--handle-prefix (&rest orig)
-  "Handle prefix argument before applying ORIG function."
+(defun vertico-indexed--handle-prefix (orig &rest args)
+  "Handle prefix argument before calling ORIG function with ARGS."
   (if (and current-prefix-arg (called-interactively-p t))
       (let ((vertico--index (+ vertico-indexed--min (prefix-numeric-value current-prefix-arg))))
         (if (or (< vertico--index vertico-indexed--min)
                 (> vertico--index vertico-indexed--max)
                 (= vertico--total 0))
             (minibuffer-message "Out of range")
-          (apply orig)))
-    (apply orig)))
+          (funcall orig)))
+    (apply orig args)))
 
 ;;;###autoload
 (define-minor-mode vertico-indexed-mode
