@@ -426,9 +426,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
         (if (and (eq 'file (completion-metadata-get metadata 'category))
                  (or (vertico--remote-p content) (vertico--remote-p default-directory)))
             (vertico--recompute-candidates pt content metadata)
-          ;; bug#38024: Icomplete uses `while-no-input-ignore-events' to repair updating issues
-          (let ((while-no-input-ignore-events '(selection-request))
-                (non-essential t))
+          (let ((non-essential t))
             (while-no-input (vertico--recompute-candidates pt content metadata))))
       ('nil (abort-recursive-edit))
       (`(,base ,total ,def-missing ,index ,candidates ,groups ,all-groups ,hl)
