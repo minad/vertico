@@ -69,6 +69,7 @@
                            vertico--lock-candidate t)
                      (vertico--exhibit))))))
 
+;;;###autoload
 (defun vertico-repeat ()
   "Repeat last Vertico completion session."
   (interactive)
