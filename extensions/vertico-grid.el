@@ -34,6 +34,8 @@
 ;;; Code:
 
 (require 'vertico)
+(eval-when-compile
+  (require 'cl-lib))
 
 (defcustom vertico-grid-max-columns 8
   "Maximal number of grid columns."
@@ -76,7 +78,7 @@ When scrolling beyond this limit, candidates may be truncated."
          (width (- (/ (window-width) vertico-grid--columns) sep))
          (cands
           (seq-map-indexed (lambda (cand index)
-                             (setq index (+ index start))
+                             (cl-incf index start)
                              (when (string-match-p "\n" cand)
                                (setq cand (vertico--truncate-multiline cand width)))
                              (truncate-string-to-width
@@ -90,25 +92,24 @@ When scrolling beyond this limit, candidates may be truncated."
                                     (seq-subseq vertico--candidates start
                                                 (min (+ start count)
                                                      vertico--total)))))
-         (width (make-vector vertico-grid--columns 0))
-         (lines))
+         (width (make-vector vertico-grid--columns 0)))
     (dotimes (col vertico-grid--columns)
       (dotimes (row vertico-grid-rows)
         (aset width col (max
                          (aref width col)
                          (string-width (or (nth (+ row (* col vertico-grid-rows)) cands) ""))))))
-    (dotimes (row vertico-grid-rows)
-      (let ((line))
-        (push "\n" line)
-        (dotimes (col vertico-grid--columns)
-          (let ((n (- vertico-grid--columns col 1)))
-            (when-let (cand (nth (+ row (* n vertico-grid-rows)) cands))
-              (push (make-string (- (aref width n) (string-width cand)) ?\s) line)
-              (push cand line)
-              (when (< col (1- vertico-grid--columns))
-                (push vertico-grid-separator line)))))
-        (push (string-join line) lines)))
-    (nreverse lines)))
+    (dotimes (col (1- vertico-grid--columns))
+      (cl-incf (aref width (1+ col)) (+ (aref width col) sep)))
+    (cl-loop for row from 0 to (1- vertico-grid-rows) collect
+             (let ((line (list "\n")))
+               (cl-loop for col from (1- vertico-grid--columns) downto 0 do
+                        (when-let (cand (nth (+ row (* col vertico-grid-rows)) cands))
+                          (push cand line)
+                          (when (> col 0)
+                            (push vertico-grid-separator line)
+                            (push (propertize " " 'display
+                                              `(space :align-to (+ left ,(aref width (1- col))))) line))))
+             (string-join line)))))
 
 (defun vertico-grid-left (&optional n)
   "Move N columns to the left in the grid."
