@@ -27,6 +27,9 @@
 ;;; Commentary:
 
 ;; This package is a Vertico extension providing a grid display.
+;;
+;; The mode can be bound to a key to toggle to the grid display.
+;; (define-key vertico-map "\M-G" #'vertico-grid-mode)
 
 ;;; Code:
 
@@ -132,6 +135,12 @@ When scrolling beyond this limit, candidates may be truncated."
   :global t :group 'vertico
   (cond
    (vertico-grid-mode
+    ;; Allow toggling between flat and grid modes
+    (when (fboundp #'vertico-flat-mode)
+      (vertico-flat-mode -1))
+    ;; Shrink current minibuffer window
+    (when-let (win (active-minibuffer-window))
+      (window-resize win (- (window-pixel-height)) nil nil 'pixelwise))
     (define-key vertico-map [remap left-char] #'vertico-grid-left)
     (define-key vertico-map [remap right-char] #'vertico-grid-right)
     (advice-add #'vertico--arrange-candidates :override #'vertico-grid--arrange-candidates))

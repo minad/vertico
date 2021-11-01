@@ -27,6 +27,9 @@
 ;;; Commentary:
 
 ;; This package is a Vertico extension providing a horizontal display.
+;;
+;; The mode can be bound to a key to toggle to the horizontal display.
+;; (define-key vertico-map "\M-F" #'vertico-flat-mode)
 
 ;;; Code:
 
@@ -102,6 +105,9 @@
   :global t :group 'vertico
   (cond
    (vertico-flat-mode
+    ;; Allow toggling between flat and grid modes
+    (when (fboundp #'vertico-grid-mode)
+      (vertico-grid-mode -1))
     ;; Shrink current minibuffer window
     (when-let (win (active-minibuffer-window))
       (window-resize win (- (window-pixel-height)) nil nil 'pixelwise))
