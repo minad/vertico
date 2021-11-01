@@ -106,7 +106,7 @@
   (cond
    (vertico-flat-mode
     ;; Allow toggling between flat and grid modes
-    (when (fboundp #'vertico-grid-mode)
+    (when (and (bound-and-true-p vertico-grid-mode) (fboundp #'vertico-grid-mode))
       (vertico-grid-mode -1))
     ;; Shrink current minibuffer window
     (when-let (win (active-minibuffer-window))
