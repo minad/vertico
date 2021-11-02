@@ -84,8 +84,8 @@ When scrolling beyond this limit, candidates may be truncated."
                              (truncate-string-to-width
                               (string-trim
                                (replace-regexp-in-string
-                                "[ \t]+" (if (= index vertico--index)
-                                             #(" " 0 1 (face vertico-current)) " ")
+                                "[ \t]+"
+                                (lambda (x) (apply #'propertize " " (text-properties-at 0 x)))
                                 (vertico--format-candidate cand "" "" index start)))
                               width))
                            (funcall vertico--highlight-function

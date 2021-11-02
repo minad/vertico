@@ -82,7 +82,8 @@
           (setq cand (vertico--truncate-multiline cand width)))
         (setq cand (string-trim
                     (replace-regexp-in-string
-                     "[ \t]+" (if (= index vertico--index) #(" " 0 1 (face vertico-current)) " ")
+                     "[ \t]+"
+                     (lambda (x) (apply #'propertize " " (text-properties-at 0 x)))
                      (vertico--format-candidate cand "" "" index vertico--index))))
         (setq index (1+ index)
               count (1- count)
