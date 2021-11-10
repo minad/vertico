@@ -241,10 +241,10 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (defun vertico--affixate (candidates)
   "Annotate CANDIDATES with annotation function."
-  (if-let (aff (or (completion-metadata-get vertico--metadata 'affixation-function)
+  (if-let (aff (or (vertico--metadata-get 'affixation-function)
                    (plist-get completion-extra-properties :affixation-function)))
       (funcall aff candidates)
-    (if-let (ann (or (completion-metadata-get vertico--metadata 'annotation-function)
+    (if-let (ann (or (vertico--metadata-get 'annotation-function)
                      (plist-get completion-extra-properties :annotation-function)))
         (mapcar (lambda (cand)
                   (let ((suffix (or (funcall ann cand) "")))
@@ -302,9 +302,13 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
           (cons (apply #'completion-all-completions args) hl))
       (cons (apply #'completion-all-completions args) hl))))
 
-(defun vertico--sort-function (metadata)
-  "Return the sorting function given the completion METADATA."
-  (or (completion-metadata-get metadata 'display-sort-function) vertico-sort-function))
+(defun vertico--metadata-get (prop)
+  "Return PROP from completion metadata."
+  (completion-metadata-get vertico--metadata prop))
+
+(defun vertico--sort-function ()
+  "Return the sorting function."
+  (or (vertico--metadata-get 'display-sort-function) vertico-sort-function))
 
 (defun vertico--filter-files (files)
   "Filter FILES by `completion-ignored-extensions'."
@@ -313,8 +317,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                     "\\)\\'")))
     (or (seq-remove (lambda (x) (string-match-p re x)) files) files)))
 
-(defun vertico--recompute-candidates (pt content metadata)
-  "Recompute candidates given PT, CONTENT and METADATA."
+(defun vertico--recompute-candidates (pt content)
+  "Recompute candidates given PT and CONTENT."
   ;; Redisplay the minibuffer such that the input becomes immediately
   ;; visible before the expensive candidate recomputation is performed (Issue #89).
   ;; Do not redisplay during initialization, since this leads to flicker.
@@ -332,15 +336,14 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                              (t (cons 0 (length after))))))
                (field (substring content (car bounds) (+ pt (cdr bounds))))
                ;; `minibuffer-completing-file-name' has been obsoleted by the completion category
-               (completing-file (eq 'file (completion-metadata-get metadata 'category)))
+               (completing-file (eq 'file (vertico--metadata-get 'category)))
                (`(,all . ,hl) (vertico--all-completions content
                                                         minibuffer-completion-table
                                                         minibuffer-completion-predicate
-                                                        pt metadata))
+                                                        pt vertico--metadata))
                (base (or (when-let (z (last all)) (prog1 (cdr z) (setcdr z nil))) 0))
                (base-str (substring content 0 base))
                (def (or (car-safe minibuffer-default) minibuffer-default))
-               (sort (vertico--sort-function metadata))
                (groups))
     ;; Reset the history hash table
     (unless (equal base-str vertico--history-base)
@@ -351,14 +354,14 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (when completing-file
       (setq all (vertico--filter-files all)))
     ;; Sort using the `display-sort-function' or the Vertico sort functions
-    (when sort (setq all (funcall sort all)))
+    (setq all (funcall (or (vertico--sort-function) #'identity) all))
     ;; Move special candidates: "field" appears at the top, before "field/", before default value
     (when (stringp def)
       (setq all (vertico--move-to-front def all)))
     (when (and completing-file (not (string-suffix-p "/" field)))
       (setq all (vertico--move-to-front (concat field "/") all)))
     (setq all (vertico--move-to-front field all))
-    (when-let (group-fun (and all (completion-metadata-get metadata 'group-function)))
+    (when-let (group-fun (and all (vertico--metadata-get 'group-function)))
       (setq groups (vertico--group-by group-fun all) all (car groups)))
     (list base (length all)
           ;; Default value is missing from collection
@@ -420,13 +423,14 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                                        minibuffer-completion-table
                                        minibuffer-completion-predicate)))
     (pcase
-        ;; If Tramp is used, do not compute the candidates in an interruptible fashion,
-        ;; since this will break the Tramp password and user name prompts (See #23).
-        (if (and (eq 'file (completion-metadata-get metadata 'category))
-                 (or (vertico--remote-p content) (vertico--remote-p default-directory)))
-            (vertico--recompute-candidates pt content metadata)
-          (let ((non-essential t))
-            (while-no-input (vertico--recompute-candidates pt content metadata))))
+        (let ((vertico--metadata metadata))
+          ;; If Tramp is used, do not compute the candidates in an interruptible fashion,
+          ;; since this will break the Tramp password and user name prompts (See #23).
+          (if (and (eq 'file (vertico--metadata-get 'category))
+                   (or (vertico--remote-p content) (vertico--remote-p default-directory)))
+              (vertico--recompute-candidates pt content)
+            (let ((non-essential t))
+              (while-no-input (vertico--recompute-candidates pt content)))))
       ('nil (abort-recursive-edit))
       (`(,base ,total ,def-missing ,index ,candidates ,groups ,all-groups ,hl)
        (setq vertico--input (cons content pt)
@@ -492,7 +496,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (let* ((index (min (max 0 (- vertico--index (/ vertico-count 2) (1- (mod vertico-count 2))))
                        (max 0 (- vertico--total vertico-count))))
            (title)
-           (group-fun (completion-metadata-get vertico--metadata 'group-function))
+           (group-fun (vertico--metadata-get 'group-function))
            (group-format (and group-fun vertico-group-format (concat vertico-group-format "\n")))
            (candidates
             (thread-last (seq-subseq vertico--candidates index
