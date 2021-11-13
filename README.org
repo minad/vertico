@@ -19,8 +19,7 @@
   completion commands and completion tables. Vertico only provides the
   completion UI but aims to be flexible and extensible. Additional enhancements
   are available as [[#extensions][extensions]] or [[#complementary-packages][complementary packages]]. The code base is small
-  and maintainable (~vertico.el~ is only about 600 lines of code without white
-  space and comments).
+  and maintainable (~vertico.el~ is well below 1000 lines of code).
 
 * Features
 
@@ -72,6 +71,12 @@
     (use-package vertico
       :init
       (vertico-mode)
+
+      ;; Different scroll margin
+      ;; (setq vertico-scroll-margin 0)
+
+      ;; Show more candidates
+      ;; (setq vertico-count 20)
 
       ;; Grow and shrink the Vertico minibuffer
       ;; (setq vertico-resize t)

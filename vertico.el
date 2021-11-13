@@ -59,6 +59,11 @@
   "Maximal number of candidates to show."
   :type 'integer)
 
+(defcustom vertico-scroll-margin 2
+  "Number of lines at the top and bottom when scrolling.
+The value should lie between 0 and vertico-count/2."
+  :type 'integer)
+
 (defcustom vertico-resize resize-mini-windows
   "How to resize the Vertico minibuffer window.
 See `resize-mini-windows' for documentation."
@@ -139,6 +144,9 @@ See `resize-mini-windows' for documentation."
 
 (defvar-local vertico--index -1
   "Index of current candidate or negative for prompt selection.")
+
+(defvar-local vertico--scroll 0
+  "Scroll position.")
 
 (defvar-local vertico--input nil
   "Cons of last minibuffer contents and point or t.")
@@ -489,12 +497,20 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (add-face-text-property 0 (length cand) 'vertico-current 'append cand))
   cand)
 
+(defun vertico--update-scroll ()
+  "Update scroll position."
+  (let ((off (max (min vertico-scroll-margin (/ vertico-count 2)) 0))
+        (corr (if (= vertico-scroll-margin (/ vertico-count 2)) (1- (mod vertico-count 2)) 0)))
+    (setq vertico--scroll (min (max 0 (- vertico--total vertico-count))
+                             (max 0 (+ vertico--index off 1 (- vertico-count))
+                                  (min (- vertico--index off corr) vertico--scroll))))))
+
 (defun vertico--arrange-candidates ()
   "Arrange candidates."
+  (vertico--update-scroll)
   (let ((curr-line 0) (lines))
     ;; Compute group titles
-    (let* ((index (min (max 0 (- vertico--index (/ vertico-count 2) (1- (mod vertico-count 2))))
-                       (max 0 (- vertico--total vertico-count))))
+    (let* ((index vertico--scroll)
            (title)
            (group-fun (vertico--metadata-get 'group-function))
            (group-format (and group-fun vertico-group-format (concat vertico-group-format "\n")))
