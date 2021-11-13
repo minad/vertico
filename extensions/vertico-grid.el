@@ -65,13 +65,13 @@ When scrolling beyond this limit, candidates may be truncated."
 (defun vertico-grid--arrange-candidates ()
   "Arrange candidates."
   (when (<= vertico--index 0)
-    (let ((cand vertico--candidates) (w 1) (n 0))
-      (while (and cand (< n vertico-grid-lookahead))
-        (setq w (max w (length (car cand))) n (1+ n))
-        (pop cand))
-      (setq vertico-grid--columns
-            (max 1 (min vertico-grid-max-columns
-                        (floor (window-width) (+ w (length vertico-grid-separator))))))))
+    (setq vertico-grid--columns
+          (max 1 (min vertico-grid-max-columns
+                      (floor (window-width)
+                             (+ (length vertico-grid-separator)
+                                (cl-loop for cand in vertico--candidates
+                                         for n from 0 below vertico-grid-lookahead
+                                         maximize (length cand))))))))
   (let* ((sep (length vertico-grid-separator))
          (count (* vertico-grid-rows vertico-grid--columns))
          (start (* count (floor (max 0 vertico--index) count)))
