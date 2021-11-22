@@ -395,6 +395,19 @@ packages a try and judge for yourself.
      (advice-add #'tmm-add-prompt :after #'minibuffer-hide-completions)
    #+end_src
 
+** ~ffap-menu~
+
+   The command ~ffap-menu~ shows the ==*Completions*= buffer by default like
+   ~tmm-menubar~, which is unnecessary with Vertico. This completion buffer can be
+   disabled as follows.
+
+   #+begin_src emacs-lisp
+     (advice-add #'ffap-menu-ask :around (lambda (&rest args)
+                                      (cl-letf (((symbol-function #'minibuffer-completion-help)
+                                                 #'ignore))
+                                        (apply args))))
+   #+end_src
+
 ** Tramp hostname completion
 
    In combination with Orderless, hostnames are not made available for
