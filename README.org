@@ -129,6 +129,8 @@
       (setq enable-recursive-minibuffers t))
   #+end_src
 
+  See also the [[https://github.com/minad/vertico/wiki][Vertico Wiki]] for additional configuration tips.
+
 ** Completion styles and TAB completion
 
   The bindings of the ~minibuffer-local-completion-map~ are not available in
