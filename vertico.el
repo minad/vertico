@@ -318,10 +318,6 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (defun vertico--recompute-candidates (pt content)
   "Recompute candidates given PT and CONTENT."
-  ;; Redisplay the minibuffer such that the input becomes immediately
-  ;; visible before the expensive candidate recomputation is performed (Issue #89).
-  ;; Do not redisplay during initialization, since this leads to flicker.
-  (when (consp vertico--input) (redisplay))
   (pcase-let* ((before (substring content 0 pt))
                (after (substring content pt))
                ;; bug#47678: `completion-boundaries` fails for `partial-completion`
@@ -417,6 +413,10 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (defun vertico--update-candidates (pt content)
   "Preprocess candidates given PT and CONTENT."
+  ;; Redisplay the minibuffer such that the input becomes immediately
+  ;; visible before the expensive candidate recomputation is performed (Issue #89).
+  ;; Do not redisplay during initialization, since this leads to flicker.
+  (when (consp vertico--input) (redisplay))
   (let ((metadata (completion-metadata (substring content 0 pt)
                                        minibuffer-completion-table
                                        minibuffer-completion-predicate)))
