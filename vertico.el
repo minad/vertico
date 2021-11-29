@@ -349,7 +349,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (when completing-file
       (setq all (vertico--filter-files all)))
     ;; Sort using the `display-sort-function' or the Vertico sort functions
-    (setq all (funcall (or (vertico--sort-function) #'identity) all))
+    (setq all (delete-consecutive-dups (funcall (or (vertico--sort-function) #'identity) all)))
     ;; Move special candidates: "field" appears at the top, before "field/", before default value
     (when (stringp def)
       (setq all (vertico--move-to-front def all)))
