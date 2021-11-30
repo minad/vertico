@@ -220,23 +220,22 @@
   :custom_id: extensions
   :end:
 
-  *NOTE*: The extensions currently require manual installation, e.g., via
-  ~package-install-file~. Please ensure that you are using the /newest/ Vertico
-  commit when using extensions.
-
   We maintain small extension packages to Vertico in this repository in the
-  subdirectory [[https://github.com/minad/vertico/tree/main/extensions][extensions/]]. The extensions can be installed additionally to
-  Vertico. Currently these extensions are available:
+  subdirectory [[https://github.com/minad/vertico/tree/main/extensions][extensions/]]. The extensions are installed together with Vertico
+  if you pull the package from ELPA. The extensions are of course inactive by
+  and must be enabled manually if desired. Furthermore it remains possible to
+  install all of the files separately, both ~vertico.el~ and the ~vertico-*.el~
+  extensions. Currently the following extensions come with Vertico:
 
-  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-buffer.el][vertico-buffer.el]]: =vertico-buffer-mode= to display Vertico in a separate buffer
-  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-directory.el][vertico-directory.el]]: Commands for Ido-like directory navigation
-  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-flat.el][vertico-flat.el]]: =vertico-flat-mode= to enable a flat, horizontal display
-  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-grid.el][vertico-grid.el]]: =vertico-grid-mode= to enable a grid display
-  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-indexed.el][vertico-indexed.el]]: =vertico-indexed-mode= to select indexed candidates with prefix arguments
-  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-mouse.el][vertico-mouse.el]]: =vertico-mouse-mode= to support for scrolling and candidate selection
-  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-quick.el][vertico-quick.el]]: Commands to select using Avy-style quick keys
-  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-repeat.el][vertico-repeat.el]]: The command =vertico-repeat= repeats the last completion session
-  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-reverse.el][vertico-reverse.el]]: =vertico-reverse-mode= to reverse the display
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-buffer.el][vertico-buffer]]: =vertico-buffer-mode= to display Vertico in a separate buffer
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-directory.el][vertico-directory]]: Commands for Ido-like directory navigation
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-flat.el][vertico-flat]]: =vertico-flat-mode= to enable a flat, horizontal display
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-grid.el][vertico-grid]]: =vertico-grid-mode= to enable a grid display
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-indexed.el][vertico-indexed]]: =vertico-indexed-mode= to select indexed candidates with prefix arguments
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-mouse.el][vertico-mouse]]: =vertico-mouse-mode= to support for scrolling and candidate selection
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-quick.el][vertico-quick]]: Commands to select using Avy-style quick keys
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-repeat.el][vertico-repeat]]: The command =vertico-repeat= repeats the last completion session
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-reverse.el][vertico-reverse]]: =vertico-reverse-mode= to reverse the display
 
   With these extensions it is possible to adapt Vertico heavily such that it
   matches your preference or behaves similar to familiar UIs. For example, the
@@ -249,8 +248,8 @@
 
   #+begin_src emacs-lisp
     ;; Configure directory extension.
-    ;; NOTE: The file `vertico-directory.el' must be installed manually.
     (use-package vertico-directory
+      :ensure nil
       ;; More convenient directory navigation commands
       :bind (:map vertico-map
                   ("RET" . vertico-directory-enter)
