@@ -223,9 +223,10 @@
   We maintain small extension packages to Vertico in this repository in the
   subdirectory [[https://github.com/minad/vertico/tree/main/extensions][extensions/]]. The extensions are installed together with Vertico
   if you pull the package from ELPA. The extensions are of course inactive by
-  and must be enabled manually if desired. Furthermore it remains possible to
+  default and can be enabled manually if desired. Furthermore it is possible to
   install all of the files separately, both ~vertico.el~ and the ~vertico-*.el~
-  extensions. Currently the following extensions come with Vertico:
+  extensions. Currently the following extensions come with the Vertico ELPA
+  package:
 
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-buffer.el][vertico-buffer]]: =vertico-buffer-mode= to display Vertico in a separate buffer
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-directory.el][vertico-directory]]: Commands for Ido-like directory navigation
@@ -237,14 +238,14 @@
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-repeat.el][vertico-repeat]]: The command =vertico-repeat= repeats the last completion session
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-reverse.el][vertico-reverse]]: =vertico-reverse-mode= to reverse the display
 
-  With these extensions it is possible to adapt Vertico heavily such that it
-  matches your preference or behaves similar to familiar UIs. For example, the
+  With these extensions it is possible to adapt Vertico such that it matches
+  your preference or behaves similar to other familiar UIs. For example, the
   combination =vertico-flat= plus =vertico-directory= resembles Ido in look and
   feel. For an interface similar to Helm, the extension =vertico-buffer= allows
   you to configure more freely where the completion buffer opens, instead of
   growing the minibuffer.
 
-  Configuration example for =vertico-directory.el=:
+  Configuration example for =vertico-directory=:
 
   #+begin_src emacs-lisp
     ;; Configure directory extension.
