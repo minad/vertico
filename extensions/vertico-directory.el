@@ -73,7 +73,8 @@
              (vertico-directory--completing-file-p))
     (save-excursion
       (goto-char (1- (point)))
-      (when (eq (char-before) ?~)
+      (when (and (= (1- (point)) (minibuffer-prompt-end))
+                 (eq (char-before) ?~))
         (delete-char -1)
         (insert (expand-file-name "~")))
       (when (search-backward "/" (minibuffer-prompt-end) t)
