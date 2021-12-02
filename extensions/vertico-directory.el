@@ -74,7 +74,7 @@
     (let ((path (buffer-substring (minibuffer-prompt-end) (point))))
       (when (string-match-p "\\`~[^/]*/\\'" path)
         (delete-minibuffer-contents)
-        (insert (file-name-directory (expand-file-name path)))))
+        (insert (expand-file-name path))))
     (save-excursion
       (goto-char (1- (point)))
       (when (search-backward "/" (minibuffer-prompt-end) t)
