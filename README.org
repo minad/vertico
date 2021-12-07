@@ -374,16 +374,30 @@ packages a try and judge for yourself.
    in steps, when ~org-refile-use-outline-path~ is non-nil.
 
    Unfortunately the implementation of this Org completion table assumes that
-   the default completion UI is used. In order to fix the issue at the root, the
-   completion table should make use of completion boundaries similar to the
-   built-in file completion table.
-
-   In order to workaround the issues with the current implementation I recommend
-   to disable the outline path completion in steps. The completion on the full
-   path is also faster since the input string matches directly against the full
-   path, which is particularily useful with Orderless.
+   the ~basic~ completion style is used. The table is incompatible with completion
+   styles like ~substring~, ~flex~ or ~orderless~. In order to fix the issue at the
+   root, the completion table should make use of completion boundaries similar
+   to the built-in file completion table. In your user configuration you can
+   prioritize ~basic~ before ~orderless:~
 
    #+begin_src emacs-lisp
+     ;; Alternative 1: Configure globally
+     (setq completion-styles '(basic orderless))
+
+     ;; Alternative 2: Locally only for the problematic command
+     (advice-add #'org-olpath-completing-read :around
+                 (lambda (&rest args)
+                   (minibuffer-with-setup-hook
+                       (lambda () (setq-local completion-styles '(basic)))
+                     (apply args))))
+   #+end_src
+
+   However I recommend to disable the outline path completion in steps. The
+   completion on the full path is faster since the input string matches directly
+   against the full path, which is particularily useful with Orderless.
+
+   #+begin_src emacs-lisp
+     ;; Alternative 3 (Recommended)
      (setq org-refile-use-outline-path 'file
            org-outline-path-complete-in-steps nil)
    #+end_src
