@@ -137,7 +137,7 @@ When scrolling beyond this limit, candidates may be truncated."
   (cond
    (vertico-grid-mode
     ;; Allow toggling between flat and grid modes
-    (when (and (bound-and-true-p vertico-flat-mode) (fboundp #'vertico-flat-mode))
+    (when (and (bound-and-true-p vertico-flat-mode) (fboundp 'vertico-flat-mode))
       (vertico-flat-mode -1))
     ;; Shrink current minibuffer window
     (when-let (win (active-minibuffer-window))

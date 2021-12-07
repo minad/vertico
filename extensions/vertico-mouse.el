@@ -37,7 +37,7 @@
   "Face used for mouse highlighting."
   :group 'vertico-faces)
 
-(defun vertico--mouse-candidate-map (index)
+(defun vertico-mouse--candidate-map (index)
   "Return keymap for candidate with INDEX."
   (let ((map (make-sparse-keymap)))
     (define-key map [mouse-1] (lambda ()
@@ -62,7 +62,7 @@
     (when (= index vertico--index)
       (add-face-text-property 0 (length cand) 'vertico-current 'append cand)))
   (add-text-properties 0 (1- (length cand))
-                       `(mouse-face vertico-mouse keymap ,(vertico--mouse-candidate-map index))
+                       `(mouse-face vertico-mouse keymap ,(vertico-mouse--candidate-map index))
                        cand)
   cand)
 
@@ -89,7 +89,7 @@
     (advice-add #'vertico--setup :after #'vertico-mouse--setup))
    (t
     (advice-remove #'vertico--format-candidate #'vertico-mouse--format-candidate)
-    (advice-remove #'vertico--setup #'vertico-reverse--setup))))
+    (advice-remove #'vertico--setup #'vertico-mouse--setup))))
 
 (provide 'vertico-mouse)
 ;;; vertico-mouse.el ends here

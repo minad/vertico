@@ -42,6 +42,7 @@
     (window-height . ,(+ 3 vertico-count))
     (side . top))
   "Display action for the Vertico buffer."
+  :group 'vertico
   :type `(choice
           (const :tag "Reuse some window"
                  (display-buffer-reuse-window))
