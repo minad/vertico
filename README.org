@@ -130,7 +130,10 @@
       (setq enable-recursive-minibuffers t))
   #+end_src
 
-  See also the [[https://github.com/minad/vertico/wiki][Vertico Wiki]] for additional configuration tips.
+  See also the [[https://github.com/minad/vertico/wiki][Vertico Wiki]] for additional configuration tips. For more general
+  documentation read the chapter about completion in the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Completion.html][Emacs manual]]. If you
+  want to create your own completion commands, you can find documentation about
+  completion in the [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Completion.html][Elisp manual]].
 
 ** Completion styles and TAB completion
 
