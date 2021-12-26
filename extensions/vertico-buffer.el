@@ -127,7 +127,7 @@
               truncate-lines t
               mode-line-format
               (list (format " %s %s "
-                            (propertize "*Vertico*" 'face 'bold)
+                            (propertize "*Vertico*" 'face 'mode-line-buffer-id)
                             (string-remove-suffix ": " (minibuffer-prompt)))
                     '(:eval (vertico--format-count)))
               cursor-in-non-selected-windows 'box
