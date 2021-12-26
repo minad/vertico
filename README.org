@@ -231,15 +231,16 @@
   extensions. Currently the following extensions come with the Vertico ELPA
   package:
 
-  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-buffer.el][vertico-buffer]]: =vertico-buffer-mode= to display Vertico in a separate buffer
-  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-directory.el][vertico-directory]]: Commands for Ido-like directory navigation
-  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-flat.el][vertico-flat]]: =vertico-flat-mode= to enable a flat, horizontal display
-  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-grid.el][vertico-grid]]: =vertico-grid-mode= to enable a grid display
-  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-indexed.el][vertico-indexed]]: =vertico-indexed-mode= to select indexed candidates with prefix arguments
-  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-mouse.el][vertico-mouse]]: =vertico-mouse-mode= to support for scrolling and candidate selection
-  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-quick.el][vertico-quick]]: Commands to select using Avy-style quick keys
-  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-repeat.el][vertico-repeat]]: The command =vertico-repeat= repeats the last completion session
-  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-reverse.el][vertico-reverse]]: =vertico-reverse-mode= to reverse the display
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-buffer.el][vertico-buffer]]: =vertico-buffer-mode= to display Vertico in a separate buffer.
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-directory.el][vertico-directory]]: Commands for Ido-like directory navigation.
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-flat.el][vertico-flat]]: =vertico-flat-mode= to enable a flat, horizontal display.
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-grid.el][vertico-grid]]: =vertico-grid-mode= to enable a grid display.
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-indexed.el][vertico-indexed]]: =vertico-indexed-mode= to select indexed candidates with prefix arguments.
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-mouse.el][vertico-mouse]]: =vertico-mouse-mode= to support for scrolling and candidate selection.
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-multiform.el][vertico-multiform]]: Configure Vertico modes per command or completion category..
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-quick.el][vertico-quick]]: Commands to select using Avy-style quick keys.
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-repeat.el][vertico-repeat]]: The command =vertico-repeat= repeats the last completion session.
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-reverse.el][vertico-reverse]]: =vertico-reverse-mode= to reverse the display.
 
   With these extensions it is possible to adapt Vertico such that it matches
   your preference or behaves similar to other familiar UIs. For example, the
