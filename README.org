@@ -237,7 +237,7 @@
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-grid.el][vertico-grid]]: =vertico-grid-mode= to enable a grid display.
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-indexed.el][vertico-indexed]]: =vertico-indexed-mode= to select indexed candidates with prefix arguments.
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-mouse.el][vertico-mouse]]: =vertico-mouse-mode= to support for scrolling and candidate selection.
-  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-multiform.el][vertico-multiform]]: Configure Vertico modes per command or completion category..
+  - [[https://github.com/minad/vertico/blob/main/extensions/vertico-multiform.el][vertico-multiform]]: Configure Vertico modes per command or completion category.
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-quick.el][vertico-quick]]: Commands to select using Avy-style quick keys.
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-repeat.el][vertico-repeat]]: The command =vertico-repeat= repeats the last completion session.
   - [[https://github.com/minad/vertico/blob/main/extensions/vertico-reverse.el][vertico-reverse]]: =vertico-reverse-mode= to reverse the display.
@@ -246,8 +246,9 @@
   your preference or behaves similar to other familiar UIs. For example, the
   combination =vertico-flat= plus =vertico-directory= resembles Ido in look and
   feel. For an interface similar to Helm, the extension =vertico-buffer= allows
-  you to configure more freely where the completion buffer opens, instead of
-  growing the minibuffer.
+  you to configure freely where the completion buffer opens, instead of growing
+  the minibuffer. Furthermore =vertico-buffer= will adjust the number of displayed
+  candidates according to the buffer height.
 
   Configuration example for =vertico-directory=:
 
@@ -264,6 +265,55 @@
       ;; Tidy shadowed file names
       :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
   #+end_src
+
+** Configure Vertico per-command or completion category
+
+Vertico offers the =vertico-multiform-mode= which allows you to configure Vertico
+per command or per completion category. The =vertico-buffer-mode= enables a
+Helm-like buffer display, which takes more space but also displays more
+candidates. This verbose display mode is useful for commands like ~consult-imenu~
+or ~consult-outline~ since the buffer display allows you to get a better overview
+over the entire current buffer.
+
+#+begin_src emacs-lisp
+  ;; Enable vertico-multiform
+  (vertico-multiform-mode)
+
+  ;; Configure the display per command.
+  ;; Use a buffer with indices for imenu
+  ;; and a flat (Ido-like) menu for M-x.
+  (setq vertico-multiform-command-modes
+        '((consult-imenu buffer indexed)
+          (execute-extended-command flat)))
+
+  ;; Configure the display per completion category.
+  ;; Use the grid display for files and a buffer
+  ;; for the consult-grep commands.
+  (setq vertico-multiform-category-modes
+        '((file grid)
+          (consult-grep buffer)))
+#+end_src
+
+You can use your own functions or even lambdas to configure the per command (or
+per category) completion behavior. The function must have the same calling
+convention as a mode, i.e., it takes a single argument, which is either 1 to
+turn on the mode and -1 to turn off the mode.
+
+#+begin_src emacs-lisp
+  ;; Configure `consult-outline' as a scaled down TOC in a separate buffer
+  (setq vertico-multiform-command-modes
+        '((consult-outline buffer (lambda (_) (text-scale-decrease 1)))))
+#+end_src
+
+Furthermore you can tune buffer-local settings per command (or category).
+
+#+begin_src emacs-lisp
+  ;; Change the default sorting function
+  (setq vertico-multiform-command-settings
+        '((describe-symbol (vertico-sort-function . vertico-sort-alpha))))
+  (setq vertico-multiform-category-settings
+        '((symbol (vertico-sort-function . vertico-sort-alpha))))
+#+end_src
 
 * Complementary packages
   :properties:
@@ -398,9 +448,8 @@ packages a try and judge for yourself.
 
    Alternatively you may want to disable the outline path completion in steps.
    The completion on the full path can be quicker since the input string matches
-   directly against substrings of the full path, which is particularily useful
-   with Orderless. However the list of possible completions becomes much more
-   cluttered.
+   directly against substrings of the full path, which is useful with Orderless.
+   However the list of possible completions becomes much more cluttered.
 
    #+begin_src emacs-lisp
      ;; Alternative 2: Complete full paths
