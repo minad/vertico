@@ -112,27 +112,29 @@
     ;; NOTE: We cannot use a buffer-local minibuffer-exit-hook here.
     ;; The hook will not be called when abnormally exiting the minibuffer
     ;; from another buffer via `keyboard-escape-quit'.
-    (add-hook 'minibuffer-exit-hook sym))
-  (set-window-parameter vertico-buffer--window 'no-other-window t)
-  (set-window-parameter vertico-buffer--window 'no-delete-other-windows t)
-  (when vertico-buffer-hide-prompt
-    (overlay-put vertico--candidates-ov 'window vertico-buffer--window)
-    (when vertico--count-ov
-      (overlay-put vertico--count-ov 'window vertico-buffer--window))
-    (setq vertico-buffer--overlay (make-overlay (point-max) (point-max) nil t t))
-    (overlay-put vertico-buffer--overlay 'window (selected-window))
-    (overlay-put vertico-buffer--overlay 'priority 1000)
-    (overlay-put vertico-buffer--overlay 'before-string "\n\n"))
-  (setq-local show-trailing-whitespace nil
-              truncate-lines t
-              mode-line-format
-              (list (format " %s %s "
-                            (propertize "*Vertico*" 'face 'mode-line-buffer-id)
-                            (string-remove-suffix ": " (minibuffer-prompt)))
-                    '(:eval (vertico--format-count)))
-              cursor-in-non-selected-windows 'box
-              vertico-count (- (/ (window-pixel-height vertico-buffer--window)
-                                  (default-line-height)) 2)))
+    (add-hook 'minibuffer-exit-hook sym)
+    (set-window-parameter vertico-buffer--window 'no-other-window t)
+    (set-window-parameter vertico-buffer--window 'no-delete-other-windows t)
+    (when vertico-buffer-hide-prompt
+      (overlay-put vertico--candidates-ov 'window vertico-buffer--window)
+      (when vertico--count-ov
+        (overlay-put vertico--count-ov 'window vertico-buffer--window))
+      (setq vertico-buffer--overlay (make-overlay (point-max) (point-max) nil t t))
+      (overlay-put vertico-buffer--overlay 'window (selected-window))
+      (overlay-put vertico-buffer--overlay 'priority 1000)
+      (overlay-put vertico-buffer--overlay 'before-string "\n\n"))
+    (setq-local show-trailing-whitespace nil
+                truncate-lines t
+                mode-line-format
+                (list (format " %s %s "
+                              (propertize
+                               (format (if (< depth 2) "*Vertico*" "*Vertico[%s]*") depth)
+                               'face 'mode-line-buffer-id)
+                              (string-remove-suffix ": " (minibuffer-prompt)))
+                      '(:eval (vertico--format-count)))
+                cursor-in-non-selected-windows 'box
+                vertico-count (- (/ (window-pixel-height vertico-buffer--window)
+                                    (default-line-height)) 2))))
 
 ;;;###autoload
 (define-minor-mode vertico-buffer-mode
