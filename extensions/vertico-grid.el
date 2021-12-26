@@ -73,7 +73,7 @@ When scrolling beyond this limit, candidates may be truncated."
             (max 1 (min vertico-grid-max-columns
                         (floor (window-width) (+ w (length vertico-grid-separator))))))))
   (let* ((sep (length vertico-grid-separator))
-         (count (* vertico-grid-rows vertico-grid--columns))
+         (count (* vertico-count vertico-grid--columns))
          (start (* count (floor (max 0 vertico--index) count)))
          (width (- (/ (window-width) vertico-grid--columns) sep))
          (cands
@@ -94,16 +94,16 @@ When scrolling beyond this limit, candidates may be truncated."
                                                      vertico--total)))))
          (width (make-vector vertico-grid--columns 0)))
     (dotimes (col vertico-grid--columns)
-      (dotimes (row vertico-grid-rows)
+      (dotimes (row vertico-count)
         (aset width col (max
                          (aref width col)
-                         (string-width (or (nth (+ row (* col vertico-grid-rows)) cands) ""))))))
+                         (string-width (or (nth (+ row (* col vertico-count)) cands) ""))))))
     (dotimes (col (1- vertico-grid--columns))
       (cl-incf (aref width (1+ col)) (+ (aref width col) sep)))
-    (cl-loop for row from 0 to (1- vertico-grid-rows) collect
+    (cl-loop for row from 0 to (1- vertico-count) collect
              (let ((line (list "\n")))
                (cl-loop for col from (1- vertico-grid--columns) downto 0 do
-                        (when-let (cand (nth (+ row (* col vertico-grid-rows)) cands))
+                        (when-let (cand (nth (+ row (* col vertico-count)) cands))
                           (push cand line)
                           (when (> col 0)
                             (push vertico-grid-separator line)
@@ -119,16 +119,16 @@ When scrolling beyond this limit, candidates may be truncated."
 (defun vertico-grid-right (&optional n)
   "Move N columns to the right in the grid."
   (interactive "p")
-  (let* ((page (* vertico-grid-rows vertico-grid--columns))
+  (let* ((page (* vertico-count vertico-grid--columns))
          (p (/ vertico--index page))
          (q (mod vertico--index page))
-         (x (/ q vertico-grid-rows))
-         (y (mod q vertico-grid-rows))
+         (x (/ q vertico-count))
+         (y (mod q vertico-count))
          (z (+ (* p page) (* vertico-grid--columns y) x (or n 1))))
     (setq x (mod z vertico-grid--columns)
           y (/ z vertico-grid--columns))
-    (vertico--goto (+ (* x vertico-grid-rows) (mod y vertico-grid-rows)
-                      (* (/ y vertico-grid-rows) page)))))
+    (vertico--goto (+ (* x vertico-count) (mod y vertico-count)
+                      (* (/ y vertico-count) page)))))
 
 ;;;###autoload
 (define-minor-mode vertico-grid-mode
