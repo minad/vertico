@@ -27,7 +27,7 @@
 ;;; Commentary:
 
 ;; This package is a Vertico extension, which prefixes candidates with
-;; indices and allows selection using prefix arguments.
+;; indices and allows you to select with prefix arguments.
 
 ;;; Code:
 

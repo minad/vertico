@@ -26,8 +26,8 @@
 
 ;;; Commentary:
 
-;; This package is a Vertico extension, which allows to display Vertico
-;; in a buffer instead of the minibuffer. The buffer display can be enabled
+;; This package is a Vertico extension, which displays Vertico in a
+;; buffer instead of the minibuffer. The buffer display can be enabled
 ;; by the `vertico-buffer-mode'.
 
 ;;; Code:

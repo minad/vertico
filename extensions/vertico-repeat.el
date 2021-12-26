@@ -26,8 +26,8 @@
 
 ;;; Commentary:
 
-;; This package is a Vertico extension, which allows to repeat the last
-;; Vertico session via the `vertico-repeat' command.
+;; This package is a Vertico extension, which enables repetition of the
+;; last Vertico session via the `vertico-repeat' command.
 ;;
 ;; (global-set-key "\M-r" #'vertico-repeat)
 ;;
