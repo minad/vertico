@@ -34,13 +34,13 @@
 ;;
 ;; Example:
 ;;
-;;    (setq vertico-multiform-commands
-;;            '((consult-line buffer)
-;;             (consult-imenu reverse buffer)
-;;             (execute-extended-command flat)))
+;;    (setq vertico-multiform-command-modes
+;;          '((consult-line buffer)
+;;            (consult-imenu reverse buffer)
+;;            (execute-extended-command flat)))
 ;;
-;;    (setq vertico-multiform-categories
-;;             '((file buffer grid)))
+;;    (setq vertico-multiform-category-modes
+;;          '((file buffer grid)))
 ;;
 ;;    (vertico-multiform-mode)
 
@@ -48,17 +48,31 @@
 
 (require 'vertico)
 
-(defcustom vertico-multiform-commands nil
+(defcustom vertico-multiform-command-modes nil
   "Alist of commands and list of modes to turn on per command.
-Takes precedence over `vertico-multiform-categories'."
+Takes precedence over `vertico-multiform-category-modes'."
   :group 'vertico
-  :type '(repeat (list symbol)))
+  :type '(alist :key-type symbol :value-type (repeat symbol)))
 
-(defcustom vertico-multiform-categories nil
-  "Alist of categories and list of modes to turn on per categories.
-Has lower precedence than `vertico-multiform-commands'."
+(defcustom vertico-multiform-category-modes nil
+  "Alist of categories and list of modes to turn on per category.
+Has lower precedence than `vertico-multiform-command-modes'."
   :group 'vertico
-  :type '(repeat (list symbol)))
+  :type '(alist :key-type symbol :value-type (repeat symbol)))
+
+(defcustom vertico-multiform-command-settings nil
+  "Alist of commands and alist of variables to set per command.
+Takes precedence over `vertico-multiform-category-settings'."
+  :group 'vertico
+  :type '(alist :key-type symbol
+                :value-type (alist :key-type symbol :value-type sexp)))
+
+(defcustom vertico-multiform-category-settings nil
+  "Alist of categories and alist of variables to set per category.
+Has lower precedence than `vertico-multiform-command-settings'."
+  :group 'vertico
+  :type '(alist :key-type symbol
+                :value-type (alist :key-type symbol :value-type sexp)))
 
 (defun vertico-multiform--advice (&rest app)
   "Advice for `vertico--advice' switching modes on and off.
@@ -69,22 +83,25 @@ APP is the original function call."
         (depth (1+ (recursion-depth))))
     (fset setup
           (lambda ()
+            (when (eq modes 'init)
+              (let ((cat (completion-metadata-get
+                          (completion-metadata
+                           (buffer-substring (minibuffer-prompt-end)
+                                             (max (minibuffer-prompt-end) (point)))
+                           minibuffer-completion-table
+                           minibuffer-completion-predicate)
+                          'category)))
+                (dolist (setting (or (and cat (alist-get cat vertico-multiform-category-settings))
+                                     (alist-get this-command vertico-multiform-command-settings)))
+                  (set (make-local-variable (car setting)) (cdr setting)))
+                (setq modes
+                      (mapcar (lambda (m)
+                                (let ((v (intern (format "vertico-%s-mode" m))))
+                                  (if (fboundp v) v m)))
+                              (or (and cat (alist-get cat vertico-multiform-category-modes))
+                                  (alist-get this-command vertico-multiform-command-modes))))))
             (cond
              ((= depth (recursion-depth))
-              (when (eq modes 'init)
-                (let ((cat (completion-metadata-get
-                            (completion-metadata
-                             (buffer-substring (minibuffer-prompt-end)
-                                               (max (minibuffer-prompt-end) (point)))
-                             minibuffer-completion-table
-                             minibuffer-completion-predicate)
-                            'category)))
-                  (setq modes
-                        (mapcar (lambda (m)
-                                  (let ((v (intern (format "vertico-%s-mode" m))))
-                                    (if (fboundp v) v m)))
-                                (or (and cat (alist-get cat vertico-multiform-categories))
-                                    (alist-get this-command vertico-multiform-commands))))))
               (mapc (lambda (f) (funcall f 1)) modes))
              ((= (1+ depth) (recursion-depth))
               (mapc (lambda (f) (funcall f -1)) modes)))))
