@@ -100,18 +100,14 @@ APP is the original function call."
                                   (if (fboundp v) v m)))
                               (or (and cat (alist-get cat vertico-multiform-category-modes))
                                   (alist-get this-command vertico-multiform-command-modes))))))
-            (cond
-             ((= depth (recursion-depth))
-              (mapc (lambda (f) (funcall f 1)) modes))
-             ((= (1+ depth) (recursion-depth))
-              (mapc (lambda (f) (funcall f -1)) modes)))))
+            (pcase (- (recursion-depth) depth)
+              (0 (mapc (lambda (f) (funcall f 1)) modes))
+              (1 (mapc (lambda (f) (funcall f -1)) modes)))))
     (fset exit
           (lambda ()
-            (cond
-             ((= depth (recursion-depth))
-              (mapc (lambda (f) (funcall f -1)) modes))
-             ((= (1+ depth) (recursion-depth))
-              (mapc (lambda (f) (funcall f 1)) modes)))))
+            (pcase (- (recursion-depth) depth)
+              (0 (mapc (lambda (f) (funcall f -1)) modes))
+              (1 (mapc (lambda (f) (funcall f 1)) modes)))))
     ;; NOTE: The setup/exit nesting is only correct for shallow recursions.
     ;; Hopefully nobody is crazy enough to work at recursion level 99.
     (add-hook 'minibuffer-setup-hook setup (+ -99 depth))
