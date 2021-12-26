@@ -35,12 +35,15 @@
 (require 'vertico)
 
 (defvar-local vertico-buffer--overlay nil)
-(defvar-local vertico-buffer--buffer nil)
+(defvar-local vertico-buffer--window nil)
+
+(defcustom vertico-buffer-hide-prompt t
+  "Hide prompt in the minibuffer."
+  :group 'vertico
+  :type 'boolean)
 
 (defcustom vertico-buffer-display-action
-  `(display-buffer-in-side-window
-    (window-height . ,(+ 3 vertico-count))
-    (side . top))
+  '(display-buffer-reuse-window)
   "Display action for the Vertico buffer."
   :group 'vertico
   :type `(choice
@@ -70,61 +73,66 @@
                   (side . bottom)))
           (sexp :tag "Other")))
 
-(defun vertico-buffer--display (lines)
-  "Display LINES in buffer."
-  (set-window-vscroll nil 100)
-  (let ((count (vertico--format-count))
-        (prompt (minibuffer-prompt))
-        (content (minibuffer-contents)))
-    (with-current-buffer vertico-buffer--buffer
-      (with-silent-modifications
-        (erase-buffer)
-        (insert (propertize (concat count prompt) 'face 'minibuffer-prompt)
-                content "\n" (string-join lines))))
-    (let ((win (or (get-buffer-window vertico-buffer--buffer)
-                   (display-buffer vertico-buffer--buffer vertico-buffer-display-action))))
-      (overlay-put vertico--candidates-ov 'window win)
-      (when vertico--count-ov
-        (overlay-put vertico--count-ov 'window win))
-      (set-window-point win (max (+ 1 (length prompt) (length count))
-                                 (+ (point) (length count))))
-      (with-current-buffer vertico-buffer--buffer
-        (setq-local truncate-lines (< (window-point win) (* 0.8 (window-width win))))))))
-
-(defun vertico-buffer--select (_)
-  "Ensure that cursor is only shown if minibuffer is selected."
-  (with-current-buffer (buffer-local-value 'vertico-buffer--buffer
-                                           (window-buffer (active-minibuffer-window)))
-    (if (eq (selected-window) (active-minibuffer-window))
-        (setq-local cursor-in-non-selected-windows 'box)
-      (setq-local cursor-in-non-selected-windows nil)
-      (goto-char (point-min)))))
-
-(defun vertico-buffer--destroy ()
-  "Destroy Vertico buffer."
-  (set-window-vscroll nil 0)
-  (kill-buffer vertico-buffer--buffer))
+(defun vertico-buffer--redisplay (win)
+  "Redisplay window WIN."
+  (when-let (mbwin (active-minibuffer-window))
+    (when (eq (window-buffer mbwin) (current-buffer))
+      (let ((old cursor-in-non-selected-windows)
+            (new (and (eq (selected-window) mbwin) 'box)))
+        (unless (eq new old)
+          (setq-local cursor-in-non-selected-windows new)
+          (force-mode-line-update t)))
+      (when (eq win vertico-buffer--window)
+        (setq-local truncate-lines (< (window-point vertico-buffer--window)
+                                      (* 0.8 (window-width vertico-buffer--window))))
+        (set-window-point vertico-buffer--window (point))
+        (when vertico-buffer-hide-prompt
+          (set-window-vscroll mbwin 100))))))
 
 (defun vertico-buffer--setup ()
   "Setup minibuffer overlay, which pushes the minibuffer content down."
-  (add-hook 'window-selection-change-functions 'vertico-buffer--select nil 'local)
-  (add-hook 'minibuffer-exit-hook 'vertico-buffer--destroy nil 'local)
-  (setq-local cursor-type '(bar . 0))
-  (setq vertico-buffer--overlay (make-overlay (point-max) (point-max) nil t t))
-  (overlay-put vertico-buffer--overlay 'window (selected-window))
-  (overlay-put vertico-buffer--overlay 'priority 1000)
-  (overlay-put vertico-buffer--overlay 'before-string "\n\n")
-  (setq vertico-buffer--buffer (get-buffer-create
-                                (if (= 1 (recursion-depth))
-                                    " *Vertico*"
-                                  (format " *Vertico-%s*" (1- (recursion-depth))))))
-  (with-current-buffer vertico-buffer--buffer
-    (add-hook 'window-selection-change-functions 'vertico-buffer--select nil 'local)
-    (setq-local display-line-numbers nil
-                truncate-lines t
-                show-trailing-whitespace nil
-                buffer-read-only t
-                cursor-in-non-selected-windows 'box)))
+  (add-hook 'pre-redisplay-functions 'vertico-buffer--redisplay nil 'local)
+  (let ((temp (generate-new-buffer "*vertico*")))
+    (setq vertico-buffer--window (display-buffer temp vertico-buffer-display-action))
+    (set-window-buffer vertico-buffer--window (current-buffer))
+    (kill-buffer temp))
+  (let ((sym (make-symbol "vertico-buffer--destroy"))
+        (mbwin (active-minibuffer-window))
+        (depth (recursion-depth))
+        (now (window-parameter vertico-buffer--window 'no-other-window))
+        (ndow (window-parameter vertico-buffer--window 'no-delete-other-windows)))
+    (fset sym (lambda ()
+                (when (= depth (recursion-depth))
+                  (when (window-live-p vertico-buffer--window)
+                    (set-window-parameter vertico-buffer--window 'no-other-window now)
+                    (set-window-parameter vertico-buffer--window 'no-delete-other-windows ndow))
+                  (when vertico-buffer-hide-prompt
+                    (set-window-vscroll mbwin 0))
+                  (remove-hook 'minibuffer-exit-hook sym))))
+    ;; NOTE: We cannot use a buffer-local minibuffer-exit-hook here.
+    ;; The hook will not be called when abnormally exiting the minibuffer
+    ;; from another buffer via `keyboard-escape-quit'.
+    (add-hook 'minibuffer-exit-hook sym))
+  (set-window-parameter vertico-buffer--window 'no-other-window t)
+  (set-window-parameter vertico-buffer--window 'no-delete-other-windows t)
+  (when vertico-buffer-hide-prompt
+    (overlay-put vertico--candidates-ov 'window vertico-buffer--window)
+    (when vertico--count-ov
+      (overlay-put vertico--count-ov 'window vertico-buffer--window))
+    (setq vertico-buffer--overlay (make-overlay (point-max) (point-max) nil t t))
+    (overlay-put vertico-buffer--overlay 'window (selected-window))
+    (overlay-put vertico-buffer--overlay 'priority 1000)
+    (overlay-put vertico-buffer--overlay 'before-string "\n\n"))
+  (setq-local show-trailing-whitespace nil
+              truncate-lines t
+              mode-line-format
+              (list (format " %s %s "
+                            (propertize "*Vertico*" 'face 'bold)
+                            (string-remove-suffix ": " (minibuffer-prompt)))
+                    '(:eval (vertico--format-count)))
+              cursor-in-non-selected-windows 'box
+              vertico-count (- (/ (window-pixel-height vertico-buffer--window)
+                                  (default-line-height)) 2)))
 
 ;;;###autoload
 (define-minor-mode vertico-buffer-mode
@@ -132,11 +140,11 @@
   :global t :group 'vertico
   (cond
    (vertico-buffer-mode
-    (advice-add #'vertico--display-candidates :override #'vertico-buffer--display)
-    (advice-add #'vertico--setup :after #'vertico-buffer--setup))
+    (advice-add #'vertico--setup :after #'vertico-buffer--setup)
+    (advice-add #'vertico--resize-window :override #'ignore))
    (t
-    (advice-remove #'vertico--display-candidates #'vertico-buffer--display)
-    (advice-remove #'vertico--setup #'vertico-buffer--setup))))
+    (advice-remove #'vertico--setup #'vertico-buffer--setup)
+    (advice-remove #'vertico--resize-window #'ignore))))
 
 (provide 'vertico-buffer)
 ;;; vertico-buffer.el ends here
