@@ -315,6 +315,33 @@ Furthermore you can tune buffer-local settings per command (or category).
         '((symbol (vertico-sort-function . vertico-sort-alpha))))
 #+end_src
 
+Combining these features allows us to fine-tune the completion display per
+command by adjusting the ~vertico-buffer-display-action~. We can for example reuse
+the current window for commands of the ~consult-grep~ category (~consult-grep~,
+~consult-git-grep~ and ~consult-ripgrep~). We have to define a display action
+function, which uses the ~(minibuffer-selected-window)~. Note that this
+configuration is incompatible with Consult preview, since the previewed buffer
+is usually shown in exactly this window. Nevertheless this snippet demonstrates
+the amount of flexibility of the configuration system.
+
+#+begin_src emacs-lisp
+  (defun display-buffer-in-selected (buffer alist)
+    "Show the buffer in the latest selected window, before the minibuffer started."
+    (window--display-buffer buffer (minibuffer-selected-window) 'reuse alist))
+
+  ;; Configure the display action
+  (setq vertico-multiform-category-settings
+        '((consult-grep
+           (vertico-display-buffer-action . (display-buffer-in-selected)))))
+
+  ;; Configure the buffer display
+  (setq vertico-multiform-category-modes
+        '((consult-grep buffer)))
+
+  ;; Disable preview for consult-grep commands
+  (consult-customize consult-ripgrep consult-git-grep consult-grep :preview-key nil)
+#+end_src
+
 * Complementary packages
   :properties:
   :custom_id: complementary-packages
