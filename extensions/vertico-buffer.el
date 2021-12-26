@@ -97,18 +97,18 @@
     (set-window-buffer vertico-buffer--window (current-buffer))
     (kill-buffer temp))
   (let ((sym (make-symbol "vertico-buffer--destroy"))
-        (mbwin (active-minibuffer-window))
         (depth (recursion-depth))
         (now (window-parameter vertico-buffer--window 'no-other-window))
         (ndow (window-parameter vertico-buffer--window 'no-delete-other-windows)))
     (fset sym (lambda ()
                 (when (= depth (recursion-depth))
-                  (when (window-live-p vertico-buffer--window)
-                    (set-window-parameter vertico-buffer--window 'no-other-window now)
-                    (set-window-parameter vertico-buffer--window 'no-delete-other-windows ndow))
-                  (when vertico-buffer-hide-prompt
-                    (set-window-vscroll mbwin 0))
-                  (remove-hook 'minibuffer-exit-hook sym))))
+                  (with-selected-window (active-minibuffer-window)
+                    (when (window-live-p vertico-buffer--window)
+                      (set-window-parameter vertico-buffer--window 'no-other-window now)
+                      (set-window-parameter vertico-buffer--window 'no-delete-other-windows ndow))
+                    (when vertico-buffer-hide-prompt
+                      (set-window-vscroll nil 0))
+                    (remove-hook 'minibuffer-exit-hook sym)))))
     ;; NOTE: We cannot use a buffer-local minibuffer-exit-hook here.
     ;; The hook will not be called when abnormally exiting the minibuffer
     ;; from another buffer via `keyboard-escape-quit'.

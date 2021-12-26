@@ -74,55 +74,60 @@ Has lower precedence than `vertico-multiform-command-settings'."
   :type '(alist :key-type symbol
                 :value-type (alist :key-type symbol :value-type sexp)))
 
-(defun vertico-multiform--advice (&rest app)
-  "Advice for `vertico--advice' switching modes on and off.
-APP is the original function call."
-  (let ((modes 'init)
-        (setup (make-symbol "vertico-multiform--setup"))
+(defvar vertico-multiform--stack nil)
+
+(defun vertico-multiform--toggle (arg)
+  "Toggle modes from stack depending on ARG."
+  (when-let (win (active-minibuffer-window))
+    (with-selected-window win
+      (dolist (f (car vertico-multiform--stack))
+        (funcall f arg)))))
+
+(defun vertico-multiform--setup ()
+  "Enable modes at minibuffer setup."
+  (let ((cat (completion-metadata-get
+              (completion-metadata
+               (buffer-substring (minibuffer-prompt-end)
+                                 (max (minibuffer-prompt-end) (point)))
+               minibuffer-completion-table
+               minibuffer-completion-predicate)
+              'category))
         (exit (make-symbol "vertico-multiform--exit"))
-        (depth (1+ (recursion-depth))))
-    (fset setup
-          (lambda ()
-            (when (eq modes 'init)
-              (let ((cat (completion-metadata-get
-                          (completion-metadata
-                           (buffer-substring (minibuffer-prompt-end)
-                                             (max (minibuffer-prompt-end) (point)))
-                           minibuffer-completion-table
-                           minibuffer-completion-predicate)
-                          'category)))
-                (dolist (setting (or (and cat (alist-get cat vertico-multiform-category-settings))
-                                     (alist-get this-command vertico-multiform-command-settings)))
-                  (set (make-local-variable (car setting)) (cdr setting)))
-                (setq modes
-                      (mapcar (lambda (m)
-                                (let ((v (intern (format "vertico-%s-mode" m))))
-                                  (if (fboundp v) v m)))
-                              (or (and cat (alist-get cat vertico-multiform-category-modes))
-                                  (alist-get this-command vertico-multiform-command-modes))))))
-            (pcase (- (recursion-depth) depth)
-              (0 (mapc (lambda (f) (funcall f 1)) modes))
-              (1 (mapc (lambda (f) (funcall f -1)) modes)))))
-    (fset exit
-          (lambda ()
-            (pcase (- (recursion-depth) depth)
-              (0 (mapc (lambda (f) (funcall f -1)) modes))
-              (1 (mapc (lambda (f) (funcall f 1)) modes)))))
-    ;; NOTE: The setup/exit nesting is only correct for shallow recursions.
-    ;; Hopefully nobody is crazy enough to work at recursion level 99.
-    (add-hook 'minibuffer-setup-hook setup (+ -99 depth))
-    (add-hook 'minibuffer-exit-hook exit (- 99 depth))
-    (unwind-protect
-        (apply app)
-      (remove-hook 'minibuffer-setup-hook setup)
-      (remove-hook 'minibuffer-exit-hook exit))))
+        (depth (recursion-depth)))
+    (fset exit (lambda ()
+                 (when (= depth (recursion-depth))
+                   (remove-hook 'minibuffer-exit-hook exit)
+                   (vertico-multiform--toggle -1)
+                   (pop vertico-multiform--stack))))
+    (add-hook 'minibuffer-exit-hook exit)
+    (dolist (x (or (and cat (alist-get cat vertico-multiform-category-settings))
+                   (alist-get this-command vertico-multiform-command-settings)))
+      (set (make-local-variable (car x)) (cdr x)))
+    (push (mapcar (lambda (m)
+                    (let ((v (intern (format "vertico-%s-mode" m))))
+                      (if (fboundp v) v m)))
+                  (or (and cat (alist-get cat vertico-multiform-category-modes))
+                      (alist-get this-command vertico-multiform-command-modes)))
+          vertico-multiform--stack)
+    (vertico-multiform--toggle 1)
+    (vertico--setup)))
+
+(defun vertico-multiform--advice (&rest app)
+  "Override advice for `vertico--advice' switching modes on and off.
+APP is the original function call."
+  (unwind-protect
+      (progn
+        (vertico-multiform--toggle -1)
+        (minibuffer-with-setup-hook #'vertico-multiform--setup
+          (apply app)))
+    (vertico-multiform--toggle 1)))
 
 ;;;###autoload
 (define-minor-mode vertico-multiform-mode
   "Configure Vertico in various forms per command."
   :global t :group 'vertico
   (if vertico-multiform-mode
-      (advice-add #'vertico--advice :around #'vertico-multiform--advice)
+      (advice-add #'vertico--advice :override #'vertico-multiform--advice)
     (advice-remove #'vertico--advice #'vertico-multiform--advice)))
 
 (provide 'vertico-multiform)
