@@ -302,7 +302,7 @@ turn on the mode and -1 to turn off the mode.
 #+begin_src emacs-lisp
   ;; Configure `consult-outline' as a scaled down TOC in a separate buffer
   (setq vertico-multiform-command-modes
-        '((consult-outline buffer (lambda (_) (text-scale-set -1)))))
+        `((consult-outline buffer ,(lambda (_) (text-scale-set -1)))))
 #+end_src
 
 Furthermore you can tune buffer-local settings per command (or category).
