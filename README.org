@@ -266,14 +266,16 @@
       :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
   #+end_src
 
-** Configure Vertico per-command or completion category
+** Configure Vertico per command or per completion category
 
 Vertico offers the =vertico-multiform-mode= which allows you to configure Vertico
 per command or per completion category. The =vertico-buffer-mode= enables a
 Helm-like buffer display, which takes more space but also displays more
 candidates. This verbose display mode is useful for commands like ~consult-imenu~
 or ~consult-outline~ since the buffer display allows you to get a better overview
-over the entire current buffer.
+over the entire current buffer. But for other commands you want to keep using
+the default Vertico display. ~vertico-multiform-mode~ solves this configuration
+problem!
 
 #+begin_src emacs-lisp
   ;; Enable vertico-multiform
@@ -294,10 +296,10 @@ over the entire current buffer.
           (consult-grep buffer)))
 #+end_src
 
-You can use your own functions or even lambdas to configure the per command (or
-per category) completion behavior. The function must have the same calling
-convention as a mode, i.e., it takes a single argument, which is either 1 to
-turn on the mode and -1 to turn off the mode.
+You can use your own functions or even lambdas to configure the completion
+behavior per command or per completion category. The function must have the
+calling convention of a mode, i.e., it takes a single argument, which is either
+1 to turn on the mode and -1 to turn off the mode.
 
 #+begin_src emacs-lisp
   ;; Configure `consult-outline' as a scaled down TOC in a separate buffer
@@ -315,14 +317,14 @@ Furthermore you can tune buffer-local settings per command (or category).
         '((symbol (vertico-sort-function . vertico-sort-alpha))))
 #+end_src
 
-Combining these features allows us to fine-tune the completion display per
-command by adjusting the ~vertico-buffer-display-action~. We can for example reuse
-the current window for commands of the ~consult-grep~ category (~consult-grep~,
+Combining these features allows us to fine-tune the completion display even more
+by adjusting the ~vertico-buffer-display-action~. We can for example reuse the
+current window for commands of the ~consult-grep~ category (~consult-grep~,
 ~consult-git-grep~ and ~consult-ripgrep~). We have to define a display action
-function, which uses the ~(minibuffer-selected-window)~. Note that this
+function, which uses the ~minibuffer-selected-window~. Note that this
 configuration is incompatible with Consult preview, since the previewed buffer
 is usually shown in exactly this window. Nevertheless this snippet demonstrates
-the amount of flexibility of the configuration system.
+the flexibility of the configuration system.
 
 #+begin_src emacs-lisp
   (defun display-buffer-in-selected (buffer alist)
