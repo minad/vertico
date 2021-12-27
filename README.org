@@ -266,7 +266,7 @@
       :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
   #+end_src
 
-** Configure Vertico per command or per completion category
+** Configure Vertico per command or completion category
 
 Vertico offers the =vertico-multiform-mode= which allows you to configure Vertico
 per command or per completion category. The =vertico-buffer-mode= enables a
