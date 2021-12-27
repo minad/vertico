@@ -36,12 +36,13 @@
 
 (defvar vertico-demand-map
   (let ((map (make-composed-keymap nil minibuffer-local-map)))
+    (define-key map [remap scroll-down-command] #'vertico-demand-show)
+    (define-key map [remap scroll-up-command] #'vertico-demand-show)
     (define-key map [remap next-line] #'vertico-demand-show)
     (define-key map [remap previous-line] #'vertico-demand-show)
     (define-key map [remap next-line-or-history-element] #'vertico-demand-show)
     (define-key map [remap previous-line-or-history-element] #'vertico-demand-show)
-    (define-key map "?" #'vertico-demand-show)
-    (define-key map "\r" #'vertico-demand-complete-and-exit)
+    (define-key map [remap exit-minibuffer] #'vertico-demand-complete-and-exit)
     (define-key map "\t" #'vertico-demand-complete)
     (define-key map [C-return] #'vertico-exit-input)
     map)
@@ -57,6 +58,8 @@
   "Complete minibuffer input and exit or open Vertico UI."
   (interactive)
   (cl-letf (((symbol-function #'minibuffer-completion-help) #'vertico-demand-show)
+            (minibuffer-completion-confirm nil)
+            (minibuffer--require-match t)
             (completion-cycle-threshold nil)) ;; disable cycling; ensure unique match!
     (minibuffer-complete-and-exit)))
 
