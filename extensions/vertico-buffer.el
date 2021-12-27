@@ -126,11 +126,11 @@
     (setq-local show-trailing-whitespace nil
                 truncate-lines t
                 mode-line-format
-                (list (format " %s %s "
+                (list (format " %s "
                               (propertize
-                               (format (if (< depth 2) "*Vertico*" "*Vertico[%s]*") depth)
-                               'face 'mode-line-buffer-id)
-                              (string-remove-suffix ": " (minibuffer-prompt)))
+                               (format (if (< depth 2) "*%s*" "*%s [%s]*")
+                                       (string-remove-suffix ": " (minibuffer-prompt)) depth)
+                               'face 'mode-line-buffer-id))
                       '(:eval (vertico--format-count)))
                 cursor-in-non-selected-windows 'box
                 vertico-count (- (/ (window-pixel-height vertico-buffer--window)
