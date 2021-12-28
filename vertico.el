@@ -496,14 +496,23 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                                (max 0 (+ vertico--index off 1 (- vertico-count))
                                     (min (- vertico--index off corr) vertico--scroll))))))
 
+(defun vertico--format-group-title (title cand)
+  "Format group TITLE given the current CAND."
+  (when (string-prefix-p title cand)
+    ;; Highlight title if title is a prefix of the candidate
+    (setq title (substring (car (funcall vertico--highlight-function
+                                         (list (propertize cand 'face 'vertico-group-title))))
+                           0 (length title)))
+    (vertico--remove-face 0 (length title) 'completions-first-difference title))
+  (format (concat vertico-group-format "\n") title))
+
 (defun vertico--arrange-candidates ()
   "Arrange candidates."
   (vertico--update-scroll)
   (let ((curr-line 0) lines)
     ;; Compute group titles
     (let* (title (index vertico--scroll)
-           (group-fun (vertico--metadata-get 'group-function))
-           (group-format (and group-fun vertico-group-format (concat vertico-group-format "\n")))
+           (group-fun (and vertico-group-format (vertico--metadata-get 'group-function)))
            (candidates
             (thread-last (seq-subseq vertico--candidates index
                                      (min (+ index vertico-count) vertico--total))
@@ -511,19 +520,10 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
               (vertico--affixate))))
       (dolist (cand candidates)
         (let ((str (car cand)))
-          (when-let (new-title (and group-format (funcall group-fun str nil)))
+          (when-let (new-title (and group-fun (funcall group-fun str nil)))
             (unless (equal title new-title)
               (setq title new-title)
-              ;; Restore group title highlighting for prefix titles
-              (when (string-prefix-p title str)
-                (setq title (substring
-                             (car (funcall
-                                   vertico--highlight-function
-                                   ;; Remove all properties from the title
-                                   (list (propertize str 'face 'vertico-group-title))))
-                             0 (length title)))
-                (vertico--remove-face 0 (length title) 'completions-first-difference title))
-              (push (format group-format title) lines))
+              (push (vertico--format-group-title title str) lines))
             (setcar cand (funcall group-fun str 'transform))))
         (when (= index vertico--index)
           (setq curr-line (length lines)))
