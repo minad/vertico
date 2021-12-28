@@ -141,7 +141,7 @@ When scrolling beyond this limit, candidates may be truncated."
       (vertico-flat-mode -1))
     ;; Shrink current minibuffer window
     (when-let (win (active-minibuffer-window))
-      (window-resize win (- (window-pixel-height)) nil nil 'pixelwise))
+      (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise))
     (define-key vertico-map [remap left-char] #'vertico-grid-left)
     (define-key vertico-map [remap right-char] #'vertico-grid-right)
     (advice-add #'vertico--arrange-candidates :override #'vertico-grid--arrange-candidates))

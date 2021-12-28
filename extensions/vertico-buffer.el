@@ -34,7 +34,6 @@
 
 (require 'vertico)
 
-(defvar-local vertico-buffer--overlay nil)
 (defvar-local vertico-buffer--window nil)
 
 (defcustom vertico-buffer-hide-prompt t
@@ -87,6 +86,7 @@
                                       (* 0.8 (window-width vertico-buffer--window))))
         (set-window-point vertico-buffer--window (point))
         (when vertico-buffer-hide-prompt
+          (window-resize mbwin (- (window-pixel-height mbwin)) nil nil 'pixelwise)
           (set-window-vscroll mbwin 100))))))
 
 (defun vertico-buffer--setup ()
@@ -118,11 +118,7 @@
     (when vertico-buffer-hide-prompt
       (overlay-put vertico--candidates-ov 'window vertico-buffer--window)
       (when vertico--count-ov
-        (overlay-put vertico--count-ov 'window vertico-buffer--window))
-      (setq vertico-buffer--overlay (make-overlay (point-max) (point-max) nil t t))
-      (overlay-put vertico-buffer--overlay 'window (selected-window))
-      (overlay-put vertico-buffer--overlay 'priority 1000)
-      (overlay-put vertico-buffer--overlay 'before-string "\n\n"))
+        (overlay-put vertico--count-ov 'window vertico-buffer--window)))
     (setq-local show-trailing-whitespace nil
                 truncate-lines t
                 mode-line-format

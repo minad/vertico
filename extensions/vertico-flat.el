@@ -111,7 +111,7 @@
       (vertico-grid-mode -1))
     ;; Shrink current minibuffer window
     (when-let (win (active-minibuffer-window))
-      (window-resize win (- (window-pixel-height)) nil nil 'pixelwise))
+      (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise))
     (advice-add #'vertico--arrange-candidates :override #'vertico-flat--arrange-candidates)
     (advice-add #'vertico--display-candidates :override #'vertico-flat--display))
    (t
