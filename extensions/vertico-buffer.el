@@ -115,10 +115,9 @@
     (add-hook 'minibuffer-exit-hook sym)
     (set-window-parameter vertico-buffer--window 'no-other-window t)
     (set-window-parameter vertico-buffer--window 'no-delete-other-windows t)
-    (when vertico-buffer-hide-prompt
-      (overlay-put vertico--candidates-ov 'window vertico-buffer--window)
-      (when vertico--count-ov
-        (overlay-put vertico--count-ov 'window vertico-buffer--window)))
+    (overlay-put vertico--candidates-ov 'window vertico-buffer--window)
+    (when (and vertico-buffer-hide-prompt vertico--count-ov)
+      (overlay-put vertico--count-ov 'window vertico-buffer--window))
     (setq-local show-trailing-whitespace nil
                 truncate-lines t
                 mode-line-format
