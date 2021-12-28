@@ -124,7 +124,10 @@
                 (list (format " %s "
                               (propertize
                                (format (if (< depth 2) "*%s*" "*%s [%s]*")
-                                       (string-remove-suffix ": " (minibuffer-prompt)) depth)
+                                       (replace-regexp-in-string
+                                        ":? *\\'" ""
+                                        (minibuffer-prompt))
+                                       depth)
                                'face 'mode-line-buffer-id))
                       '(:eval (vertico--format-count)))
                 cursor-in-non-selected-windows 'box
