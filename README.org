@@ -315,8 +315,16 @@ Furthermore you can tune buffer-local settings per command (or category).
   ;; Change the default sorting function
   (setq vertico-multiform-command-settings
         '((describe-symbol (vertico-sort-function . vertico-sort-alpha))))
+
   (setq vertico-multiform-category-settings
-        '((symbol (vertico-sort-function . vertico-sort-alpha))))
+        '((symbol (vertico-sort-function . vertico-sort-alpha))
+          (file (vertico-sort-function . sort-directories-first))))
+
+  ;; Sort directories before files
+  (defun sort-directories-first (files)
+    (setq files (vertico-sort-history-length-alpha files))
+    (nconc (seq-filter (lambda (x) (string-suffix-p "/" x)) files)
+           (seq-remove (lambda (x) (string-suffix-p "/" x)) files)))
 #+end_src
 
 Combining these features allows us to fine-tune the completion display even more
