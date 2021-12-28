@@ -35,7 +35,7 @@
   - Support for annotations (~annotation-function~ and ~affixation-function~)
   - Support for grouping and group cycling commands (~group-function~)
 
-  [[https://github.com/minad/vertico/blob/screenshots/mx.png?raw=true]]
+  [[https://github.com/minad/vertico/blob/screenshots/vertico-mx.png?raw=true]]
 
 * Key bindings
 
@@ -268,7 +268,7 @@
 
 ** Configure Vertico per command or completion category
 
-[[https://github.com/minad/vertico/blob/screenshots/ripgrep.png?raw=true]]
+[[https://github.com/minad/vertico/blob/screenshots/vertico-ripgrep.png?raw=true]]
 
 Vertico offers the =vertico-multiform-mode= which allows you to configure Vertico
 per command or per completion category. The =vertico-buffer-mode= enables a
