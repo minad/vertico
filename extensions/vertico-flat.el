@@ -28,7 +28,10 @@
 
 ;; This package is a Vertico extension providing a horizontal display.
 ;;
-;; The mode can be bound to a key to toggle to the horizontal display.
+;; The mode can be enabled pre command or completion category via
+;; `vertico-multiform-mode'. Alternatively the mode can be bound to a
+;; key to toggle to the horizontal display:
+;;
 ;; (define-key vertico-map "\M-F" #'vertico-flat-mode)
 
 ;;; Code:
@@ -49,6 +52,13 @@
   "Formatting strings."
   :type 'plist
   :group 'vertico)
+
+(defvar vertico-flat-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map [remap left-char] #'vertico-previous)
+    (define-key map [remap right-char] #'vertico-next)
+    map)
+  "Additional keymap activated in flat mode.")
 
 (defun vertico-flat--display (candidates)
   "Display CANDIDATES horizontally."
@@ -100,6 +110,10 @@
       (push (plist-get vertico-flat-format :ellipsis) result))
     (nreverse result)))
 
+(defun vertico-flat--setup ()
+  "Setup flat keymap."
+  (use-local-map (make-composed-keymap vertico-flat-map (current-local-map))))
+
 ;;;###autoload
 (define-minor-mode vertico-flat-mode
   "Flat, horizontal display for Vertico."
@@ -113,10 +127,12 @@
     (when-let (win (active-minibuffer-window))
       (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise))
     (advice-add #'vertico--arrange-candidates :override #'vertico-flat--arrange-candidates)
-    (advice-add #'vertico--display-candidates :override #'vertico-flat--display))
+    (advice-add #'vertico--display-candidates :override #'vertico-flat--display)
+    (advice-add #'vertico--setup :after #'vertico-flat--setup))
    (t
     (advice-remove #'vertico--arrange-candidates #'vertico-flat--arrange-candidates)
-    (advice-remove #'vertico--display-candidates #'vertico-flat--display))))
+    (advice-remove #'vertico--display-candidates #'vertico-flat--display)
+    (advice-remove #'vertico--setup #'vertico-flat--setup))))
 
 (provide 'vertico-flat)
 ;;; vertico-flat.el ends here

@@ -33,7 +33,7 @@
 (require 'vertico)
 
 (defvar vertico-reverse-map
-  (let ((map (make-composed-keymap nil vertico-map)))
+  (let ((map (make-sparse-keymap)))
     (define-key map [remap beginning-of-buffer] #'vertico-last)
     (define-key map [remap minibuffer-beginning-of-buffer] #'vertico-last)
     (define-key map [remap end-of-buffer] #'vertico-first)
@@ -46,7 +46,7 @@
     (define-key map [remap backward-paragraph] #'vertico-next-group)
     (define-key map [remap forward-paragraph] #'vertico-previous-group)
     map)
-  "Vertico keymap adapted to reversed candidate order.")
+  "Additional keymap activated in reverse mode.")
 
 (defun vertico-reverse--display (lines)
   "Display LINES in reverse."
@@ -61,7 +61,7 @@
 
 (defun vertico-reverse--setup ()
   "Setup reverse keymap."
-  (use-local-map vertico-reverse-map))
+  (use-local-map (make-composed-keymap vertico-reverse-map (current-local-map))))
 
 ;;;###autoload
 (define-minor-mode vertico-reverse-mode

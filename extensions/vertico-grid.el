@@ -28,7 +28,10 @@
 
 ;; This package is a Vertico extension providing a grid display.
 ;;
-;; The mode can be bound to a key to toggle to the grid display.
+;; The mode can be enabled pre command or completion category via
+;; `vertico-multiform-mode'. Alternatively the mode can be bound to a
+;; key to toggle to the grid display:
+;;
 ;; (define-key vertico-map "\M-G" #'vertico-grid-mode)
 
 ;;; Code:
@@ -58,6 +61,13 @@
 When scrolling beyond this limit, candidates may be truncated."
   :type 'integer
   :group 'vertico)
+
+(defvar vertico-grid-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map [remap left-char] #'vertico-grid-left)
+    (define-key map [remap right-char] #'vertico-grid-right)
+    map)
+  "Additional keymap activated in grid mode.")
 
 (defvar-local vertico-grid--columns 1
   "Current number of grid columns.")
@@ -130,6 +140,10 @@ When scrolling beyond this limit, candidates may be truncated."
     (vertico--goto (+ (* x vertico-count) (mod y vertico-count)
                       (* (/ y vertico-count) page)))))
 
+(defun vertico-grid--setup ()
+  "Setup grid keymap."
+  (use-local-map (make-composed-keymap vertico-grid-map (current-local-map))))
+
 ;;;###autoload
 (define-minor-mode vertico-grid-mode
   "Grid display for Vertico."
@@ -142,13 +156,11 @@ When scrolling beyond this limit, candidates may be truncated."
     ;; Shrink current minibuffer window
     (when-let (win (active-minibuffer-window))
       (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise))
-    (define-key vertico-map [remap left-char] #'vertico-grid-left)
-    (define-key vertico-map [remap right-char] #'vertico-grid-right)
-    (advice-add #'vertico--arrange-candidates :override #'vertico-grid--arrange-candidates))
+    (advice-add #'vertico--arrange-candidates :override #'vertico-grid--arrange-candidates)
+    (advice-add #'vertico--setup :after #'vertico-grid--setup))
    (t
-    (assq-delete-all 'left-char (assq 'remap vertico-map))
-    (assq-delete-all 'right-char (assq 'remap vertico-map))
-    (advice-remove #'vertico--arrange-candidates #'vertico-grid--arrange-candidates))))
+    (advice-remove #'vertico--arrange-candidates #'vertico-grid--arrange-candidates)
+    (advice-remove #'vertico--setup #'vertico-grid--setup))))
 
 ;; Emacs 28: Do not show Vertico commands in M-X
 (dolist (sym '(vertico-grid-left vertico-grid-right))
