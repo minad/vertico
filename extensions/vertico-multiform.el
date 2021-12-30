@@ -47,6 +47,8 @@
 ;;; Code:
 
 (require 'vertico)
+(eval-when-compile
+  (require 'cl-lib))
 
 (defcustom vertico-multiform-command-modes nil
   "Alist of commands/regexps and list of modes to turn on per command.
