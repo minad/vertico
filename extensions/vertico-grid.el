@@ -140,10 +140,6 @@ When scrolling beyond this limit, candidates may be truncated."
     (vertico--goto (+ (* x vertico-count) (mod y vertico-count)
                       (* (/ y vertico-count) page)))))
 
-(defun vertico-grid--setup ()
-  "Setup grid keymap."
-  (use-local-map (make-composed-keymap vertico-grid-map (current-local-map))))
-
 ;;;###autoload
 (define-minor-mode vertico-grid-mode
   "Grid display for Vertico."
@@ -156,11 +152,13 @@ When scrolling beyond this limit, candidates may be truncated."
     ;; Shrink current minibuffer window
     (when-let (win (active-minibuffer-window))
       (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise))
-    (advice-add #'vertico--arrange-candidates :override #'vertico-grid--arrange-candidates)
-    (advice-add #'vertico--setup :after #'vertico-grid--setup))
+    (unless (eq (cadr vertico-map) vertico-grid-map)
+      (setcdr vertico-map (cons vertico-grid-map (cdr vertico-map))))
+    (advice-add #'vertico--arrange-candidates :override #'vertico-grid--arrange-candidates))
    (t
-    (advice-remove #'vertico--arrange-candidates #'vertico-grid--arrange-candidates)
-    (advice-remove #'vertico--setup #'vertico-grid--setup))))
+    (when (eq (cadr vertico-map) vertico-grid-map)
+      (setcdr vertico-map (cddr vertico-map)))
+    (advice-remove #'vertico--arrange-candidates #'vertico-grid--arrange-candidates))))
 
 ;; Emacs 28: Do not show Vertico commands in M-X
 (dolist (sym '(vertico-grid-left vertico-grid-right))

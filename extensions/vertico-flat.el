@@ -110,10 +110,6 @@
       (push (plist-get vertico-flat-format :ellipsis) result))
     (nreverse result)))
 
-(defun vertico-flat--setup ()
-  "Setup flat keymap."
-  (use-local-map (make-composed-keymap vertico-flat-map (current-local-map))))
-
 ;;;###autoload
 (define-minor-mode vertico-flat-mode
   "Flat, horizontal display for Vertico."
@@ -126,13 +122,15 @@
     ;; Shrink current minibuffer window
     (when-let (win (active-minibuffer-window))
       (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise))
+    (unless (eq (cadr vertico-map) vertico-flat-map)
+      (setcdr vertico-map (cons vertico-flat-map (cdr vertico-map))))
     (advice-add #'vertico--arrange-candidates :override #'vertico-flat--arrange-candidates)
-    (advice-add #'vertico--display-candidates :override #'vertico-flat--display)
-    (advice-add #'vertico--setup :after #'vertico-flat--setup))
+    (advice-add #'vertico--display-candidates :override #'vertico-flat--display))
    (t
+    (when (eq (cadr vertico-map) vertico-flat-map)
+      (setcdr vertico-map (cddr vertico-map)))
     (advice-remove #'vertico--arrange-candidates #'vertico-flat--arrange-candidates)
-    (advice-remove #'vertico--display-candidates #'vertico-flat--display)
-    (advice-remove #'vertico--setup #'vertico-flat--setup))))
+    (advice-remove #'vertico--display-candidates #'vertico-flat--display))))
 
 (provide 'vertico-flat)
 ;;; vertico-flat.el ends here

@@ -59,21 +59,19 @@
     (overlay-put vertico--candidates-ov 'before-string string))
   (vertico--resize-window (length lines)))
 
-(defun vertico-reverse--setup ()
-  "Setup reverse keymap."
-  (use-local-map (make-composed-keymap vertico-reverse-map (current-local-map))))
-
 ;;;###autoload
 (define-minor-mode vertico-reverse-mode
   "Reverse the Vertico display."
   :global t :group 'vertico
   (cond
    (vertico-reverse-mode
-    (advice-add #'vertico--display-candidates :override #'vertico-reverse--display)
-    (advice-add #'vertico--setup :after #'vertico-reverse--setup))
+    (unless (eq (cadr vertico-map) vertico-reverse-map)
+      (setcdr vertico-map (cons vertico-reverse-map (cdr vertico-map))))
+    (advice-add #'vertico--display-candidates :override #'vertico-reverse--display))
    (t
-    (advice-remove #'vertico--display-candidates #'vertico-reverse--display)
-    (advice-remove #'vertico--setup #'vertico-reverse--setup))))
+    (when (eq (cadr vertico-map) vertico-reverse-map)
+      (setcdr vertico-map (cddr vertico-map)))
+    (advice-remove #'vertico--display-candidates #'vertico-reverse--display))))
 
 (provide 'vertico-reverse)
 ;;; vertico-reverse.el ends here
