@@ -33,6 +33,9 @@
 ;; key to toggle to the horizontal display:
 ;;
 ;; (define-key vertico-map "\M-F" #'vertico-flat-mode)
+;;
+;; `vertico-flat-mode' can be made to look like `ido-mode' by setting
+;; `vertico-cycle' is `t'.
 
 ;;; Code:
 
