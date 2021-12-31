@@ -456,12 +456,12 @@ packages a try and judge for yourself.
     is great if you prefer an unobtrusive UI since it can be configured to open
     only when requested. Furthermore since Mct uses a fully functional buffer
     you can reuse all your familar buffer commands inside the completions
-    buffer. The main distinction to an approach like Vertico's is that
-    ~*Completions*~ buffer displays all matching candidates. On the one hand this
-    is good since it allows you to interact with all the candidates and jump
-    around with Isearch or Avy. On the other hand it necessarily causes a small
-    slowdown in comparison to Vertico, which only displays a small subset of
-    candidates.
+    buffer. The main distinction to Vertico's approach is that ~*Completions*~
+    buffer displays all matching candidates. On the one hand this is good since
+    it allows you to interact with all the candidates and jump around with
+    Isearch or Avy. On the other hand it necessarily causes a slowdown in
+    comparison to Vertico, which only displays a subset of candidates. Mct
+    supports completion in region via its ~mct-region-mode~.
 
 * Problematic completion commands
 
