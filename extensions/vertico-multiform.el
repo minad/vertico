@@ -57,10 +57,10 @@ Takes precedence over `vertico-multiform-category-modes'."
   :type '(alist :key-type (choice symbol regexp) :value-type (repeat symbol)))
 
 (defcustom vertico-multiform-category-modes nil
-  "Alist of categories and list of modes to turn on per category.
+  "Alist of categories/regexps and list of modes to turn on per category.
 Has lower precedence than `vertico-multiform-command-modes'."
   :group 'vertico
-  :type '(alist :key-type symbol :value-type (repeat symbol)))
+  :type '(alist :key-type (choice symbol regexp) :value-type (repeat symbol)))
 
 (defcustom vertico-multiform-command-settings nil
   "Alist of commands/regexps and alist of variables to set per command.
@@ -70,10 +70,10 @@ Takes precedence over `vertico-multiform-category-settings'."
                 :value-type (alist :key-type symbol :value-type sexp)))
 
 (defcustom vertico-multiform-category-settings nil
-  "Alist of categories and alist of variables to set per category.
+  "Alist of categories/regexps and alist of variables to set per category.
 Has lower precedence than `vertico-multiform-command-settings'."
   :group 'vertico
-  :type '(alist :key-type symbol
+  :type '(alist :key-type (choice symbol regexp)
                 :value-type (alist :key-type symbol :value-type sexp)))
 
 (defvar vertico-multiform--stack nil)
@@ -112,14 +112,14 @@ The keys in LIST can be symbols or regexps."
                    (vertico-multiform--toggle -1)
                    (pop vertico-multiform--stack))))
     (add-hook 'minibuffer-exit-hook exit)
-    (dolist (x (or (and cat (alist-get cat vertico-multiform-category-settings))
-                   (vertico-multiform--lookup this-command vertico-multiform-command-settings)))
+    (dolist (x (or (vertico-multiform--lookup this-command vertico-multiform-command-settings)
+                   (and cat (vertico-multiform--lookup cat vertico-multiform-category-settings))))
       (set (make-local-variable (car x)) (cdr x)))
     (push (mapcar (lambda (m)
                     (let ((v (intern (format "vertico-%s-mode" m))))
                       (if (fboundp v) v m)))
-                  (or (and cat (alist-get cat vertico-multiform-category-modes))
-                      (vertico-multiform--lookup this-command vertico-multiform-command-modes)))
+                  (or (vertico-multiform--lookup this-command vertico-multiform-command-modes)
+                      (and cat (vertico-multiform--lookup cat vertico-multiform-category-modes))))
           vertico-multiform--stack)
     (vertico-multiform--toggle 1)
     (vertico--setup)))
