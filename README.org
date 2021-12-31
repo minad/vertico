@@ -327,6 +327,19 @@ Furthermore you can tune buffer-local settings per command (or category).
            (seq-remove (lambda (x) (string-suffix-p "/" x)) files)))
 #+end_src
 
+As another example, the following code uses ~vertico-flat~ and ~vertico-cycle~ to
+emulate ~(ido-mode 'buffer)~, i.e. Ido when it is enabled only for completion of
+buffer names. ~vertico-cycle~ set to ~t~ is necessary here to prevent completion
+candidates from disappearing when they scroll off-screen to the left.
+
+#+begin_src emacs-lisp
+  (setq vertico-multiform-category-modes
+        '((buffer flat)))
+
+  (setq vertico-multiform-category-settings
+        '((buffer (vertico-cycle . t))))
+#+end_src
+
 Combining these features allows us to fine-tune the completion display even more
 by adjusting the ~vertico-buffer-display-action~. We can for example reuse the
 current window for commands of the ~consult-grep~ category (~consult-grep~,
