@@ -35,7 +35,7 @@
 ;; (define-key vertico-map "\M-F" #'vertico-flat-mode)
 ;;
 ;; `vertico-flat-mode' can be made to look like `ido-mode' by setting
-;; `vertico-cycle' is `t'.
+;; `vertico-cycle' to `t'.
 
 ;;; Code:
 
