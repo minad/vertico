@@ -134,8 +134,7 @@
                                         ":? *\\'" ""
                                         (minibuffer-prompt))
                                        depth)
-                               'face 'mode-line-buffer-id))
-                      '(:eval (vertico--format-count)))
+                               'face 'mode-line-buffer-id)))
                 cursor-in-non-selected-windows 'box
                 vertico-count (- (/ (window-pixel-height vertico-buffer--window)
                                     (default-line-height)) 2))))
