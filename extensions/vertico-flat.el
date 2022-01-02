@@ -65,7 +65,7 @@
     map)
   "Additional keymap activated in flat mode.")
 
-(defun vertico-flat--display (candidates)
+(defun vertico-flat--display-candidates (candidates)
   "Display CANDIDATES horizontally."
   (setq-local truncate-lines nil
               resize-mini-windows t)
@@ -130,12 +130,12 @@
     (unless (eq (cadr vertico-map) vertico-flat-map)
       (setcdr vertico-map (cons vertico-flat-map (cdr vertico-map))))
     (advice-add #'vertico--arrange-candidates :override #'vertico-flat--arrange-candidates)
-    (advice-add #'vertico--display-candidates :override #'vertico-flat--display))
+    (advice-add #'vertico--display-candidates :override #'vertico-flat--display-candidates))
    (t
     (when (eq (cadr vertico-map) vertico-flat-map)
       (setcdr vertico-map (cddr vertico-map)))
     (advice-remove #'vertico--arrange-candidates #'vertico-flat--arrange-candidates)
-    (advice-remove #'vertico--display-candidates #'vertico-flat--display))))
+    (advice-remove #'vertico--display-candidates #'vertico-flat--display-candidates))))
 
 (provide 'vertico-flat)
 ;;; vertico-flat.el ends here

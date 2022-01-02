@@ -48,7 +48,7 @@
     map)
   "Additional keymap activated in reverse mode.")
 
-(defun vertico-reverse--display (lines)
+(defun vertico-reverse--display-candidates (lines)
   "Display LINES in reverse."
   (move-overlay vertico--candidates-ov (point-min) (point-min))
   (setq lines (nreverse lines))
@@ -67,11 +67,11 @@
    (vertico-reverse-mode
     (unless (eq (cadr vertico-map) vertico-reverse-map)
       (setcdr vertico-map (cons vertico-reverse-map (cdr vertico-map))))
-    (advice-add #'vertico--display-candidates :override #'vertico-reverse--display))
+    (advice-add #'vertico--display-candidates :override #'vertico-reverse--display-candidates))
    (t
     (when (eq (cadr vertico-map) vertico-reverse-map)
       (setcdr vertico-map (cddr vertico-map)))
-    (advice-remove #'vertico--display-candidates #'vertico-reverse--display))))
+    (advice-remove #'vertico--display-candidates #'vertico-reverse--display-candidates))))
 
 (provide 'vertico-reverse)
 ;;; vertico-reverse.el ends here
