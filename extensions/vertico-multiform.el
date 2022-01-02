@@ -43,7 +43,14 @@
 ;;          '((file buffer grid)))
 ;;
 ;;    (vertico-multiform-mode)
-
+;;
+;; Temporary toggling between the different display modes is
+;; possible. Bind the following commands:
+;;
+;; (define-key vertico-map "\M-G" #'vertico-multiform-grid)
+;; (define-key vertico-map "\M-F" #'vertico-multiform-flat)
+;; (define-key vertico-map "\M-V" #'vertico-multiform-vertical)
+;;
 ;;; Code:
 
 (require 'vertico)
@@ -91,11 +98,11 @@ Has lower precedence than `vertico-multiform-command-settings'."
   "Lookup symbolic KEY in LIST.
 The keys in LIST can be symbols or regexps."
   (and (symbolp key)
-       (cl-loop for x in list
-                if (if (symbolp (car x))
+       (seq-find (lambda (x)
+                   (if (symbolp (car x))
                        (eq key (car x))
-                     (string-match-p (car x) (symbol-name key)))
-                return x)))
+                     (string-match-p (car x) (symbol-name key))))
+                 list)))
 
 (defun vertico-multiform--setup ()
   "Enable modes at minibuffer setup."
@@ -143,6 +150,41 @@ APP is the original function call."
   (if vertico-multiform-mode
       (advice-add #'vertico--advice :override #'vertico-multiform--advice)
     (advice-remove #'vertico--advice #'vertico-multiform--advice)))
+
+(defun vertico-multiform--disable-temporarily (mode)
+  "Disable MODE temporarily in minibuffer."
+  (unless (minibufferp)
+    (user-error "`%s' must be called inside the minibuffer" this-command))
+  (unless vertico-multiform-mode
+    (user-error "`vertico-multiform-mode' is not enabled"))
+  (when (and (boundp mode) (symbol-value mode))
+    (funcall mode -1)
+    (setf (car vertico-multiform--stack)
+          (remove mode (car vertico-multiform--stack)))))
+
+(defun vertico-multiform--enable-temporarily (mode)
+  "Enable MODE temporarily in minibuffer."
+  (unless (and (boundp mode) (symbol-value mode))
+    (funcall mode 1)
+    (push mode (car vertico-multiform--stack))))
+
+(defun vertico-multiform--toggle-temporarily (mode)
+  "Toggle MODE temporarily in minibuffer."
+  (if (and (boundp mode) (symbol-value mode))
+      (vertico-multiform--disable-temporarily mode)
+    (vertico-multiform--enable-temporarily mode)))
+
+(defun vertico-multiform-grid ()
+  "Toggle the grid display."
+  (interactive)
+  (vertico-multiform--disable-temporarily 'vertico-flat-mode)
+  (vertico-multiform--toggle-temporarily 'vertico-grid-mode))
+
+(defun vertico-multiform-flat ()
+  "Toggle the flat display."
+  (interactive)
+  (vertico-multiform--disable-temporarily 'vertico-grid-mode)
+  (vertico-multiform--toggle-temporarily 'vertico-flat-mode))
 
 (provide 'vertico-multiform)
 ;;; vertico-multiform.el ends here

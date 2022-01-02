@@ -29,10 +29,10 @@
 ;; This package is a Vertico extension providing a horizontal display.
 ;;
 ;; The mode can be enabled globally or via `vertico-multiform-mode' per
-;; command or completion category. Alternatively the mode can be bound
-;; to a key to toggle to the flat display:
+;; command or completion category. Alternatively the flat display can be
+;; toggled temporarily if `vertico-multiform-mode' is enabled:
 ;;
-;; (define-key vertico-map "\M-F" #'vertico-flat-mode)
+;; (define-key vertico-map "\M-F" #'vertico-multiform-flat)
 ;;
 ;; The flat display can be made to look like `ido-mode' by setting
 ;; `vertico-cycle' to t. See also the `vertico-flat-format'
@@ -119,14 +119,11 @@
 (define-minor-mode vertico-flat-mode
   "Flat, horizontal display for Vertico."
   :global t :group 'vertico
+  ;; Shrink current minibuffer window
+  (when-let (win (active-minibuffer-window))
+    (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise))
   (cond
    (vertico-flat-mode
-    ;; Allow toggling between flat and grid modes
-    (when (and (bound-and-true-p vertico-grid-mode) (fboundp 'vertico-grid-mode))
-      (vertico-grid-mode -1))
-    ;; Shrink current minibuffer window
-    (when-let (win (active-minibuffer-window))
-      (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise))
     (unless (eq (cadr vertico-map) vertico-flat-map)
       (setcdr vertico-map (cons vertico-flat-map (cdr vertico-map))))
     (advice-add #'vertico--arrange-candidates :override #'vertico-flat--arrange-candidates)
