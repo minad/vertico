@@ -48,11 +48,12 @@
   :group 'vertico)
 
 (defcustom vertico-flat-format
-  '(:left      #("{" 0 1 (face minibuffer-prompt))
-    :separator #(" | " 0 3 (face minibuffer-prompt))
-    :right     #("}" 0 1 (face minibuffer-prompt))
-    :ellipsis  #("…" 0 1 (face minibuffer-prompt))
-    :no-match  "[No match]")
+  '(:left       #("{" 0 1 (face minibuffer-prompt))
+    :separator  #(" | " 0 3 (face minibuffer-prompt))
+    :right      #("}" 0 1 (face minibuffer-prompt))
+    :ellipsis   #("…" 0 1 (face minibuffer-prompt))
+    :only-match #("[%s]" 0 4 (face success))
+    :no-match   #("[No match]" 0 10 (face error)))
   "Formatting strings."
   :type 'plist
   :group 'vertico)
@@ -72,11 +73,13 @@
   (overlay-put
    vertico--candidates-ov 'after-string
    (concat #(" " 0 1 (cursor t))
-           (if candidates
-               (concat (plist-get vertico-flat-format :left)
-                       (string-join candidates (plist-get vertico-flat-format :separator))
-                       (plist-get vertico-flat-format :right))
-             (plist-get vertico-flat-format :no-match)))))
+           (pcase candidates
+             ('nil (plist-get vertico-flat-format :no-match))
+             ((and `(,cand) (let fmt (plist-get vertico-flat-format :only-match)) (guard fmt))
+              (format fmt (substring-no-properties cand)))
+             (_ (concat (plist-get vertico-flat-format :left)
+                        (string-join candidates (plist-get vertico-flat-format :separator))
+                        (plist-get vertico-flat-format :right)))))))
 
 (defun vertico-flat--arrange-candidates ()
   "Arrange candidates."
