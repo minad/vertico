@@ -110,7 +110,7 @@ When scrolling beyond this limit, candidates may be truncated."
                          (string-width (or (nth (+ row (* col vertico-count)) cands) ""))))))
     (dotimes (col (1- vertico-grid--columns))
       (cl-incf (aref width (1+ col)) (+ (aref width col) sep)))
-    (cl-loop for row from 0 to (1- vertico-count) collect
+    (cl-loop for row from 0 to (1- (min vertico-count vertico--total)) collect
              (let ((line (list "\n")))
                (cl-loop for col from (1- vertico-grid--columns) downto 0 do
                         (when-let (cand (nth (+ row (* col vertico-count)) cands))
