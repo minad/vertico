@@ -286,14 +286,14 @@ problem!
   ;; Configure the display per command.
   ;; Use a buffer with indices for imenu
   ;; and a flat (Ido-like) menu for M-x.
-  (setq vertico-multiform-command-modes
+  (setq vertico-multiform-commands
         '((consult-imenu buffer indexed)
           (execute-extended-command flat)))
 
   ;; Configure the display per completion category.
   ;; Use the grid display for files and a buffer
   ;; for the consult-grep commands.
-  (setq vertico-multiform-category-modes
+  (setq vertico-multiform-categories
         '((file grid)
           (consult-grep buffer)))
 #+end_src
@@ -305,18 +305,18 @@ calling convention of a mode, i.e., it takes a single argument, which is either
 
 #+begin_src emacs-lisp
   ;; Configure `consult-outline' as a scaled down TOC in a separate buffer
-  (setq vertico-multiform-command-modes
+  (setq vertico-multiform-commands
         `((consult-outline buffer ,(lambda (_) (text-scale-set -1)))))
 #+end_src
 
-Furthermore you can tune buffer-local settings per command (or category).
+Furthermore you can tune buffer-local settings per command or category.
 
 #+begin_src emacs-lisp
   ;; Change the default sorting function
-  (setq vertico-multiform-command-settings
+  (setq vertico-multiform-commands
         '((describe-symbol (vertico-sort-function . vertico-sort-alpha))))
 
-  (setq vertico-multiform-category-settings
+  (setq vertico-multiform-categories
         '((symbol (vertico-sort-function . vertico-sort-alpha))
           (file (vertico-sort-function . sort-directories-first))))
 
@@ -325,19 +325,6 @@ Furthermore you can tune buffer-local settings per command (or category).
     (setq files (vertico-sort-history-length-alpha files))
     (nconc (seq-filter (lambda (x) (string-suffix-p "/" x)) files)
            (seq-remove (lambda (x) (string-suffix-p "/" x)) files)))
-#+end_src
-
-As another example, the following code uses ~vertico-flat~ and ~vertico-cycle~ to
-emulate ~(ido-mode 'buffer)~, i.e. Ido when it is enabled only for completion of
-buffer names. ~vertico-cycle~ set to ~t~ is necessary here to prevent completion
-candidates from disappearing when they scroll off-screen to the left.
-
-#+begin_src emacs-lisp
-  (setq vertico-multiform-category-modes
-        '((buffer flat)))
-
-  (setq vertico-multiform-category-settings
-        '((buffer (vertico-cycle . t))))
 #+end_src
 
 Combining these features allows us to fine-tune the completion display even more
@@ -349,17 +336,24 @@ in exactly this window. Nevertheless this snippet demonstrates the flexibility
 of the configuration system.
 
 #+begin_src emacs-lisp
-  ;; Configure the display action
-  (setq vertico-multiform-category-settings
+  ;; Configure the buffer display and the buffer display action
+  (setq vertico-multiform-categories
         '((consult-grep
+           buffer
            (vertico-buffer-display-action . (display-buffer-same-window)))))
-
-  ;; Configure the buffer display
-  (setq vertico-multiform-category-modes
-        '((consult-grep buffer)))
 
   ;; Disable preview for consult-grep commands
   (consult-customize consult-ripgrep consult-git-grep consult-grep :preview-key nil)
+#+end_src
+
+As another example, the following code uses ~vertico-flat~ and ~vertico-cycle~ to
+emulate ~(ido-mode 'buffer)~, i.e., Ido when it is enabled only for completion of
+buffer names. ~vertico-cycle~ set to ~t~ is necessary here to prevent completion
+candidates from disappearing when they scroll off-screen to the left.
+
+#+begin_src emacs-lisp
+  (setq vertico-multiform-categories
+        '((buffer flat (vertico-cycle . t))))
 #+end_src
 
 * Complementary packages

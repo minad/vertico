@@ -34,12 +34,12 @@
 ;;
 ;; Example:
 ;;
-;;    (setq vertico-multiform-command-modes
+;;    (setq vertico-multiform-commands
 ;;          '((consult-line buffer)
 ;;            (consult-imenu reverse buffer)
 ;;            (execute-extended-command flat)))
 ;;
-;;    (setq vertico-multiform-category-modes
+;;    (setq vertico-multiform-categories
 ;;          '((file buffer grid)))
 ;;
 ;;    (vertico-multiform-mode)
@@ -56,31 +56,19 @@
 (eval-when-compile
   (require 'cl-lib))
 
-(defcustom vertico-multiform-command-modes nil
-  "Alist of commands/regexps and list of modes to turn on per command.
-Takes precedence over `vertico-multiform-category-modes'."
+(defcustom vertico-multiform-commands nil
+  "Alist of commands/regexps and list of settings to turn on per command.
+A setting can either be a mode symbol, a function or a cons cell of variable
+name and variable value. Takes precedence over `vertico-multiform-categories'."
   :group 'vertico
-  :type '(alist :key-type (choice symbol regexp) :value-type (repeat symbol)))
+  :type '(alist :key-type (choice symbol regexp) :value-type (repeat sexp)))
 
-(defcustom vertico-multiform-category-modes nil
-  "Alist of categories/regexps and list of modes to turn on per category.
-Has lower precedence than `vertico-multiform-command-modes'."
+(defcustom vertico-multiform-categories nil
+  "Alist of categories/regexps and list of settings to turn on per category.
+A setting can either be a mode symbol, a function or a cons cell of variable
+name and value. Has lower precedence than `vertico-multiform-commands'."
   :group 'vertico
-  :type '(alist :key-type (choice symbol regexp) :value-type (repeat symbol)))
-
-(defcustom vertico-multiform-command-settings nil
-  "Alist of commands/regexps and alist of variables to set per command.
-Takes precedence over `vertico-multiform-category-settings'."
-  :group 'vertico
-  :type '(alist :key-type (choice symbol regexp)
-                :value-type (alist :key-type symbol :value-type sexp)))
-
-(defcustom vertico-multiform-category-settings nil
-  "Alist of categories/regexps and alist of variables to set per category.
-Has lower precedence than `vertico-multiform-command-settings'."
-  :group 'vertico
-  :type '(alist :key-type (choice symbol regexp)
-                :value-type (alist :key-type symbol :value-type sexp)))
+  :type '(alist :key-type (choice symbol regexp) :value-type (repeat sexp)))
 
 (defvar vertico-multiform--stack nil)
 
@@ -121,13 +109,14 @@ The keys in LIST can be symbols or regexps."
                    (vertico-multiform--toggle -1)
                    (pop vertico-multiform--stack))))
     (add-hook 'minibuffer-exit-hook exit)
-    (dolist (x (cdr (or (vertico-multiform--lookup this-command vertico-multiform-command-settings)
-                        (and cat (vertico-multiform--lookup cat vertico-multiform-category-settings)))))
-      (set (make-local-variable (car x)) (cdr x)))
-    (dolist (x (cdr (or (vertico-multiform--lookup this-command vertico-multiform-command-modes)
-                        (and cat (vertico-multiform--lookup cat vertico-multiform-category-modes)))))
-      (let ((sym (and (symbolp x) (intern-soft (format "vertico-%s-mode" x)))))
-        (push (if (and sym (fboundp sym)) sym x) modes)))
+    (dolist (x (cdr (or (vertico-multiform--lookup this-command vertico-multiform-commands)
+                        (and cat (vertico-multiform--lookup cat vertico-multiform-categories)))))
+      (pcase x
+        ((or (pred functionp) (pred symbolp))
+         (let ((sym (and (symbolp x) (intern-soft (format "vertico-%s-mode" x)))))
+           (push (if (and sym (fboundp sym)) sym x) modes)))
+        (`(,k . ,v) (set (make-local-variable k) v))
+        (_ (error "Invalid multiform setting %S" x))))
     (push modes vertico-multiform--stack)
     (vertico-multiform--toggle 1)
     (vertico--setup)))
@@ -150,7 +139,7 @@ APP is the original function call."
       (advice-add #'vertico--advice :override #'vertico-multiform--advice)
     (advice-remove #'vertico--advice #'vertico-multiform--advice)))
 
-(defun vertico-multiform--disable-temporarily (mode)
+(defun vertico-multiform--temporary-disable (mode)
   "Disable MODE temporarily in minibuffer."
   (unless (minibufferp)
     (user-error "`%s' must be called inside the minibuffer" this-command))
@@ -161,29 +150,29 @@ APP is the original function call."
     (setf (car vertico-multiform--stack)
           (remove mode (car vertico-multiform--stack)))))
 
-(defun vertico-multiform--enable-temporarily (mode)
+(defun vertico-multiform--temporary-enable (mode)
   "Enable MODE temporarily in minibuffer."
   (unless (and (boundp mode) (symbol-value mode))
     (funcall mode 1)
     (push mode (car vertico-multiform--stack))))
 
-(defun vertico-multiform--toggle-temporarily (mode)
+(defun vertico-multiform--temporary-toggle (mode)
   "Toggle MODE temporarily in minibuffer."
   (if (and (boundp mode) (symbol-value mode))
-      (vertico-multiform--disable-temporarily mode)
-    (vertico-multiform--enable-temporarily mode)))
+      (vertico-multiform--temporary-disable mode)
+    (vertico-multiform--temporary-enable mode)))
 
 (defun vertico-multiform-grid ()
   "Toggle the grid display."
   (interactive)
-  (vertico-multiform--disable-temporarily 'vertico-flat-mode)
-  (vertico-multiform--toggle-temporarily 'vertico-grid-mode))
+  (vertico-multiform--temporary-disable 'vertico-flat-mode)
+  (vertico-multiform--temporary-toggle 'vertico-grid-mode))
 
 (defun vertico-multiform-flat ()
   "Toggle the flat display."
   (interactive)
-  (vertico-multiform--disable-temporarily 'vertico-grid-mode)
-  (vertico-multiform--toggle-temporarily 'vertico-flat-mode))
+  (vertico-multiform--temporary-disable 'vertico-grid-mode)
+  (vertico-multiform--temporary-toggle 'vertico-flat-mode))
 
 (provide 'vertico-multiform)
 ;;; vertico-multiform.el ends here
