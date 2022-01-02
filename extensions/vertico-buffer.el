@@ -90,7 +90,7 @@
           (set-window-vscroll mbwin 100))))))
 
 (defun vertico-buffer--setup ()
-  "Setup minibuffer overlay, which pushes the minibuffer content down."
+  "Setup buffer display."
   (add-hook 'pre-redisplay-functions 'vertico-buffer--redisplay nil 'local)
   (let ((action vertico-buffer-display-action)
         (temp (generate-new-buffer "*vertico*")))
