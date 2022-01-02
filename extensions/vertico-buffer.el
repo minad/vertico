@@ -123,6 +123,9 @@
       (overlay-put vertico--count-ov 'window vertico-buffer--window))
     (setq-local show-trailing-whitespace nil
                 truncate-lines t
+                face-remapping-alist
+                (copy-tree `((mode-line-inactive mode-line)
+                             ,@face-remapping-alist))
                 mode-line-format
                 (list (format " %s "
                               (propertize
