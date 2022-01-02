@@ -67,7 +67,7 @@
   ;; Reset overlays
   (dolist (buf (buffer-list))
     (when-let (ov (buffer-local-value 'vertico--candidates-ov buf))
-      (overlay-put vertico--candidates-ov 'before-string nil)))
+      (overlay-put ov 'before-string nil)))
   (cond
    (vertico-reverse-mode
     (unless (eq (cadr vertico-map) vertico-reverse-map)
