@@ -136,6 +136,11 @@ APP is the original function call."
 (define-minor-mode vertico-multiform-mode
   "Configure Vertico in various forms per command."
   :global t :group 'vertico
+  (when (/= (recursion-depth) 0)
+    (warn "vertico-multiform must not be toggled from recursive minibuffers"))
+  (when vertico-multiform--stack
+    (warn "vertico-multiform state is inconsistent")
+    (setq vertico-multiform--stack nil))
   (if vertico-multiform-mode
       (advice-add #'vertico--advice :override #'vertico-multiform--advice)
     (advice-remove #'vertico--advice #'vertico-multiform--advice)))
