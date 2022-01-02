@@ -580,11 +580,9 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (defun vertico--display-count ()
   "Update count overlay `vertico--count-ov'."
-  (when vertico--count-ov
-    (move-overlay vertico--count-ov (point-min) (point-min))
-    ;; Set priority for compatibility with `minibuffer-depth-indicate-mode'
-    (overlay-put vertico--count-ov 'priority 1)
-    (overlay-put vertico--count-ov 'before-string (vertico--format-count))))
+  (move-overlay vertico--count-ov (point-min) (point-min))
+  (overlay-put vertico--count-ov 'before-string
+               (if vertico-count-format (vertico--format-count) "")))
 
 (defun vertico--prompt-selection ()
   "Highlight the prompt if selected."
@@ -750,8 +748,9 @@ When the prefix argument is 0, the group order is reset."
   "Setup completion UI."
   (setq vertico--input t
         vertico--candidates-ov (make-overlay (point-max) (point-max) nil t t)
-        vertico--count-ov (and vertico-count-format
-                               (make-overlay (point-min) (point-min) nil t t)))
+        vertico--count-ov (make-overlay (point-min) (point-min) nil t t))
+  ;; Set priority for compatibility with `minibuffer-depth-indicate-mode'
+  (overlay-put vertico--count-ov 'priority 1)
   (setq-local completion-auto-help nil
               completion-show-inline-help nil)
   (use-local-map vertico-map)
