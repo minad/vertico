@@ -288,7 +288,7 @@ problem!
   ;; and a flat (Ido-like) menu for M-x.
   (setq vertico-multiform-commands
         '((consult-imenu buffer indexed)
-          (execute-extended-command flat)))
+          (execute-extended-command unobtrusive)))
 
   ;; Configure the display per completion category.
   ;; Use the grid display for files and a buffer

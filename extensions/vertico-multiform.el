@@ -50,6 +50,7 @@
 ;; (define-key vertico-map "\M-G" #'vertico-multiform-grid)
 ;; (define-key vertico-map "\M-F" #'vertico-multiform-flat)
 ;; (define-key vertico-map "\M-R" #'vertico-multiform-reverse)
+;; (define-key vertico-map "\M-U" #'vertico-multiform-unobtrusive)
 ;;
 ;;; Code:
 
@@ -145,8 +146,8 @@ APP is the original function call."
       (advice-add #'vertico--advice :override #'vertico-multiform--advice)
     (advice-remove #'vertico--advice #'vertico-multiform--advice)))
 
-(defun vertico-multiform--temporary-disable (mode)
-  "Disable MODE temporarily in minibuffer."
+(defun vertico-multiform--display-disable (mode)
+  "Disable display MODE temporarily in minibuffer."
   (unless (minibufferp)
     (user-error "`%s' must be called inside the minibuffer" this-command))
   (unless vertico-multiform-mode
@@ -156,34 +157,39 @@ APP is the original function call."
     (setf (car vertico-multiform--stack)
           (remove mode (car vertico-multiform--stack)))))
 
-(defun vertico-multiform--temporary-enable (mode)
-  "Enable MODE temporarily in minibuffer."
+(defun vertico-multiform--display-enable (mode)
+  "Enable display MODE temporarily in minibuffer."
   (unless (and (boundp mode) (symbol-value mode))
     (funcall mode 1)
     (push mode (car vertico-multiform--stack))))
 
-(defun vertico-multiform--temporary-toggle (mode)
-  "Toggle MODE temporarily in minibuffer."
+(defun vertico--multiform--display-disable-all ()
+  "Disable all display modes."
+  (dolist (m '(vertico-flat-mode vertico-grid-mode
+               vertico-reverse-mode vertico-unobtrusive-mode))
+    (vertico-multiform--display-disable m)))
+
+(defun vertico-multiform--display-toggle (mode)
+  "Toggle display MODE temporarily in minibuffer."
   (if (and (boundp mode) (symbol-value mode))
-      (vertico-multiform--temporary-disable mode)
-    (dolist (m '(vertico-flat-mode vertico-grid-mode vertico-reverse-mode))
-      (vertico-multiform--temporary-disable m))
-    (vertico-multiform--temporary-enable mode)))
+      (vertico-multiform--display-disable mode)
+    (vertico--multiform--display-disable-all)
+    (vertico-multiform--display-enable mode)))
 
-(defun vertico-multiform-grid ()
-  "Toggle the grid display."
-  (interactive)
-  (vertico-multiform--temporary-toggle 'vertico-grid-mode))
+(defmacro vertico-multiform--display-define-toggle (name)
+  "Define toggle for display mode NAME."
+  (let ((sym (intern (format "vertico-multiform-%s" name))))
+    `(progn
+       (defun ,sym ()
+         ,(format "Toggle the %s display." name)
+         (interactive)
+         (vertico-multiform--display-toggle ',(intern (format "vertico-%s-mode" name))))
+       (put ',sym 'completion-predicate #'vertico--command-p))))
 
-(defun vertico-multiform-flat ()
-  "Toggle the flat display."
-  (interactive)
-  (vertico-multiform--temporary-toggle 'vertico-flat-mode))
-
-(defun vertico-multiform-reverse ()
-  "Toggle the reverse display."
-  (interactive)
-  (vertico-multiform--temporary-toggle 'vertico-reverse-mode))
+(vertico-multiform--display-define-toggle grid)
+(vertico-multiform--display-define-toggle flat)
+(vertico-multiform--display-define-toggle reverse)
+(vertico-multiform--display-define-toggle unobtrusive)
 
 (provide 'vertico-multiform)
 ;;; vertico-multiform.el ends here
