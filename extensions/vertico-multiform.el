@@ -49,7 +49,6 @@
 ;;
 ;; (define-key vertico-map "\M-G" #'vertico-multiform-grid)
 ;; (define-key vertico-map "\M-F" #'vertico-multiform-flat)
-;; (define-key vertico-map "\M-V" #'vertico-multiform-vertical)
 ;;
 ;;; Code:
 
