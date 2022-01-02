@@ -73,11 +73,12 @@
   (overlay-put
    vertico--candidates-ov 'after-string
    (concat #(" " 0 1 (cursor t))
-           (pcase candidates
-             ('nil (plist-get vertico-flat-format :no-match))
-             ((and `(,cand) (let fmt (plist-get vertico-flat-format :only-match)) (guard fmt))
-              (format fmt (substring-no-properties cand)))
-             (_ (concat (plist-get vertico-flat-format :left)
+           (cond
+            ((and (not candidates) (plist-get vertico-flat-format :no-match)))
+            ((and (= vertico--total 1)
+                  (when-let (fmt (plist-get vertico-flat-format :only-match))
+                    (format fmt (substring-no-properties (car candidates))))))
+             (t (concat (plist-get vertico-flat-format :left)
                         (string-join candidates (plist-get vertico-flat-format :separator))
                         (plist-get vertico-flat-format :right)))))))
 
