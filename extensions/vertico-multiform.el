@@ -80,10 +80,12 @@ Has lower precedence than `vertico-multiform-command-settings'."
 
 (defun vertico-multiform--toggle (arg)
   "Toggle modes from stack depending on ARG."
-  (when-let (win (active-minibuffer-window))
+  (when-let ((win (active-minibuffer-window))
+             (modes (car vertico-multiform--stack)))
+    (when (= arg -1) (setq modes (reverse modes)))
     (with-selected-window win
-      (dolist (f (car vertico-multiform--stack))
-        (funcall f arg)))))
+      (dolist (m modes)
+        (funcall m arg)))))
 
 (defun vertico-multiform--lookup (key list)
   "Lookup symbolic KEY in LIST.
