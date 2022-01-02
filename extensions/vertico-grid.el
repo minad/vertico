@@ -28,9 +28,9 @@
 
 ;; This package is a Vertico extension providing a grid display.
 ;;
-;; The mode can be enabled pre command or completion category via
-;; `vertico-multiform-mode'. Alternatively the mode can be bound to a
-;; key to toggle to the grid display:
+;; The mode can be enabled globally or via `vertico-multiform-mode' per
+;; command or completion category. Alternatively the mode can be bound
+;; to a key to toggle to the grid display:
 ;;
 ;; (define-key vertico-map "\M-G" #'vertico-grid-mode)
 
