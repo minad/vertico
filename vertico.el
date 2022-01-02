@@ -555,7 +555,9 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (defun vertico--resize-window (height)
   "Resize active minibuffer window to HEIGHT."
-  (setq-local truncate-lines (< (point) (* 0.8 (window-width))))
+  (setq-local truncate-lines (< (point) (* 0.8 (window-width)))
+              resize-mini-windows 'grow-only
+              max-mini-window-height 1.0)
   (unless (frame-root-window-p (active-minibuffer-window))
     (unless vertico-resize
       (setq height (max height vertico-count)))
@@ -750,10 +752,7 @@ When the prefix argument is 0, the group order is reset."
         vertico--candidates-ov (make-overlay (point-max) (point-max) nil t t)
         vertico--count-ov (and vertico-count-format
                                (make-overlay (point-min) (point-min) nil t t)))
-  (setq-local resize-mini-windows 'grow-only
-              max-mini-window-height 1.0
-              truncate-lines t
-              completion-auto-help nil
+  (setq-local completion-auto-help nil
               completion-show-inline-help nil)
   (use-local-map vertico-map)
   ;; Use -90 to ensure that the exhibit hook runs early such that the

@@ -65,7 +65,8 @@
 
 (defun vertico-flat--display (candidates)
   "Display CANDIDATES horizontally."
-  (setq-local truncate-lines nil)
+  (setq-local truncate-lines nil
+              resize-mini-windows t)
   (move-overlay vertico--candidates-ov (point-max) (point-max))
   (overlay-put
    vertico--candidates-ov 'after-string
