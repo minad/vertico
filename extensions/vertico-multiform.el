@@ -49,6 +49,7 @@
 ;;
 ;; (define-key vertico-map "\M-G" #'vertico-multiform-grid)
 ;; (define-key vertico-map "\M-F" #'vertico-multiform-flat)
+;; (define-key vertico-map "\M-R" #'vertico-multiform-reverse)
 ;;
 ;;; Code:
 
@@ -160,19 +161,24 @@ APP is the original function call."
   "Toggle MODE temporarily in minibuffer."
   (if (and (boundp mode) (symbol-value mode))
       (vertico-multiform--temporary-disable mode)
+    (dolist (m '(vertico-flat-mode vertico-grid-mode vertico-reverse-mode))
+      (vertico-multiform--temporary-disable m))
     (vertico-multiform--temporary-enable mode)))
 
 (defun vertico-multiform-grid ()
   "Toggle the grid display."
   (interactive)
-  (vertico-multiform--temporary-disable 'vertico-flat-mode)
   (vertico-multiform--temporary-toggle 'vertico-grid-mode))
 
 (defun vertico-multiform-flat ()
   "Toggle the flat display."
   (interactive)
-  (vertico-multiform--temporary-disable 'vertico-grid-mode)
   (vertico-multiform--temporary-toggle 'vertico-flat-mode))
+
+(defun vertico-multiform-reverse ()
+  "Toggle the reverse display."
+  (interactive)
+  (vertico-multiform--temporary-toggle 'vertico-reverse-mode))
 
 (provide 'vertico-multiform)
 ;;; vertico-multiform.el ends here

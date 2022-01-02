@@ -56,13 +56,18 @@
     (setq lines (nconc (make-list (max 0 (- vertico-count (length lines))) "\n") lines)))
   (let ((string (apply #'concat lines)))
     (add-face-text-property 0 (length string) 'default 'append string)
-    (overlay-put vertico--candidates-ov 'before-string string))
+    (overlay-put vertico--candidates-ov 'before-string string)
+    (overlay-put vertico--candidates-ov 'after-string nil))
   (vertico--resize-window (length lines)))
 
 ;;;###autoload
 (define-minor-mode vertico-reverse-mode
   "Reverse the Vertico display."
   :global t :group 'vertico
+  ;; Reset overlays
+  (dolist (buf (buffer-list))
+    (when-let (ov (buffer-local-value 'vertico--candidates-ov buf))
+      (overlay-put vertico--candidates-ov 'before-string nil)))
   (cond
    (vertico-reverse-mode
     (unless (eq (cadr vertico-map) vertico-reverse-map)
