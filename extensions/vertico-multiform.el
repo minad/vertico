@@ -164,17 +164,14 @@ APP is the original function call."
     (funcall mode 1)
     (push mode (car vertico-multiform--stack))))
 
-(defun vertico--multiform--display-disable-all ()
-  "Disable all display modes."
-  (dolist (m '(vertico-flat-mode vertico-grid-mode
-               vertico-reverse-mode vertico-unobtrusive-mode))
-    (vertico-multiform--display-disable m)))
-
 (defun vertico-multiform--display-toggle (mode)
   "Toggle display MODE temporarily in minibuffer."
+  (dolist (m '(vertico-unobtrusive-mode vertico-flat-mode
+               vertico-grid-mode vertico-reverse-mode))
+    (unless (eq m mode)
+      (vertico-multiform--display-disable m)))
   (if (and (boundp mode) (symbol-value mode))
-      (vertico-multiform--display-disable mode)
-    (vertico--multiform--display-disable-all)
+      (vertico--multiform--display-disable-all)
     (vertico-multiform--display-enable mode)))
 
 (defmacro vertico-multiform--display-define-toggle (name)
