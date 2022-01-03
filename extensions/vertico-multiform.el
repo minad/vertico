@@ -63,14 +63,14 @@
 A setting can either be a mode symbol, a function or a cons cell of variable
 name and variable value. Takes precedence over `vertico-multiform-categories'."
   :group 'vertico
-  :type '(alist :key-type (choice symbol regexp) :value-type (repeat sexp)))
+  :type '(alist :key-type (choice symbol regexp (const t)) :value-type (repeat sexp)))
 
 (defcustom vertico-multiform-categories nil
   "Alist of categories/regexps and list of settings to turn on per category.
 A setting can either be a mode symbol, a function or a cons cell of variable
 name and value. Has lower precedence than `vertico-multiform-commands'."
   :group 'vertico
-  :type '(alist :key-type (choice symbol regexp) :value-type (repeat sexp)))
+  :type '(alist :key-type (choice symbol regexp (const t)) :value-type (repeat sexp)))
 
 (defvar vertico-multiform--stack nil)
 
@@ -88,9 +88,10 @@ name and value. Has lower precedence than `vertico-multiform-commands'."
 The keys in LIST can be symbols or regexps."
   (and (symbolp key)
        (seq-find (lambda (x)
-                   (if (symbolp (car x))
-                       (eq key (car x))
-                     (string-match-p (car x) (symbol-name key))))
+                   (cond
+                    ((eq (car x) t))
+                    ((symbolp (car x)) (eq key (car x)))
+                    ((string-match-p (car x) (symbol-name key)))))
                  list)))
 
 (defun vertico-multiform--setup ()
@@ -112,7 +113,7 @@ The keys in LIST can be symbols or regexps."
                    (pop vertico-multiform--stack))))
     (add-hook 'minibuffer-exit-hook exit)
     (dolist (x (cdr (or (vertico-multiform--lookup this-command vertico-multiform-commands)
-                        (and cat (vertico-multiform--lookup cat vertico-multiform-categories)))))
+                        (vertico-multiform--lookup cat vertico-multiform-categories))))
       (pcase x
         ((or (pred functionp) (pred symbolp))
          (let ((sym (and (symbolp x) (intern-soft (format "vertico-%s-mode" x)))))
