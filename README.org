@@ -370,28 +370,30 @@ candidates from disappearing when they scroll off-screen to the left.
   - [[https://github.com/oantolin/orderless][Orderless]]: Advanced completion style
 
   In order to get accustomed with the package ecosystem, I recommed the
-  following approach:
+  following quick start approach:
 
-  1. Start with plain Emacs.
+  1. Start with plain Emacs (~emacs -Q~).
   2. Install and enable Vertico to get incremental minibuffer completion.
   3. Install Orderless and/or configure the built-in completion styles
      for more flexible minibuffer filtering.
   4. Install Marginalia if you like rich minibuffer annotations.
   5. Install Embark and add two keybindings for ~embark-dwim~ and ~embark-act~.
-     I am using =M-.= and =C-.=. These commands allow you to act on the object
-     at point or in the minibuffer.
+     I am using the mnemonic keybindings =M-.= and =C-.= since these commands allow
+     you to act on the object at point or in the minibuffer.
   6. Install Consult if you want additional featureful completion commands,
      e.g, the buffer switcher ~consult-buffer~ with preview or the line-based
      search ~consult-line~.
   7. Install Embark-Consult and Wgrep for export from =consult-line= to =occur-mode=
      buffers and from =consult-grep= to editable =grep-mode= buffers.
+  8. Fine tune Vertico with [[#extensions][extensions]].
 
-  You don't have to use all of these components. Use only the ones you like and
-  the ones which fit well into your setup. The steps 1. to 4. introduce no new
-  commands over plain Emacs. Step 5. introduces the new commands ~embark-act~ and
-  ~embark-dwim~. In step 6. you get the Consult commands, some offer new
-  functionality not present in Emacs already (e.g., ~consult-line~) and some are
-  substitutes (e.g., ~consult-buffer~ for ~switch-to-buffer~).
+  The ecosystem is modular. You don't have to use all of these components. Use
+  only the ones you like and the ones which fit well into your setup. The
+  steps 1. to 4. introduce no new commands over plain Emacs. Step 5. introduces
+  the new commands ~embark-act~ and ~embark-dwim~. In step 6. you get the Consult
+  commands, some offer new functionality not present in Emacs already (e.g.,
+  ~consult-line~) and some are substitutes (e.g., ~consult-buffer~ for
+  ~switch-to-buffer~).
 
 * Child frames and Popups
 
