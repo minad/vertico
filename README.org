@@ -25,7 +25,7 @@
 
 * Features
 
-  - Vertical display with arrow key navigation
+  - Vertical display with arrow key navigation (see the [[#extensions][extensions]] for additional display modes)
   - Prompt shows the current candidate index and the total number of candidates
   - The current candidate is inserted with =TAB= and selected with =RET=
   - Non-existing candidates can be entered by moving the point to the prompt line
