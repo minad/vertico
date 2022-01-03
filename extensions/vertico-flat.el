@@ -52,8 +52,9 @@
     :separator  #(" | " 0 3 (face minibuffer-prompt))
     :right      #("}" 0 1 (face minibuffer-prompt))
     :ellipsis   #("…" 0 1 (face minibuffer-prompt))
-    :only-match #("[%s]" 0 4 (face success))
-    :no-match   #("[No match]" 0 10 (face error)))
+    :only-match #("[%s]" 0 1 (face minibuffer-prompt)
+                  1 3 (face success) 3 4 (face minibuffer-prompt))
+    :no-match   "[No match]")
   "Formatting strings."
   :type 'plist
   :group 'vertico)
