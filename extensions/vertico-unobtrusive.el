@@ -50,6 +50,7 @@
   (cond
    (vertico-unobtrusive-mode
     (unless vertico-unobtrusive--orig-count
+      (push '(vertico-current . default) (default-value 'face-remapping-alist))
       (setq vertico-unobtrusive--orig-count vertico-count
             vertico-unobtrusive--orig-count-format vertico-count-format
             vertico-count 1
@@ -59,6 +60,9 @@
     (vertico-flat-mode 1))
    (t
     (when vertico-unobtrusive--orig-count
+      (setq-default face-remapping-alist
+                    (remove '(vertico-current . default)
+                            (default-value 'face-remapping-alist)))
       (setq vertico-count vertico-unobtrusive--orig-count
             vertico-count-format vertico-unobtrusive--orig-count-format
             vertico-flat-format (nthcdr 4 vertico-flat-format)
