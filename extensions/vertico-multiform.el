@@ -171,7 +171,7 @@ APP is the original function call."
     (unless (eq m mode)
       (vertico-multiform--display-disable m)))
   (if (and (boundp mode) (symbol-value mode))
-      (vertico--multiform--display-disable-all)
+      (vertico-multiform--display-disable mode)
     (vertico-multiform--display-enable mode)))
 
 (defmacro vertico-multiform--display-define-toggle (name)
