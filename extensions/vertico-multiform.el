@@ -40,7 +40,9 @@
 ;;            (execute-extended-command flat)))
 ;;
 ;;    (setq vertico-multiform-categories
-;;          '((file buffer grid)))
+;;          '((file buffer grid))
+;;            (imenu (:not indexed mouse))
+;;            (symbol (vertico-sort-function . vertico-sort-alpha))))
 ;;
 ;;    (vertico-multiform-mode)
 ;;
@@ -60,15 +62,16 @@
 
 (defcustom vertico-multiform-commands nil
   "Alist of commands/regexps and list of settings to turn on per command.
-A setting can either be a mode symbol, a function or a cons cell of variable
-name and variable value. Takes precedence over `vertico-multiform-categories'."
+Takes precedence over `vertico-multiform-categories'. A setting can
+either be a mode symbol, a function, an inverted mode symbol or
+function, or a cons cell of variable name and value."
   :group 'vertico
   :type '(alist :key-type (choice symbol regexp (const t)) :value-type (repeat sexp)))
 
 (defcustom vertico-multiform-categories nil
   "Alist of categories/regexps and list of settings to turn on per category.
-A setting can either be a mode symbol, a function or a cons cell of variable
-name and value. Has lower precedence than `vertico-multiform-commands'."
+See `vertico-multiform-commands' on details about the settings.
+Has lower precedence than `vertico-multiform-commands'."
   :group 'vertico
   :type '(alist :key-type (choice symbol regexp (const t)) :value-type (repeat sexp)))
 
@@ -81,7 +84,9 @@ name and value. Has lower precedence than `vertico-multiform-commands'."
     (when (= arg 1) (setq modes (reverse modes)))
     (with-selected-window win
       (dolist (m modes)
-        (funcall m arg)))))
+        (if (eq (car-safe m) :not)
+            (funcall (cdr m) (- arg))
+          (funcall m arg))))))
 
 (defun vertico-multiform--lookup (key list)
   "Lookup symbolic KEY in LIST.
@@ -115,6 +120,10 @@ The keys in LIST can be symbols or regexps."
     (dolist (x (cdr (or (vertico-multiform--lookup this-command vertico-multiform-commands)
                         (vertico-multiform--lookup cat vertico-multiform-categories))))
       (pcase x
+        (`(:not . ,fs)
+         (dolist (f fs)
+           (let ((sym (and (symbolp f) (intern-soft (format "vertico-%s-mode" f)))))
+             (push (cons :not (if (and sym (fboundp sym)) sym f)) modes))))
         ((or (pred functionp) (pred symbolp))
          (let ((sym (and (symbolp x) (intern-soft (format "vertico-%s-mode" x)))))
            (push (if (and sym (fboundp sym)) sym x) modes)))
@@ -155,8 +164,8 @@ APP is the original function call."
     (user-error "`vertico-multiform-mode' is not enabled"))
   (when (and (boundp mode) (symbol-value mode))
     (funcall mode -1)
-    (setf (car vertico-multiform--stack)
-          (remove mode (car vertico-multiform--stack)))))
+    (setcar vertico-multiform--stack
+            (remove mode (car vertico-multiform--stack)))))
 
 (defun vertico-multiform--display-enable (mode)
   "Enable display MODE temporarily in minibuffer."
