@@ -732,17 +732,18 @@ When the prefix argument is 0, the group order is reset."
 (defun vertico--candidate (&optional hl)
   "Return current candidate string with optional highlighting if HL is non-nil."
   (let ((content (substring (or (car-safe vertico--input) (minibuffer-contents)))))
-    (if (>= vertico--index 0)
-        (let ((cand (substring (nth vertico--index vertico--candidates))))
-          ;;; XXX Drop the completions-common-part face which is added by `completion--twq-all'.
-          ;; This is a hack in Emacs and should better be fixed in Emacs itself, the corresponding
-          ;; code is already marked with a FIXME. Should this be reported as a bug?
-          (vertico--remove-face 0 (length cand) 'completions-common-part cand)
-          (concat (substring content 0 vertico--base)
-                  (if hl (car (funcall vertico--highlight-function (list cand))) cand)))
-      ;; Remove prompt face
-      (vertico--remove-face 0 (length content) 'vertico-current content)
-      content)))
+    (cond
+     ((>= vertico--index 0)
+      (let ((cand (substring (nth vertico--index vertico--candidates))))
+        ;; XXX Drop the completions-common-part face which is added by `completion--twq-all'.
+        ;; This is a hack in Emacs and should better be fixed in Emacs itself, the corresponding
+        ;; code is already marked with a FIXME. Should this be reported as a bug?
+        (vertico--remove-face 0 (length cand) 'completions-common-part cand)
+        (concat (substring content 0 vertico--base)
+                (if hl (car (funcall vertico--highlight-function (list cand))) cand))))
+     ((and (equal content "") (or (car-safe minibuffer-default) minibuffer-default)))
+     (t (vertico--remove-face 0 (length content) 'vertico-current content) ;; Remove prompt face
+        content))))
 
 (defun vertico--setup ()
   "Setup completion UI."
