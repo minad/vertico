@@ -401,11 +401,13 @@ An often requested feature is the ability to display the completions in a child
 frame popup. Personally I am critical of using child frames for minibuffer
 completion. From my experience it introduces more problems than it solves. Most
 importantly child frames hide the content of the underlying buffer. Furthermore
-child frames can feel slow and sometimes flicker. A better alternative is the
-~vertico-buffer~ display which can even be configured individually per command
-using ~vertico-multiform~. On the plus side of child frames, the completion
-display appears at the center of the screen, where your eyes are focused. Please
-give the following packages a try and judge for yourself.
+child frames do not play well together with changing windows and entering
+recursive minibuffer sessions. On top, child frames can feel slow and sometimes
+flicker. A better alternative is the ~vertico-buffer~ display which can even be
+configured individually per command using ~vertico-multiform~. On the plus side of
+child frames, the completion display appears at the center of the screen, where
+your eyes are focused. Please give the following packages a try and judge for
+yourself.
 
 - [[https://github.com/muffinmad/emacs-mini-frame][mini-frame]]: Display the entire minibuffer in a child frame.
 - [[https://github.com/minad/mini-popup][mini-popup]]: Slightly simpler alternative to mini-frame.
