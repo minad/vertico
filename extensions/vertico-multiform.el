@@ -81,7 +81,7 @@ Has lower precedence than `vertico-multiform-commands'."
   "Toggle modes from stack depending on ARG."
   (when-let ((win (active-minibuffer-window))
              (modes (car vertico-multiform--stack)))
-    (when (= arg 1) (setq modes (reverse modes)))
+    (when (> arg 0) (setq modes (reverse modes)))
     (with-selected-window win
       (dolist (m modes)
         (if (eq (car-safe m) :not)
@@ -163,34 +163,34 @@ APP is the original function call."
   (unless vertico-multiform-mode
     (user-error "`vertico-multiform-mode' is not enabled")))
 
-(defun vertico-multiform--temporary-set (mode arg)
-  "Set MODE temporarily in minibuffer to ARG."
+(defun vertico-multiform--temporary-mode (mode arg)
+  "Enable or disable MODE temporarily in minibuffer given ARG.
+ARG can be nil, t, -1, 1 or toggle."
   (unless (minibufferp)
     (user-error "`%s' must be called inside the minibuffer" this-command))
   (unless vertico-multiform-mode
     (user-error "`vertico-multiform-mode' is not enabled"))
-  (unless (eq (= arg 1) (and (boundp mode) (symbol-value mode)))
-    (funcall mode arg)
+  (setq arg (pcase arg
+              ('toggle (not (and (boundp mode) (symbol-value mode))))
+              ((or 'nil 't) arg)
+              (_ (> arg 0))))
+  (unless (eq arg (and (boundp mode) (symbol-value mode)))
+    (funcall mode (if arg 1 -1))
     (let ((modes (car vertico-multiform--stack))
           (not-mode (cons :not mode)))
-      (when (= arg 1)
+      (when arg
         (cl-rotatef not-mode mode))
       (if (member mode modes)
           (setcar vertico-multiform--stack (remove mode modes))
         (push not-mode (car vertico-multiform--stack))))))
 
-(defun vertico-multiform--temporary-toggle (mode)
-  "Toggle MODE temporarily in minibuffer."
-  (vertico-multiform--temporary-set
-   mode (if (and (boundp mode) (symbol-value mode)) -1 1)))
-
 (defun vertico-multiform--display-toggle (mode)
   "Toggle display MODE temporarily in minibuffer."
-  (dolist (m '(vertico-unobtrusive-mode vertico-flat-mode
-               vertico-grid-mode vertico-reverse-mode))
-    (unless (eq m mode)
-      (vertico-multiform--temporary-set m -1)))
-  (vertico-multiform--temporary-toggle mode))
+  (let ((arg (not (and (boundp mode) (symbol-value mode)))))
+    (dolist (m '(vertico-unobtrusive-mode vertico-flat-mode
+                 vertico-grid-mode vertico-reverse-mode))
+      (vertico-multiform--temporary-mode m -1))
+    (when arg (vertico-multiform--temporary-mode mode 1))))
 
 (defmacro vertico-multiform--define-display-toggle (name)
   "Define toggle for display mode NAME."

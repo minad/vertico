@@ -68,7 +68,8 @@
             vertico-flat-format (nthcdr 4 vertico-flat-format)
             vertico-unobtrusive--orig-count nil))
     (advice-remove #'vertico--setup #'redisplay)
-    (vertico-flat-mode 0))))
+    (vertico-flat-mode -1)))
+  (setq vertico-flat-mode nil))
 
 (provide 'vertico-unobtrusive)
 ;;; vertico-unobtrusive.el ends here
