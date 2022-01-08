@@ -133,7 +133,7 @@
     (advice-add #'vertico--arrange-candidates :override #'vertico-flat--arrange-candidates)
     (advice-add #'vertico--display-candidates :override #'vertico-flat--display-candidates))
    (t
-    (setq minor-mode-map-alist (remove `(vertico--input . ,vertico-flat-map) minor-mode-map-alist))
+    (setq minor-mode-map-alist (delete `(vertico--input . ,vertico-flat-map) minor-mode-map-alist))
     (advice-remove #'vertico--arrange-candidates #'vertico-flat--arrange-candidates)
     (advice-remove #'vertico--display-candidates #'vertico-flat--display-candidates))))
 

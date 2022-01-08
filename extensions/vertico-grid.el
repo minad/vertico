@@ -158,7 +158,7 @@ When scrolling beyond this limit, candidates may be truncated."
     (add-to-list 'minor-mode-map-alist `(vertico--input . ,vertico-grid-map))
     (advice-add #'vertico--arrange-candidates :override #'vertico-grid--arrange-candidates))
    (t
-    (setq minor-mode-map-alist (remove `(vertico--input . ,vertico-grid-map) minor-mode-map-alist))
+    (setq minor-mode-map-alist (delete `(vertico--input . ,vertico-grid-map) minor-mode-map-alist))
     (advice-remove #'vertico--arrange-candidates #'vertico-grid--arrange-candidates))))
 
 ;; Emacs 28: Do not show Vertico commands in M-X

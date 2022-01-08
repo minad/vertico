@@ -79,7 +79,7 @@
     (add-to-list 'minor-mode-map-alist `(vertico--input . ,vertico-reverse-map))
     (advice-add #'vertico--display-candidates :override #'vertico-reverse--display-candidates))
    (t
-    (setq minor-mode-map-alist (remove `(vertico--input . ,vertico-reverse-map) minor-mode-map-alist))
+    (setq minor-mode-map-alist (delete `(vertico--input . ,vertico-reverse-map) minor-mode-map-alist))
     (advice-remove #'vertico--display-candidates #'vertico-reverse--display-candidates))))
 
 (provide 'vertico-reverse)
