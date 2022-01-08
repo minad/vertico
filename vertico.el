@@ -469,6 +469,10 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
               (setq pos nexti))))))
     (if chunks (apply #'concat (nreverse chunks)) str)))
 
+(defun vertico--window-width ()
+  "Return minimum width of windows, which display the minibuffer."
+  (cl-loop for win in (get-buffer-window-list) minimize (window-width win)))
+
 (defun vertico--truncate-multiline (cand max-width)
   "Truncate multiline CAND to MAX-WIDTH."
   (truncate-string-to-width
@@ -533,7 +537,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                  (nbutlast lines)
                (setq curr-line (1- curr-line) lines (cdr lines))))
     ;; Format candidates
-    (let ((max-width (- (window-width) 4)) start)
+    (let ((max-width (- (vertico--window-width) 4)) start)
       (cl-loop for line on lines do
                (pcase (car line)
                  (`(,index ,cand ,prefix ,suffix)
@@ -552,7 +556,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (defun vertico--resize-window (height)
   "Resize active minibuffer window to HEIGHT."
-  (setq-local truncate-lines (< (point) (* 0.8 (window-width)))
+  (setq-local truncate-lines (< (point) (* 0.8 (vertico--window-width)))
               resize-mini-windows 'grow-only
               max-mini-window-height 1.0)
   (unless (frame-root-window-p (active-minibuffer-window))
