@@ -155,12 +155,12 @@ When scrolling beyond this limit, candidates may be truncated."
     (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise))
   (cond
    (vertico-grid-mode
-    (unless (eq (cadr vertico-map) vertico-grid-map)
+    (unless (memq vertico-grid-map vertico-map)
       (setcdr vertico-map (cons vertico-grid-map (cdr vertico-map))))
     (advice-add #'vertico--arrange-candidates :override #'vertico-grid--arrange-candidates))
    (t
-    (when (eq (cadr vertico-map) vertico-grid-map)
-      (setcdr vertico-map (cddr vertico-map)))
+    (when (memq vertico-grid-map vertico-map)
+      (delq vertico-grid-map vertico-map))
     (advice-remove #'vertico--arrange-candidates #'vertico-grid--arrange-candidates))))
 
 ;; Emacs 28: Do not show Vertico commands in M-X

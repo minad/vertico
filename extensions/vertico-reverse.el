@@ -76,12 +76,12 @@
       (overlay-put ov 'before-string nil)))
   (cond
    (vertico-reverse-mode
-    (unless (eq (cadr vertico-map) vertico-reverse-map)
+    (unless (memq vertico-reverse-map vertico-map)
       (setcdr vertico-map (cons vertico-reverse-map (cdr vertico-map))))
     (advice-add #'vertico--display-candidates :override #'vertico-reverse--display-candidates))
    (t
-    (when (eq (cadr vertico-map) vertico-reverse-map)
-      (setcdr vertico-map (cddr vertico-map)))
+    (when (memq vertico-reverse-map vertico-map)
+      (delq vertico-reverse-map vertico-map))
     (advice-remove #'vertico--display-candidates #'vertico-reverse--display-candidates))))
 
 (provide 'vertico-reverse)

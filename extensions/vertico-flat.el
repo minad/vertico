@@ -129,13 +129,13 @@
     (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise))
   (cond
    (vertico-flat-mode
-    (unless (eq (cadr vertico-map) vertico-flat-map)
+    (unless (memq vertico-flat-map vertico-map)
       (setcdr vertico-map (cons vertico-flat-map (cdr vertico-map))))
     (advice-add #'vertico--arrange-candidates :override #'vertico-flat--arrange-candidates)
     (advice-add #'vertico--display-candidates :override #'vertico-flat--display-candidates))
    (t
-    (when (eq (cadr vertico-map) vertico-flat-map)
-      (setcdr vertico-map (cddr vertico-map)))
+    (when (memq vertico-flat-map vertico-map)
+      (delq vertico-flat-map vertico-map))
     (advice-remove #'vertico--arrange-candidates #'vertico-flat--arrange-candidates)
     (advice-remove #'vertico--display-candidates #'vertico-flat--display-candidates))))
 
