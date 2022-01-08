@@ -248,12 +248,11 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                      (plist-get completion-extra-properties :annotation-function)))
         (cl-loop for cand in cands collect
                  (let ((suffix (or (funcall ann cand) "")))
-                   (list cand ""
-                         ;; The default completion UI adds the `completions-annotations' face
-                         ;; if no other faces are present.
-                         (if (text-property-not-all 0 (length suffix) 'face nil suffix)
-                             suffix
-                           (propertize suffix 'face 'completions-annotations)))))
+                   ;; The default completion UI adds the `completions-annotations' face
+                   ;; if no other faces are present.
+                   (unless (text-property-not-all 0 (length suffix) 'face nil suffix)
+                     (setq suffix (propertize suffix 'face 'completions-annotations)))
+                   (list cand "" suffix)))
       (cl-loop for cand in cands collect (list cand "" "")))))
 
 (defun vertico--move-to-front (elem list)
