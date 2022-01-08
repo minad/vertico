@@ -87,7 +87,7 @@
   "Arrange candidates."
   (let* ((index (max 0 vertico--index)) (count vertico-count)
          (candidates (nthcdr vertico--index vertico--candidates))
-         (width (- (* vertico-flat-max-lines (- (window-width) 4))
+         (width (- (* vertico-flat-max-lines (- (vertico--window-width) 4))
                    (length (plist-get vertico-flat-format :left))
                    (length (plist-get vertico-flat-format :separator))
                    (length (plist-get vertico-flat-format :right))
