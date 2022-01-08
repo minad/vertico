@@ -556,6 +556,16 @@ yourself.
            completion-category-overrides '((file (styles basic-remote partial-completion))))
    #+end_src
 
+* Resources
+
+If you want to learn more about Vertico, check out the following resources:
+
+- [[https://github.com/hlissner/doom-emacs/tree/develop/modules/completion/vertico][Doom Emacs Vertico Module]]: Vertico is Doom's default completion system.
+- [[https://www.youtube.com/watch?v=hPwDbx--Waw][Vertico Extensions for Emacs]] (2022-01-08) by Karthik Chikmagalur.
+- [[https://youtu.be/5ffb2at2d7w][Using Emacs Episode 80 - Vertico, Marginalia, Consult and Embark]] (2021-10-26) by Mike Zamansky.
+- [[https://www.youtube.com/watch?v=UtqE-lR2HCA][System Crafters Live! - Replacing Ivy and Counsel with Vertico and Consult]] (2021-05-21) by David Wilson.
+- [[https://www.youtube.com/watch?v=J0OaRy85MOo][Streamline Your Emacs Completions with Vertico]] (2021-05-17) by David Wilson.
+
 * Contributions
 
   Since this package is part of [[http://elpa.gnu.org/packages/vertico.html][GNU ELPA]] contributions require a copyright
