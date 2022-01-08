@@ -40,6 +40,11 @@
 (eval-when-compile
   (require 'cl-lib))
 
+(defcustom vertico-grid-min-columns 2
+  "Minimal number of grid columns."
+  :type 'integer
+  :group 'vertico)
+
 (defcustom vertico-grid-max-columns 8
   "Maximal number of grid columns."
   :type 'integer
@@ -80,12 +85,13 @@ When scrolling beyond this limit, candidates may be truncated."
         (setq w (max w (length (car cand))) n (1+ n))
         (pop cand))
       (setq vertico-grid--columns
-            (max 1 (min vertico-grid-max-columns
-                        (floor (window-width) (+ w (length vertico-grid-separator))))))))
+            (max vertico-grid-min-columns
+                 (min vertico-grid-max-columns
+                      (floor (vertico--window-width) (+ w (length vertico-grid-separator))))))))
   (let* ((sep (length vertico-grid-separator))
          (count (* vertico-count vertico-grid--columns))
          (start (* count (floor (max 0 vertico--index) count)))
-         (width (- (/ (window-width) vertico-grid--columns) sep))
+         (width (- (/ (vertico--window-width) vertico-grid--columns) sep))
          (cands
           (seq-map-indexed (lambda (cand index)
                              (cl-incf index start)
