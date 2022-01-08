@@ -34,8 +34,6 @@
 
 (require 'vertico)
 
-(defvar-local vertico-buffer--window nil)
-
 (defcustom vertico-buffer-hide-prompt t
   "Hide prompt in the minibuffer."
   :group 'vertico
@@ -81,34 +79,36 @@
         (unless (eq new old)
           (setq-local cursor-in-non-selected-windows new)
           (force-mode-line-update t)))
-      (when (eq win vertico-buffer--window)
-        (setq-local truncate-lines (< (window-point vertico-buffer--window)
-                                      (* 0.8 (window-width vertico-buffer--window))))
-        (set-window-point vertico-buffer--window (point))
-        (when vertico-buffer-hide-prompt
-          (window-resize mbwin (- (window-pixel-height mbwin)) nil nil 'pixelwise)
-          (set-window-vscroll mbwin 100))))))
+      (unless (eq win mbwin)
+        (setq-local truncate-lines (< (window-point win)
+                                      (* 0.8 (window-width win))))
+        (set-window-point win (point)))
+      (when vertico-buffer-hide-prompt
+        (window-resize mbwin (- (window-pixel-height mbwin)) nil nil 'pixelwise)
+        (set-window-vscroll mbwin 100)))))
 
 (defun vertico-buffer--setup ()
   "Setup buffer display."
   (add-hook 'pre-redisplay-functions 'vertico-buffer--redisplay nil 'local)
-  (let ((action vertico-buffer-display-action)
-        (temp (generate-new-buffer "*vertico*")))
-    (setq vertico-buffer--window
-          ;; Temporarily select the original window such that `display-buffer-same-window' works.
-          (with-minibuffer-selected-window (display-buffer temp action)))
-    (set-window-buffer vertico-buffer--window (current-buffer))
-    (kill-buffer temp))
-  (let ((sym (make-symbol "vertico-buffer--destroy"))
-        (depth (recursion-depth))
-        (now (window-parameter vertico-buffer--window 'no-other-window))
-        (ndow (window-parameter vertico-buffer--window 'no-delete-other-windows)))
+  (let* ((action vertico-buffer-display-action) tmp win
+         (_ (unwind-protect
+                (progn
+                  (setq tmp (generate-new-buffer "*vertico*")
+                        ;; Temporarily select the original window such
+                        ;; that `display-buffer-same-window' works.
+                        win (with-minibuffer-selected-window (display-buffer tmp action)))
+                  (set-window-buffer win (current-buffer)))
+              (kill-buffer tmp)))
+         (sym (make-symbol "vertico-buffer--destroy"))
+         (depth (recursion-depth))
+         (now (window-parameter win 'no-other-window))
+         (ndow (window-parameter win 'no-delete-other-windows)))
     (fset sym (lambda ()
                 (when (= depth (recursion-depth))
                   (with-selected-window (active-minibuffer-window)
-                    (when (window-live-p vertico-buffer--window)
-                      (set-window-parameter vertico-buffer--window 'no-other-window now)
-                      (set-window-parameter vertico-buffer--window 'no-delete-other-windows ndow))
+                    (when (window-live-p win)
+                      (set-window-parameter win 'no-other-window now)
+                      (set-window-parameter win 'no-delete-other-windows ndow))
                     (when vertico-buffer-hide-prompt
                       (set-window-vscroll nil 0))
                     (remove-hook 'minibuffer-exit-hook sym)))))
@@ -116,11 +116,11 @@
     ;; The hook will not be called when abnormally exiting the minibuffer
     ;; from another buffer via `keyboard-escape-quit'.
     (add-hook 'minibuffer-exit-hook sym)
-    (set-window-parameter vertico-buffer--window 'no-other-window t)
-    (set-window-parameter vertico-buffer--window 'no-delete-other-windows t)
-    (overlay-put vertico--candidates-ov 'window vertico-buffer--window)
+    (set-window-parameter win 'no-other-window t)
+    (set-window-parameter win 'no-delete-other-windows t)
+    (overlay-put vertico--candidates-ov 'window win)
     (when (and vertico-buffer-hide-prompt vertico--count-ov)
-      (overlay-put vertico--count-ov 'window vertico-buffer--window))
+      (overlay-put vertico--count-ov 'window win))
     (setq-local show-trailing-whitespace nil
                 truncate-lines t
                 face-remapping-alist
@@ -136,7 +136,7 @@
                                        depth)
                                'face 'mode-line-buffer-id)))
                 cursor-in-non-selected-windows 'box
-                vertico-count (- (/ (window-pixel-height vertico-buffer--window)
+                vertico-count (- (/ (window-pixel-height win)
                                     (default-line-height)) 2))))
 
 ;;;###autoload
