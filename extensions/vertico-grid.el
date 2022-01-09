@@ -61,7 +61,7 @@
   :type 'integer
   :group 'vertico)
 
-(defcustom vertico-grid-lookahead 200
+(defcustom vertico-grid-lookahead 100
   "Number of candidates to lookahead for column number computation.
 When scrolling beyond this limit, candidates may be truncated."
   :type 'integer
