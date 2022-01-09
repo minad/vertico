@@ -64,14 +64,16 @@
   "Alist of commands/regexps and list of settings to turn on per command.
 Takes precedence over `vertico-multiform-categories'. A setting can
 either be a mode symbol, a function, an inverted mode symbol or
-function, or a cons cell of variable name and value."
+function, or a cons cell of variable name and value. The key t can be
+used to specify catch all/default settings."
   :group 'vertico
   :type '(alist :key-type (choice symbol regexp (const t)) :value-type (repeat sexp)))
 
 (defcustom vertico-multiform-categories nil
   "Alist of categories/regexps and list of settings to turn on per category.
-See `vertico-multiform-commands' on details about the settings.
-Has lower precedence than `vertico-multiform-commands'."
+See `vertico-multiform-commands' on details about the settings. The
+category settings have lower precedence than
+`vertico-multiform-commands'."
   :group 'vertico
   :type '(alist :key-type (choice symbol regexp (const t)) :value-type (repeat sexp)))
 
