@@ -51,7 +51,7 @@
   :group 'vertico)
 
 (defcustom vertico-grid-separator
-  #("  |  " 2 3 (display (space :width (1)) face (:inverse-video t)))
+  #("   |   " 3 4 (display (space :width (1)) face (:inherit shadow :inverse-video t)))
   "Separator between columns."
   :type 'string
   :group 'vertico)
