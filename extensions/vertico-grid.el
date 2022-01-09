@@ -74,7 +74,7 @@ When scrolling beyond this limit, candidates may be truncated."
     map)
   "Additional keymap activated in grid mode.")
 
-(defvar-local vertico-grid--columns 1
+(defvar-local vertico-grid--columns vertico-grid-min-columns
   "Current number of grid columns.")
 
 (defun vertico-grid--arrange-candidates ()
