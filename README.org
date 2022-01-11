@@ -28,7 +28,7 @@
   - Vertical display with arrow key navigation. See the [[#extensions][extensions]] for additional display modes.
   - Prompt shows the current candidate index and the total number of candidates.
   - The current candidate is inserted with =TAB= and selected with =RET.=
-  - Non-existing candidates can be submitted by moving the point to the prompt line, see also ~vertico-exit-input~.
+  - Non-existing candidates can be submitted with =C-return= or by moving the point to the prompt.
   - Configurable sorting by history position, length and alphabetically.
   - Long candidates with newlines are formatted to take up less space.
   - Deferred completion style highlighting for performance.
@@ -55,7 +55,7 @@
   - ~backward-paragraph~ -> ~vertico-previous-group~
   - ~exit-minibuffer~ -> ~vertico-exit~
   - ~kill-ring-save~ -> ~vertico-save~
-  - =C-<return>= -> ~vertico-exit-input~
+  - =C-return= -> ~vertico-exit-input~
   - =TAB= -> ~vertico-insert~
 
 * Configuration
