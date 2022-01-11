@@ -76,7 +76,7 @@
    (concat #(" " 0 1 (cursor t))
            (cond
             ((and (not candidates) (plist-get vertico-flat-format :no-match)))
-            ((and (= vertico--total 1)
+            ((and (= vertico--total 1) (= vertico--index 0)
                   (when-let (fmt (plist-get vertico-flat-format :only-match))
                     (format fmt (substring-no-properties (car candidates))))))
              (t (concat (plist-get vertico-flat-format :left)
