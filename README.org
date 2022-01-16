@@ -524,9 +524,12 @@ If you want to learn more about Vertico, check out the following resources:
 
    The text menu bar works well with Vertico but always shows a =*Completions*=
    buffer, which is unwanted if you use the Vertico UI. This completion buffer
-   can be disabled as follows.
+   can be disabled with an advice. If you disabled the standard GUI menu bar and
+   prefer the Vertico interface you may also overwrite the default F10
+   keybinding.
 
    #+begin_src emacs-lisp
+     (global-set-key [f10] #'tmm-menubar)
      (advice-add #'tmm-add-prompt :after #'minibuffer-hide-completions)
    #+end_src
 
