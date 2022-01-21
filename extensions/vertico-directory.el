@@ -65,36 +65,37 @@
     (vertico-exit)))
 
 ;;;###autoload
-(defun vertico-directory-up ()
-  "Delete directory before point."
-  (interactive)
+(defun vertico-directory-up (&optional n)
+  "Delete N directories before point."
+  (interactive "p")
   (when (and (> (point) (minibuffer-prompt-end))
              (eq (char-before) ?/)
              (vertico-directory--completing-file-p))
-    (let ((path (buffer-substring (minibuffer-prompt-end) (point))))
+    (let ((path (buffer-substring (minibuffer-prompt-end) (point))) found)
       (when (string-match-p "\\`~[^/]*/\\'" path)
         (delete-minibuffer-contents)
-        (insert (expand-file-name path))))
-    (save-excursion
-      (goto-char (1- (point)))
-      (when (search-backward "/" (minibuffer-prompt-end) t)
-        (delete-region (1+ (point)) (point-max))
-        t))))
+        (insert (expand-file-name path)))
+      (dotimes (_ n found)
+        (save-excursion
+          (goto-char (1- (point)))
+          (when (search-backward "/" (minibuffer-prompt-end) t)
+            (delete-region (1+ (point)) (point-max))
+            (setq found t)))))))
 
 ;;;###autoload
-(defun vertico-directory-delete-char ()
-  "Delete directory or char before point."
-  (interactive)
-  (unless (vertico-directory-up)
-    (call-interactively #'backward-delete-char)))
+(defun vertico-directory-delete-char (&optional n)
+  "Delete N directories or chars before point."
+  (interactive "p")
+  (unless (vertico-directory-up n)
+    (backward-delete-char n)))
 
 ;;;###autoload
-(defun vertico-directory-delete-word ()
-  "Delete directory or word before point."
-  (interactive)
-  (unless (vertico-directory-up)
+(defun vertico-directory-delete-word (&optional n)
+  "Delete N directories or words before point."
+  (interactive "p")
+  (unless (vertico-directory-up n)
     (let ((pt (point)))
-      (forward-word -1)
+      (backward-word n)
       (delete-region pt (point)))))
 
 ;;;###autoload
