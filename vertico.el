@@ -134,7 +134,7 @@ See `resize-mini-windows' for documentation."
   "History hash table.")
 
 (defvar-local vertico--history-base nil
-  "Base prefix of `vertico--history-hash'.")
+  "Base prefix of current history hash.")
 
 (defvar-local vertico--candidates-ov nil
   "Overlay showing the candidates.")
