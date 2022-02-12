@@ -77,10 +77,11 @@
         (insert (expand-file-name path)))
       (dotimes (_ n found)
         (save-excursion
-          (goto-char (1- (point)))
-          (when (search-backward "/" (minibuffer-prompt-end) t)
-            (delete-region (1+ (point)) (point-max))
-            (setq found t)))))))
+          (let ((end (point)))
+            (goto-char (1- end))
+            (when (search-backward "/" (minibuffer-prompt-end) t)
+              (delete-region (1+ (point)) end)
+              (setq found t))))))))
 
 ;;;###autoload
 (defun vertico-directory-delete-char (&optional n)
