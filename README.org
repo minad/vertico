@@ -298,6 +298,17 @@ problem!
           (consult-grep buffer)))
 #+end_src
 
+Temporary toggling between the different display modes is possible. Bind the
+following commands:
+
+#+begin_src emacs-lisp
+  (define-key vertico-map "\M-V" #'vertico-multiform-vertical)
+  (define-key vertico-map "\M-G" #'vertico-multiform-grid)
+  (define-key vertico-map "\M-F" #'vertico-multiform-flat)
+  (define-key vertico-map "\M-R" #'vertico-multiform-reverse)
+  (define-key vertico-map "\M-U" #'vertico-multiform-unobtrusive)
+#+end_src
+
 You can use your own functions or even lambdas to configure the completion
 behavior per command or per completion category. The function must have the
 calling convention of a mode, i.e., it takes a single argument, which is either

@@ -49,6 +49,7 @@
 ;; Temporary toggling between the different display modes is
 ;; possible. Bind the following commands:
 ;;
+;; (define-key vertico-map "\M-V" #'vertico-multiform-vertical)
 ;; (define-key vertico-map "\M-G" #'vertico-multiform-grid)
 ;; (define-key vertico-map "\M-F" #'vertico-multiform-flat)
 ;; (define-key vertico-map "\M-R" #'vertico-multiform-reverse)
@@ -186,13 +187,23 @@ ARG can be nil, t, -1, 1 or toggle."
           (setcar vertico-multiform--stack (remove mode modes))
         (push not-mode (car vertico-multiform--stack))))))
 
-(defun vertico-multiform--display-toggle (mode)
-  "Toggle display MODE temporarily in minibuffer."
-  (let ((arg (not (and (boundp mode) (symbol-value mode)))))
+(defvar-local vertico-multiform--display-last nil)
+
+(defun vertico-multiform-vertical (&optional mode)
+  "Toggle to display MODE temporarily in minibuffer.
+MODE defaults to the vertical display."
+  (interactive)
+  (let (last)
     (dolist (m '(vertico-unobtrusive-mode vertico-flat-mode
                  vertico-grid-mode vertico-reverse-mode))
-      (vertico-multiform--temporary-mode m -1))
-    (when arg (vertico-multiform--temporary-mode mode 1))))
+      (when (and (boundp m) (symbol-value m))
+        (setq last m)
+        (vertico-multiform--temporary-mode m -1)))
+    (when (eq last mode)
+      (setq mode vertico-multiform--display-last))
+    (when mode
+      (vertico-multiform--temporary-mode mode 1))
+    (setq vertico-multiform--display-last last)))
 
 (defmacro vertico-multiform--define-display-toggle (name)
   "Define toggle for display mode NAME."
@@ -201,7 +212,7 @@ ARG can be nil, t, -1, 1 or toggle."
        (defun ,sym ()
          ,(format "Toggle the %s display." name)
          (interactive)
-         (vertico-multiform--display-toggle ',(intern (format "vertico-%s-mode" name))))
+         (vertico-multiform-vertical ',(intern (format "vertico-%s-mode" name))))
        (put ',sym 'completion-predicate #'vertico--command-p))))
 
 (vertico-multiform--define-display-toggle grid)
