@@ -546,7 +546,7 @@ If you want to learn more about Vertico, check out the following resources:
 
 ** ~ffap-menu~
 
-   The command ~ffap-menu~ shows the ==*Completions*= buffer by default like
+   The command ~ffap-menu~ shows the =*Completions*= buffer by default like
    ~tmm-menubar~, which is unnecessary with Vertico. This completion buffer can be
    disabled as follows.
 
