@@ -507,7 +507,7 @@ If you want to learn more about Vertico, check out the following resources:
    styles like ~substring~, ~flex~ or ~orderless~. In order to fix the issue at the
    root, the completion table should make use of completion boundaries similar
    to the built-in file completion table. In your user configuration you can
-   prioritize ~basic~ before ~orderless:~
+   prioritize ~basic~ before ~orderless~.
 
    #+begin_src emacs-lisp
      ;; Alternative 1: Use the basic completion style
