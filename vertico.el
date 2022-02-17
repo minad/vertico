@@ -668,7 +668,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                        minibuffer-completion-predicate)
       (if (eq minibuffer--require-match 'confirm)
           (eq (ignore-errors (read-char "Confirm")) 13)
-        (and (message "Match required") nil))))
+        (and (minibuffer-message "Match required") nil))))
 
 (defun vertico-exit (&optional arg)
   "Exit minibuffer with current candidate or input if prefix ARG is given."
