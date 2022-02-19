@@ -40,7 +40,7 @@
 ;;            (execute-extended-command flat)))
 ;;
 ;;    (setq vertico-multiform-categories
-;;          '((file buffer grid))
+;;          '((file buffer grid)
 ;;            (imenu (:not indexed mouse))
 ;;            (symbol (vertico-sort-function . vertico-sort-alpha))))
 ;;
