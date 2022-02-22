@@ -753,10 +753,7 @@ When the prefix argument is 0, the group order is reset."
   (setq-local completion-auto-help nil
               completion-show-inline-help nil)
   (use-local-map vertico-map)
-  ;; Use -90 to ensure that the exhibit hook runs early such that the
-  ;; candidates are available for Consult preview. It works, but besides
-  ;; that I'dont have a specific reason for this particular value.
-  (add-hook 'post-command-hook #'vertico--exhibit -90 'local))
+  (add-hook 'post-command-hook #'vertico--exhibit nil 'local))
 
 (defun vertico--advice (&rest args)
   "Advice for completion function, receiving ARGS."
