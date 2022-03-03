@@ -447,31 +447,31 @@ an integral part in how the users interacts with Emacs.
 
 There are other interactive completion UIs, which follow a similar philosophy:
 
-- [[https://github.com/raxod502/selectrum][Selectrum]]: Selectrum has a similar UI and interaction model as Vertico, since
-  it directly inspired Vertico. Vertico offers additional features and is more
-  flexible than Selectrum thanks to its [[#extensions][extensions]]. Unfortunately Selectrum is
-  not fully compatible with every Emacs completion command and dynamic
-  completion tables ([[https://github.com/raxod502/selectrum/issues/481][Issue #481]]), since it uses its own filtering
-  infrastructure, which deviates from the standard Emacs completion facilities.
-  The filtering infrastructure also leads to a larger and more complex code base.
+- [[https://gitlab.com/protesilaos/mct][Mct]]: Minibuffer and Completions in Tandem. Mct reuses the default ~*Completions*~
+  buffer and enhances it with automatic updates and additional keybindings, to
+  select a candidate and move between minibuffer and completions buffer. Mct can
+  be configured to open only when requested. Furthermore since Mct uses a fully
+  functional buffer you can reuse all your familar buffer commands inside the
+  completions buffer. The main distinction to Vertico's approach is that
+  ~*Completions*~ buffer displays all matching candidates. This has the advantage
+  that you can interact freely with the candidates and jump around with Isearch
+  or Avy. On the other hand it necessarily causes a slowdown in comparison to
+  Vertico, which only displays a subset of candidates. Mct supports completion
+  in region via its ~mct-region-mode~.
 - [[https://github.com/oantolin/icomplete-vertical][Icomplete-vertical]]: This package enhances the Emacs builtin Icomplete with a
   vertical display. In contrast to Vertico, Icomplete rotates the candidates
   such that the current candidate always appears at the top. From my
   perspective, candidate rotation feels a bit less intuitive than the UI of
   Vertico or Selectrum. Note that Emacs 28 offers a built-in
   ~icomplete-vertical-mode~.
-- [[https://gitlab.com/protesilaos/mct][Mct]]: Minibuffer and Completions in Tandem. Mct reuses the default ~*Completions*~
-  buffer and enhances it with automatic updates and additional keybindings, to
-  select a candidate and move between minibuffer and completions buffer. Mct is
-  great if you prefer an unobtrusive UI since it can be configured to open only
-  when requested. Furthermore since Mct uses a fully functional buffer you can
-  reuse all your familar buffer commands inside the completions buffer. The main
-  distinction to Vertico's approach is that ~*Completions*~ buffer displays all
-  matching candidates. On the one hand this is good since it allows you to
-  interact with all the candidates and jump around with Isearch or Avy. On the
-  other hand it necessarily causes a slowdown in comparison to Vertico, which
-  only displays a subset of candidates. Mct supports completion in region via
-  its ~mct-region-mode~.
+- [[https://github.com/raxod502/selectrum][Selectrum]]: Selectrum is the predecessor of Vertico, since it directly inspired
+  Vertico. Selectrum has a similar UI and interaction model as Vertico. Vertico
+  offers additional features and is more flexible than Selectrum thanks to its
+  [[#extensions][extensions]]. Unfortunately Selectrum is not fully compatible with every Emacs
+  completion command and dynamic completion tables ([[https://github.com/raxod502/selectrum/issues/481][Issue #481]]), since it uses
+  its own filtering infrastructure, which deviates from the standard Emacs
+  completion facilities. The filtering infrastructure also leads to a larger and
+  more complex code base.
 
 * Resources
 
