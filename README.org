@@ -447,13 +447,13 @@ an integral part in how the users interacts with Emacs.
 
 There are other interactive completion UIs, which follow a similar philosophy:
 
-- [[https://github.com/raxod502/selectrum][Selectrum]]: Selectrum has a similar UI as Vertico, since it directly inspired
-  Vertico. The Selectrum code base is more complex. Unfortunately Selectrum is
-  not fully compatible with every Emacs completion command ([[https://github.com/raxod502/selectrum/issues/481][Issue #481]]), since
-  it uses its own filtering infrastructure, which deviates from the standard
-  Emacs completion facilities. Vertico additionally has the ability to cycle
-  over candidates, offers commands for grouping support and comes with a rich
-  set of [[#extensions][extensions]].
+- [[https://github.com/raxod502/selectrum][Selectrum]]: Selectrum has a similar UI and interaction model as Vertico, since
+  it directly inspired Vertico. Vertico offers additional features and is more
+  flexible than Selectrum thanks to its [[#extensions][extensions]]. Unfortunately Selectrum is
+  not fully compatible with every Emacs completion command and dynamic
+  completion tables ([[https://github.com/raxod502/selectrum/issues/481][Issue #481]]), since it uses its own filtering
+  infrastructure, which deviates from the standard Emacs completion facilities.
+  The filtering infrastructure also leads to a larger and more complex code base.
 - [[https://github.com/oantolin/icomplete-vertical][Icomplete-vertical]]: This package enhances the Emacs builtin Icomplete with a
   vertical display. In contrast to Vertico, Icomplete rotates the candidates
   such that the current candidate always appears at the top. From my
