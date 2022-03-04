@@ -581,5 +581,5 @@ define a custom completion style which sets in only for remote files!
    'completion-styles-alist
    '(basic-remote basic-remote-try-completion basic-remote-all-completions nil))
   (setq completion-styles '(orderless)
-        completion-category-overrides '((file (styles basic-remote partial-completion))))
+        completion-category-overrides '((file (styles basic-remote orderless))))
 #+end_src
