@@ -560,8 +560,7 @@ disabled as follows.
 
 The commands ~multi-occur~, ~auto-insert~, ~bbdb-create~ read multiple arguments from
 the minibuffer with ~completing-read~, one at a time, until you submit an empty
-string. You should type =M-RET= (~vertico-exit-input~) to finish the loop.
-Alternatively you can move the cursor to the prompt line and press =RET=. Directly
+string. You should type =M-RET= (~vertico-exit-input~) to finish the loop. Directly
 pressing =RET= (~vertico-exit~) does not work since the first candidate is
 preselected.
 
