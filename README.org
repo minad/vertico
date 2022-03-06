@@ -54,7 +54,7 @@ binding of =TAB= to ~vertico-insert~ and the bindings of ~vertico-exit/exit-inpu
 - ~backward-paragraph~ -> ~vertico-previous-group~
 - ~exit-minibuffer~ -> ~vertico-exit~
 - ~kill-ring-save~ -> ~vertico-save~
-- =C-RET= -> ~vertico-exit-input~
+- =M-RET= -> ~vertico-exit-input~
 - =TAB= -> ~vertico-insert~
 
 * Configuration
@@ -556,15 +556,29 @@ disabled as follows.
                                      (apply args))))
 #+end_src
 
-** ~multi-occur~, ~auto-insert~, ~bbdb-create~
+** Submitting the empty string
 
-These commands read multiple arguments from the minibuffer, one at a
-time, until you submit an empty string.  You should type =C-RET=
-(~vertico-exit-input~) to finish the loop.
+The commands ~multi-occur~, ~auto-insert~, ~bbdb-create~ read multiple arguments from
+the minibuffer with ~completing-read~, one at a time, until you submit an empty
+string. You should type =M-RET= (~vertico-exit-input~) to finish the loop.
+Alternatively you can move the cursor to the prompt line and press =RET=. Directly
+pressing =RET= (~vertico-exit~) does not work since the first candidate is
+preselected.
 
-Simply pressing =RET= (~vertico-exit~) does not work here because
-these commands require a match and Vertico gives no special treatment
-to the empty string.
+The underlying issue is that ~completing-read~ always allows you to exit with the
+empty string, which is called the /null completion/, even if the ~REQUIRE-MATCH~
+argument is non-nil. Try the following two calls to ~completing-read~ with =C-x C-e=:
+
+#+begin_src emacs-lisp
+  (completing-read "Select: " '("first" "second" "third") nil 'require-match)
+  (completing-read "Select: " '("first" "second" "third") nil 'require-match nil nil "")
+#+end_src
+
+In both cases the empty string can be submitted. In the first case no explicit
+default value is specified and Vertico preselects the *first* candidate. In order
+to exit with the empty string, press =M-RET=. In the second case the explicit
+default value "" is specified and Vertico preselects the prompt, such that
+existing with the empty string is possible by pressing =RET= only.
 
 ** Tramp hostname completion
 
