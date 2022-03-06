@@ -54,7 +54,7 @@ binding of =TAB= to ~vertico-insert~ and the bindings of ~vertico-exit/exit-inpu
 - ~backward-paragraph~ -> ~vertico-previous-group~
 - ~exit-minibuffer~ -> ~vertico-exit~
 - ~kill-ring-save~ -> ~vertico-save~
-- =M-RET= -> ~vertico-exit-input~
+- =C-RET= -> ~vertico-exit-input~
 - =TAB= -> ~vertico-insert~
 
 * Configuration
@@ -555,6 +555,16 @@ disabled as follows.
                                               #'ignore))
                                      (apply args))))
 #+end_src
+
+** ~multi-occur~, ~auto-insert~, ~bbdb-create~
+
+These commands read multiple arguments from the minibuffer, one at a
+time, until you submit an empty string.  You should type =C-RET=
+(~vertico-exit-input~) to finish the loop.
+
+Simply pressing =RET= (~vertico-exit~) does not work here because
+these commands require a match and Vertico gives no special treatment
+to the empty string.
 
 ** Tramp hostname completion
 
