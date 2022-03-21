@@ -1,4 +1,4 @@
-;;; vertico-repeat.el --- Repeat the last Vertico session -*- lexical-binding: t -*-
+;;; vertico-repeat.el --- Repeat Vertico sessions -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2021, 2022  Free Software Foundation, Inc.
 
@@ -27,70 +27,121 @@
 ;;; Commentary:
 
 ;; This package is a Vertico extension, which enables repetition of the
-;; last Vertico session via the `vertico-repeat' command.
+;; Vertico sessions via the `vertico-repeat-last' and
+;; `vertico-repeat-select' commands. It is necessary to register a
+;; minibuffer setup hook, which saves the Vertico state for repetition.
 ;;
-;; (global-set-key "\M-r" #'vertico-repeat)
-;;
-;; It is necessary to register a minibuffer setup hook, which saves the
-;; Vertico state for repetition.
-;;
+;; (global-set-key "\M-r" #'vertico-repeat-last)
+;; (global-set-key "\M-R" #'vertico-repeat-select)
 ;; (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
 
 ;;; Code:
 
 (require 'vertico)
+(eval-when-compile (require 'cl-lib))
 
-(defvar-local vertico-repeat--restore nil)
-(defvar vertico-repeat--input nil)
-(defvar vertico-repeat--command nil)
-(defvar vertico-repeat--candidate nil)
+(defcustom vertico-repeat-filter
+  '(vertico-repeat-select
+    execute-extended-command
+    execute-extended-command-for-buffer)
+  "List of commands to filter out from the history."
+  :type '(repeat symbol)
+  :group 'vertico)
+
+(defvar vertico-repeat--history nil)
+(defvar-local vertico-repeat--command nil)
+(defvar-local vertico-repeat--input nil)
 
 (defun vertico-repeat--save-input ()
-  "Save current minibuffer content for `vertico-repeat'."
+  "Save current minibuffer input."
   (setq vertico-repeat--input (minibuffer-contents)))
 
-(defun vertico-repeat--save-candidate ()
-  "Save currently selected candidate for `vertico-repeat'."
-  (setq vertico-repeat--candidate
-        (and vertico--lock-candidate
-             (>= vertico--index 0)
-             (nth vertico--index vertico--candidates))))
+(defun vertico-repeat--save-exit ()
+  "Save command session in `vertico-repeat--history'."
+  (add-to-history
+   'vertico-repeat--history
+   (list
+    vertico-repeat--command
+    vertico-repeat--input
+    (and vertico--lock-candidate
+         (>= vertico--index 0)
+         (nth vertico--index vertico--candidates)))))
 
-(defun vertico-repeat--restore ()
-  "Restore Vertico status for `vertico-repeat'."
-  (setq vertico-repeat--restore t)
+(defun vertico-repeat--restore (session)
+  "Restore Vertico SESSION for `vertico-repeat'."
   (delete-minibuffer-contents)
-  (insert vertico-repeat--input)
-  (when vertico-repeat--candidate
-    (run-at-time 0 nil
-                 (lambda ()
-                   (when-let (idx (seq-position vertico--candidates vertico-repeat--candidate))
-                     (setq vertico--index idx
-                           vertico--lock-candidate t)
-                     (vertico--exhibit))))))
-
-;;;###autoload
-(defun vertico-repeat ()
-  "Repeat last Vertico completion session."
-  (interactive)
-  (unless vertico-repeat--command
-    (user-error "No repeatable Vertico session"))
-  (minibuffer-with-setup-hook
-      #'vertico-repeat--restore
-    (command-execute (setq this-command vertico-repeat--command))))
+  (insert (cadr session))
+  (when (caddr session)
+    (vertico--exhibit)
+    (when-let (idx (seq-position vertico--candidates (caddr session)))
+      (setq vertico--index idx
+            vertico--lock-candidate t)
+      (vertico--exhibit))))
 
 ;;;###autoload
 (defun vertico-repeat-save ()
-  "Save Vertico status for `vertico-repeat'.
+  "Save Vertico session for `vertico-repeat'.
 This function must be registered as `minibuffer-setup-hook'."
-  (when vertico--input
-    (unless vertico-repeat--restore
-      (setq vertico-repeat--command this-command
-            vertico-repeat--input ""
-            vertico-repeat--candidate nil
-            vertico-repeat--restore nil))
+  (when (and vertico--input (not (memq this-command vertico-repeat-filter)))
+    (setq vertico-repeat--command this-command)
     (add-hook 'post-command-hook #'vertico-repeat--save-input nil 'local)
-    (add-hook 'minibuffer-exit-hook #'vertico-repeat--save-candidate nil 'local)))
+    (add-hook 'minibuffer-exit-hook #'vertico-repeat--save-exit nil 'local)))
+
+;;;###autoload
+(defun vertico-repeat-last (&optional session)
+  "Repeat last Vertico completion SESSION."
+  (interactive
+   (list (or (car vertico-repeat--history)
+             (user-error "No repeatable Vertico session"))))
+  (minibuffer-with-setup-hook
+      (apply-partially #'vertico-repeat--restore session)
+    (command-execute (setq this-command (car session)))))
+
+(defun vertico-repeat-select ()
+  "Select a session from the last Vertico sessions and repeat it."
+  (interactive)
+  (let* ((trimmed
+          (delete-dups
+           (or
+            (cl-loop
+             for session in vertico-repeat--history collect
+             (list
+              (symbol-name (car session))
+              (replace-regexp-in-string
+               "\\s-+" " "
+               (string-trim (cadr session)))
+              (if (caddr session)
+                  (replace-regexp-in-string
+                   "\\s-+" " "
+                   (string-trim (caddr session)))
+                "")
+              session))
+            (user-error "No repeatable Vertico session"))))
+         (max-cmd (cl-loop for (cmd . _) in trimmed
+                           maximize (string-width cmd)))
+         (max-input (cl-loop for (_cmd input . _) in trimmed
+                             maximize (string-width input)))
+         (formatted (cl-loop
+                     for (cmd input cand session) in trimmed collect
+                     (cons
+                      (concat
+                       (propertize cmd 'face 'font-lock-function-name-face)
+                       (make-string (- max-cmd (string-width cmd) -4) ?\s)
+                       (propertize input 'face 'font-lock-string-face)
+                       (make-string (- max-input (string-width input) -4) ?\s)
+                       (and cand (propertize cand 'face 'font-lock-comment-face)))
+                      session)))
+         (selected (or (cdr (assoc (completing-read
+                                    "History: "
+                                    (lambda (str pred action)
+                                      (if (eq action 'metadata)
+                                          '(metadata (display-sort-function . identity)
+                                                     (cycle-sort-function . identity))
+                                        (complete-with-action action formatted str pred)))
+                                    nil t nil t)
+                                   formatted))
+                       (user-error "No session selected"))))
+    (vertico-repeat-last selected)))
 
 (provide 'vertico-repeat)
 ;;; vertico-repeat.el ends here
