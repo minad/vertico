@@ -26,13 +26,12 @@
 
 ;;; Commentary:
 
-;; This package is a Vertico extension, which enables repetition of the
-;; Vertico sessions via the `vertico-repeat-last' and
+;; This package is a Vertico extension, which enables repetition of
+;; Vertico sessions via the `vertico-repeat', `vertico-repeat-last' and
 ;; `vertico-repeat-select' commands. It is necessary to register a
 ;; minibuffer setup hook, which saves the Vertico state for repetition.
 ;;
-;; (global-set-key "\M-r" #'vertico-repeat-last)
-;; (global-set-key "\M-R" #'vertico-repeat-select)
+;; (global-set-key "\M-R" #'vertico-repeat)
 ;; (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
 
 ;;; Code:
@@ -41,7 +40,8 @@
 (eval-when-compile (require 'cl-lib))
 
 (defcustom vertico-repeat-filter
-  '(vertico-repeat-select
+  '(vertico-repeat
+    vertico-repeat-select
     execute-extended-command
     execute-extended-command-for-buffer)
   "List of commands to filter out from the history."
@@ -97,8 +97,9 @@ This function must be registered as `minibuffer-setup-hook'."
       (apply-partially #'vertico-repeat--restore session)
     (command-execute (setq this-command (car session)))))
 
+;;;###autoload
 (defun vertico-repeat-select ()
-  "Select a session from the last Vertico sessions and repeat it."
+  "Select a Vertico session from the session history and repeat it."
   (interactive)
   (let* ((trimmed
           (delete-dups
@@ -142,6 +143,14 @@ This function must be registered as `minibuffer-setup-hook'."
                                    formatted))
                        (user-error "No session selected"))))
     (vertico-repeat-last selected)))
+
+;;;###autoload
+(defun vertico-repeat (&optional arg)
+  "Repeat last vertico session.
+If prefix ARG is non-nil, offer completion menu to select from session history."
+  (interactive "P")
+  (call-interactively
+   (if arg #'vertico-repeat-select #'vertico-repeat-last)))
 
 (provide 'vertico-repeat)
 ;;; vertico-repeat.el ends here
