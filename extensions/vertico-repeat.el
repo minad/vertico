@@ -146,7 +146,7 @@ This function must be registered as `minibuffer-setup-hook'."
 
 ;;;###autoload
 (defun vertico-repeat (&optional arg)
-  "Repeat last vertico session.
+  "Repeat last Vertico session.
 If prefix ARG is non-nil, offer completion menu to select from session history."
   (interactive "P")
   (call-interactively
