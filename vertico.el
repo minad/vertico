@@ -752,7 +752,10 @@ When the prefix argument is 0, the group order is reset."
   (overlay-put vertico--count-ov 'priority 1)
   (setq-local completion-auto-help nil
               completion-show-inline-help nil)
-  (use-local-map vertico-map)
+  (use-local-map (if (memq minibuffer-completing-file-name '(nil lambda))
+                     (make-composed-keymap minibuffer-local-filename-completion-map
+                                           vertico-map)
+                   vertico-map))
   (add-hook 'post-command-hook #'vertico--exhibit nil 'local))
 
 (defun vertico--advice (&rest args)
