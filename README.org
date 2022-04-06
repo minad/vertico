@@ -566,6 +566,27 @@ disabled as follows.
                                      (apply args))))
 #+end_src
 
+** ~completion-table-dynamic~
+
+Dynamic completion tables (~completion-table-dynamic~, ~completion-table-in-turn~,
+etc.) should work well with Vertico. However the requirement is that the =basic=
+completion style is enabled. The =basic= style performs prefix filtering by
+passing the input to the completion table (or the dynamic completion table
+function). The =basic= completion style must not necessarily be configured with
+highest priority, it can also come after other completion styles like =orderless=,
+=substring= or =flex=.
+
+#+begin_src emacs-lisp
+  (setq completion-styles '(basic))
+  ;; (setq completion-styles '(orderless basic))
+  (completing-read "Dynamic: "
+                   (completion-table-dynamic
+                    (lambda (str)
+                      (list (concat str "1")
+                            (concat str "2")
+                            (concat str "3")))))
+#+end_src
+
 ** Submitting the empty string
 
 The commands ~multi-occur~, ~auto-insert~, ~bbdb-create~ read multiple arguments from
