@@ -97,7 +97,7 @@ configuration:
     ;; Configure a custom style dispatcher (see the Consult wiki)
     ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
     ;;       orderless-component-separator #'orderless-escapable-split-on-space)
-    (setq completion-styles '(orderless)
+    (setq completion-styles '(orderless basic)
           completion-category-defaults nil
           completion-category-overrides '((file (styles partial-completion)))))
 
@@ -158,7 +158,7 @@ a prefix. In order to support completing prefixes you may want to combine
 ~orderless~ with ~substring~ in your =completion-styles= configuration.
 
 #+begin_src emacs-lisp
-  (setq completion-styles '(substring orderless))
+  (setq completion-styles '(substring orderless basic))
 #+end_src
 
 Alternatively you can experiment with the built-in completion-styles, e.g.,
@@ -586,7 +586,7 @@ after entering =/ssh:=. In order to avoid this problem, the =basic= completion s
 should be specified for the file completion category.
 
 #+begin_src emacs-lisp
-  (setq completion-styles '(orderless)
+  (setq completion-styles '(orderless basic)
         completion-category-overrides '((file (styles basic partial-completion))))
 #+end_src
 
@@ -603,6 +603,6 @@ define a custom completion style which sets in only for remote files!
   (add-to-list
    'completion-styles-alist
    '(basic-remote basic-remote-try-completion basic-remote-all-completions nil))
-  (setq completion-styles '(orderless)
+  (setq completion-styles '(orderless basic)
         completion-category-overrides '((file (styles basic-remote partial-completion))))
 #+end_src
