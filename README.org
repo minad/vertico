@@ -583,7 +583,8 @@ existing with the empty string is possible by pressing =RET= only.
 
 In combination with Orderless, hostnames are not made available for completion
 after entering =/ssh:=. In order to avoid this problem, the =basic= completion style
-should be specified for the file completion category.
+should be specified for the file completion category, such that =basic= is tried
+before =orderless=.
 
 #+begin_src emacs-lisp
   (setq completion-styles '(orderless basic)
