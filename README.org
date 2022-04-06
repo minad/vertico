@@ -535,10 +535,11 @@ However the list of possible completions becomes much more cluttered.
 
 Similar to ~org-refile~, the ~org-agenda-filter~ completion function
 (~org-agenda-filter-completion-function~) does not make use of completion
-boundaries. Unfortunately =TAB= completion does not work for this reason. This
-affects Vertico and also the Emacs default completion system. For example if you
-enter ~+tag<0 TAB~ the input is replaced with ~0:10~ which is not correct. With
-preserved completion boundaries, the expected result would be ~+tag<0:10~.
+boundaries. Unfortunately =TAB= completion (~minibuffer-complete~) does not work for
+this reason. This affects Vertico and also the Emacs default completion system.
+For example if you enter ~+tag<0 TAB~ the input is replaced with ~0:10~ which is not
+correct. With preserved completion boundaries, the expected result would be
+~+tag<0:10~.
 
 ** ~tmm-menubar~
 
