@@ -62,9 +62,7 @@ binding of =TAB= to ~vertico-insert~ and the bindings of ~vertico-exit/exit-inpu
 Vertico is available from [[http://elpa.gnu.org/packages/vertico.html][GNU ELPA]]. You can install it directly via
 ~package-install~. After installation, you can activate the global minor mode with
 =M-x vertico-mode=. In order to configure Vertico and other packages in your
-init.el, you may want to take advantage of ~use-package~. I recommend to give
-Orderless completion a try, which is different from the prefix TAB completion
-used by the basic default completion system or in shells. Here is an example
+init.el, you may want to take advantage of ~use-package~. Here is an example
 configuration:
 
 #+begin_src emacs-lisp
@@ -85,21 +83,6 @@ configuration:
     ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
     ;; (setq vertico-cycle t)
     )
-
-  ;; Optionally use the `orderless' completion style. See
-  ;; `+orderless-dispatch' in the Consult wiki for an advanced Orderless style
-  ;; dispatcher. Additionally enable `partial-completion' for file path
-  ;; expansion. `partial-completion' is important for wildcard support.
-  ;; Multiple files can be opened at once with `find-file' if you enter a
-  ;; wildcard. You may also give the `initials' completion style a try.
-  (use-package orderless
-    :init
-    ;; Configure a custom style dispatcher (see the Consult wiki)
-    ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
-    ;;       orderless-component-separator #'orderless-escapable-split-on-space)
-    (setq completion-styles '(orderless basic)
-          completion-category-defaults nil
-          completion-category-overrides '((file (styles partial-completion)))))
 
   ;; Persist history over Emacs restarts. Vertico sorts by history position.
   (use-package savehist
@@ -128,6 +111,30 @@ configuration:
     ;; Enable recursive minibuffers
     (setq enable-recursive-minibuffers t))
 #+end_src
+
+I recommend to give Orderless completion a try, which is different from the
+prefix TAB completion used by the basic default completion system or in shells.
+
+#+begin_src emacs-lisp
+    ;; Optionally use the `orderless' completion style.
+    (use-package orderless
+      :init
+      ;; Configure a custom style dispatcher (see the Consult wiki)
+      ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
+      ;;       orderless-component-separator #'orderless-escapable-split-on-space)
+      (setq completion-styles '(orderless basic)
+            completion-category-defaults nil
+            completion-category-overrides '((file (styles partial-completion)))))
+#+end_src
+
+The =basic= completion style is specified as fallback in addition to =orderless= in
+order to ensure that completion commands which rely on dynamic completion
+tables, e.g., ~completion-table-dynamic~ or ~completion-table-in-turn~, work
+correctly. See =+orderless-dispatch= in the [[https://github.com/minad/consult/wiki][Consult wiki]] for an advanced Orderless
+style dispatcher. Additionally enable =partial-completion= for file path
+expansion. =partial-completion= is important for file wildcard support. Multiple
+files can be opened at once with =find-file= if you enter a wildcard. You may also
+give the =initials= completion style a try.
 
 See also the [[https://github.com/minad/vertico/wiki][Vertico Wiki]] for additional configuration tips. For more general
 documentation read the chapter about completion in the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Completion.html][Emacs manual]]. If you want
