@@ -454,7 +454,7 @@ an integral part in how the users interacts with Emacs.
 
 There are other interactive completion UIs, which follow a similar philosophy:
 
-- [[https://gitlab.com/protesilaos/mct][Mct]]: Minibuffer and Completions in Tandem. Mct reuses the default ~*Completions*~
+- [[https://git.sr.ht/~protesilaos/mct][Mct]]: Minibuffer and Completions in Tandem. Mct reuses the default ~*Completions*~
   buffer and enhances it with automatic updates and additional keybindings, to
   select a candidate and move between minibuffer and completions buffer. Mct can
   be configured to open only when requested. Furthermore since Mct uses a fully
