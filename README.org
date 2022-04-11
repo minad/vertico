@@ -225,9 +225,9 @@ use with Vertico.
 #+end_src
 
 * Extensions
-  :properties:
-  :custom_id: extensions
-  :end:
+:properties:
+:custom_id: extensions
+:end:
 
 We maintain small extension packages to Vertico in this repository in the
 subdirectory [[https://github.com/minad/vertico/tree/main/extensions][extensions/]]. The extensions are installed together with Vertico if
@@ -375,9 +375,9 @@ candidates from disappearing when they scroll off-screen to the left.
 #+end_src
 
 * Complementary packages
-  :properties:
-  :custom_id: complementary-packages
-  :end:
+:properties:
+:custom_id: complementary-packages
+:end:
 
 Vertico integrates well with complementary packages, which enrich the completion
 UI. These packages are fully supported:
