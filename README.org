@@ -495,15 +495,15 @@ following resources:
 
 * Contributions
 
-  Since this package is part of [[http://elpa.gnu.org/packages/vertico.html][GNU ELPA]] contributions require a copyright
-  assignment to the FSF.
+Since this package is part of [[http://elpa.gnu.org/packages/vertico.html][GNU ELPA]] contributions require a copyright
+assignment to the FSF.
 
 * Problematic completion commands
 
-  Vertico is robust in most scenarios. However some completion commands make
-  certain assumptions about the completion styles and the completion UI. Some of
-  these assumptions may not hold in Vertico or other UIs and require minor
-  workarounds.
+Vertico is robust in most scenarios. However some completion commands make
+certain assumptions about the completion styles and the completion UI. Some of
+these assumptions may not hold in Vertico or other UIs and require minor
+workarounds.
 
 ** ~org-refile~
 
