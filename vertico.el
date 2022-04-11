@@ -157,8 +157,8 @@ See `resize-mini-windows' for documentation."
 (defvar-local vertico--metadata nil
   "Completion metadata.")
 
-(defvar-local vertico--base 0
-  "Size of the base string, which is concatenated with the candidate.")
+(defvar-local vertico--base ""
+  "Base string, which is concatenated with the candidate.")
 
 (defvar-local vertico--total 0
   "Length of the candidate list `vertico--candidates'.")
@@ -354,7 +354,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (setq all (vertico--move-to-front field all))
     (when-let (group-fun (and all (vertico--metadata-get 'group-function)))
       (setq groups (vertico--group-by group-fun all) all (car groups)))
-    (list base (length all)
+    (list base-str (length all)
           ;; Default value is missing from collection
           (and def (equal content "") (not (member def all)))
           ;; Find position of old candidate in the new list.
@@ -447,7 +447,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                vertico--index
                (if (or vertico--default-missing
                        (= 0 vertico--total)
-                       (and (= base (length content))
+                       (and (= (length base) (length content))
                             (test-completion content minibuffer-completion-table
                                              minibuffer-completion-predicate)))
                    -1 0)))))))
@@ -737,7 +737,7 @@ When the prefix argument is 0, the group order is reset."
         ;; This is a hack in Emacs and should better be fixed in Emacs itself, the corresponding
         ;; code is already marked with a FIXME. Should this be reported as a bug?
         (vertico--remove-face 0 (length cand) 'completions-common-part cand)
-        (concat (substring content 0 vertico--base)
+        (concat vertico--base
                 (if hl (car (funcall vertico--highlight-function (list cand))) cand))))
      ((and (equal content "") (or (car-safe minibuffer-default) minibuffer-default)))
      (t (vertico--remove-face 0 (length content) 'vertico-current content) ;; Remove prompt face
