@@ -329,7 +329,8 @@ calling convention of a mode, i.e., it takes a single argument, which is either
 Furthermore you can tune buffer-local settings per command or category.
 
 #+begin_src emacs-lisp
-  ;; Change the default sorting function
+  ;; Change the default sorting function.
+  ;; See `vertico-sort-function' and `vertico-sort-override-function'.
   (setq vertico-multiform-commands
         '((describe-symbol (vertico-sort-function . vertico-sort-alpha))))
 

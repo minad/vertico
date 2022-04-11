@@ -90,6 +90,10 @@ See `resize-mini-windows' for documentation."
           (const :tag "Alphabetically" ,#'vertico-sort-alpha)
           (function :tag "Custom function")))
 
+(defcustom vertico-sort-override-function nil
+  "Override sort function which overrides the `display-sort-function'."
+  :type '(choice (const nil) function))
+
 (defgroup vertico-faces nil
   "Faces used by Vertico."
   :group 'vertico
@@ -303,7 +307,9 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (defun vertico--sort-function ()
   "Return the sorting function."
-  (or (vertico--metadata-get 'display-sort-function) vertico-sort-function))
+  (or vertico-sort-override-function
+      (vertico--metadata-get 'display-sort-function)
+      vertico-sort-function))
 
 (defun vertico--filter-files (files)
   "Filter FILES by `completion-ignored-extensions'."
