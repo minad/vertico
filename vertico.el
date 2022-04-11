@@ -80,14 +80,16 @@ See `resize-mini-windows' for documentation."
   "Replacements for multiline strings."
   :type '(cons (string :tag "Newline") (string :tag "Truncation")))
 
-(defcustom vertico-sort-function #'vertico-sort-history-length-alpha
-  "Default sorting function, used if no `display-sort-function' is specified."
-  :type `(choice
+(defcustom vertico-sort-function
+  ;; Use `vertico-sort-history-length-alpha' if available.
+  (and (fboundp 'vertico-sort-history-length-alpha) 'vertico-sort-history-length-alpha)
+  "Default sort function, used if no `display-sort-function' is specified."
+  :type '(choice
           (const :tag "No sorting" nil)
-          (const :tag "By history, length and alpha" ,#'vertico-sort-history-length-alpha)
-          (const :tag "By history and alpha" ,#'vertico-sort-history-alpha)
-          (const :tag "By length and alpha" ,#'vertico-sort-length-alpha)
-          (const :tag "Alphabetically" ,#'vertico-sort-alpha)
+          (const :tag "By history, length and alpha" vertico-sort-history-length-alpha)
+          (const :tag "By history and alpha" vertico-sort-history-alpha)
+          (const :tag "By length and alpha" vertico-sort-length-alpha)
+          (const :tag "Alphabetically" vertico-sort-alpha)
           (function :tag "Custom function")))
 
 (defcustom vertico-sort-override-function nil
@@ -134,9 +136,6 @@ See `resize-mini-windows' for documentation."
 (defvar-local vertico--highlight-function #'identity
   "Deferred candidate highlighting function.")
 
-(defvar-local vertico--history-hash nil
-  "History hash table and corresponding base string.")
-
 (defvar-local vertico--candidates-ov nil
   "Overlay showing the candidates.")
 
@@ -178,67 +177,6 @@ See `resize-mini-windows' for documentation."
 
 (defvar-local vertico--default-missing nil
   "Default candidate is missing from candidates list.")
-
-(defun vertico--history-hash ()
-  "Recompute history hash table and return it."
-  (or (and (equal (car vertico--history-hash) vertico--base) (cdr vertico--history-hash))
-      (let* ((base vertico--base)
-             (base-size (length base))
-             ;; History disabled if `minibuffer-history-variable' eq `t'.
-             (hist (and (not (eq minibuffer-history-variable t))
-                        (symbol-value minibuffer-history-variable)))
-             (hash (make-hash-table :test #'equal :size (length hist))))
-        (if (= base-size 0)
-            ;; Put history elements into the hash
-            (cl-loop for elem in hist for index from 0 do
-                     (unless (gethash elem hash)
-                       (puthash elem index hash)))
-          ;; Drop base string from history elements, before putting them into the hash
-          (cl-loop for elem in hist for index from 0 do
-                   (when (and (>= (length elem) base-size)
-                              (eq t (compare-strings base 0 base-size elem 0 base-size)))
-                     (setq elem (substring elem base-size))
-                     (unless (gethash elem hash)
-                       (puthash elem index hash)))))
-        (cdr (setq vertico--history-hash (cons base hash))))))
-
-(defun vertico--length-string< (x y)
-  "Sorting predicate which compares X and Y first by length then by `string<'."
-  (or (< (length x) (length y)) (and (= (length x) (length y)) (string< x y))))
-
-(defun vertico--sort-decorated (list)
-  "Sort decorated LIST and remove decorations."
-  (setq list (sort list #'car-less-than-car))
-  (cl-loop for item on list do (setcar item (cdar item)))
-  list)
-
-(defmacro vertico--define-sort (by bsize bindex bpred pred)
-  "Generate optimized sorting function.
-The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
-  `(defun ,(intern (mapconcat #'symbol-name `(vertico sort ,@by) "-")) (candidates)
-     ,(concat "Sort candidates by " (mapconcat #'symbol-name by ", ") ".")
-     (let* ((buckets (make-vector ,bsize nil))
-            ,@(and (eq (car by) 'history) '((hhash (vertico--history-hash)) (hcands))))
-       (dolist (% candidates)
-         ,(if (eq (car by) 'history)
-              ;; Find recent candidates or fill buckets
-              `(if-let (idx (gethash % hhash))
-                   (push (cons idx %) hcands)
-                 (let ((idx (min ,(1- bsize) ,bindex)))
-                   (aset buckets idx (cons % (aref buckets idx)))))
-            ;; Fill buckets
-            `(let ((idx (min ,(1- bsize) ,bindex)))
-               (aset buckets idx (cons % (aref buckets idx))))))
-       (nconc ,@(and (eq (car by) 'history) '((vertico--sort-decorated hcands)))
-              (mapcan (lambda (bucket) (sort bucket #',bpred))
-                      (nbutlast (append buckets nil)))
-              ;; Last bucket needs special treatment
-              (sort (aref buckets ,(1- bsize)) #',pred)))))
-
-(vertico--define-sort (history length alpha) 32 (length %) string< vertico--length-string<)
-(vertico--define-sort (history alpha) 32 (if (eq % "") 0 (/ (aref % 0) 4)) string< string<)
-(vertico--define-sort (length alpha) 32 (length %) string< vertico--length-string<)
-(vertico--define-sort (alpha) 32 (if (eq % "") 0 (/ (aref % 0) 4)) string< string<)
 
 (defun vertico--affixate (cands)
   "Annotate CANDS with annotation function."

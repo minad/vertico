@@ -241,6 +241,7 @@ following extensions come with the Vertico ELPA package:
 - [[https://github.com/minad/vertico/blob/main/extensions/vertico-quick.el][vertico-quick]]: Commands to select using Avy-style quick keys.
 - [[https://github.com/minad/vertico/blob/main/extensions/vertico-repeat.el][vertico-repeat]]: The command =vertico-repeat= repeats the last completion session.
 - [[https://github.com/minad/vertico/blob/main/extensions/vertico-reverse.el][vertico-reverse]]: =vertico-reverse-mode= to reverse the display.
+- [[https://github.com/minad/vertico/blob/main/extensions/vertico-sort.el][vertico-sort]]: Provides optimized sort functions, by history, by length and lexical.
 - [[https://github.com/minad/vertico/blob/main/extensions/vertico-unobtrusive.el][vertico-unobtrusive]]: =vertico-unobtrusive-mode= displays only the topmost candidate.
 
 See the Commentary of those files for configuration details. With these
