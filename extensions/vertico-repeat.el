@@ -30,6 +30,9 @@
 ;; Vertico sessions via the `vertico-repeat', `vertico-repeat-last' and
 ;; `vertico-repeat-select' commands. It is necessary to register a
 ;; minibuffer setup hook, which saves the Vertico state for repetition.
+;; In order to save the history across Emacs sessions, enable
+;; `savehist-mode' and add `vertico-repeat-history' to
+;; `savehist-additional-variables'.
 ;;
 ;; (global-set-key "\M-R" #'vertico-repeat)
 ;; (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
