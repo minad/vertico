@@ -68,14 +68,15 @@
 (defvar-local vertico-quick--list nil)
 (defvar-local vertico-quick--first nil)
 
-(defun vertico-quick--keys (index)
-  "Format keys for INDEX."
+(defun vertico-quick--keys (index start)
+  "Format keys for INDEX and START."
   (let* ((fst (length vertico-quick1))
          (snd (length vertico-quick2))
+         (idx (- index start))
          (len (+ fst snd)))
-    (if (>= index fst)
-        (let ((first (elt vertico-quick2 (mod (/ (- index fst) len) snd)))
-              (second (elt (concat vertico-quick1 vertico-quick2) (mod (- index fst) len))))
+    (if (>= idx fst)
+        (let ((first (elt vertico-quick2 (mod (/ (- idx fst) len) snd)))
+              (second (elt (concat vertico-quick1 vertico-quick2) (mod (- idx fst) len))))
           (cond
            ((eq first vertico-quick--first)
             (push (cons second index) vertico-quick--list)
@@ -85,7 +86,7 @@
             (push (cons first (list first)) vertico-quick--list)
             (concat (propertize (char-to-string first) 'face 'vertico-quick1)
                     (propertize (char-to-string second) 'face 'vertico-quick2)))))
-      (let ((first (elt vertico-quick1 (mod index fst))))
+      (let ((first (elt vertico-quick1 (mod idx fst))))
         (if vertico-quick--first
             "  "
           (push (cons first index) vertico-quick--list)
@@ -93,7 +94,7 @@
 
 (defun vertico-quick--format-candidate (orig cand prefix suffix index start)
   "Format candidate, see `vertico--format-candidate' for arguments."
-  (let ((keys (vertico-quick--keys (- index start))))
+  (let ((keys (vertico-quick--keys index start)))
     (if (bound-and-true-p vertico-flat-mode)
         (setq keys (replace-regexp-in-string " " "" keys)
               cand (string-trim cand)
