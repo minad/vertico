@@ -48,7 +48,7 @@
   :type '(repeat symbol)
   :group 'vertico)
 
-(defvar vertico-repeat--history nil)
+(defvar vertico-repeat-history nil)
 (defvar-local vertico-repeat--command nil)
 (defvar-local vertico-repeat--input nil)
 
@@ -57,9 +57,9 @@
   (setq vertico-repeat--input (minibuffer-contents)))
 
 (defun vertico-repeat--save-exit ()
-  "Save command session in `vertico-repeat--history'."
+  "Save command session in `vertico-repeat-history'."
   (add-to-history
-   'vertico-repeat--history
+   'vertico-repeat-history
    (list
     vertico-repeat--command
     vertico-repeat--input
@@ -91,7 +91,7 @@ This function must be registered as `minibuffer-setup-hook'."
 (defun vertico-repeat-last (&optional session)
   "Repeat last Vertico completion SESSION."
   (interactive
-   (list (or (car vertico-repeat--history)
+   (list (or (car vertico-repeat-history)
              (user-error "No repeatable Vertico session"))))
   (minibuffer-with-setup-hook
       (apply-partially #'vertico-repeat--restore session)
@@ -105,7 +105,7 @@ This function must be registered as `minibuffer-setup-hook'."
           (delete-dups
            (or
             (cl-loop
-             for session in vertico-repeat--history collect
+             for session in vertico-repeat-history collect
              (list
               (symbol-name (car session))
               (replace-regexp-in-string
