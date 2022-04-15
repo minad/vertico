@@ -37,6 +37,7 @@
 ;;; Code:
 
 (require 'vertico)
+(require 'vertico-bottom)
 
 (defvar vertico-reverse-map
   (let ((map (make-sparse-keymap)))
@@ -54,18 +55,6 @@
     map)
   "Additional keymap activated in reverse mode.")
 
-(defun vertico-reverse--display-candidates (lines)
-  "Display LINES in reverse."
-  (move-overlay vertico--candidates-ov (point-min) (point-min))
-  (setq lines (nreverse lines))
-  (unless (eq vertico-resize t)
-    (setq lines (nconc (make-list (max 0 (- vertico-count (length lines))) "\n") lines)))
-  (let ((string (apply #'concat lines)))
-    (add-face-text-property 0 (length string) 'default 'append string)
-    (overlay-put vertico--candidates-ov 'before-string string)
-    (overlay-put vertico--candidates-ov 'after-string nil))
-  (vertico--resize-window (length lines)))
-
 ;;;###autoload
 (define-minor-mode vertico-reverse-mode
   "Reverse the Vertico display."
@@ -77,10 +66,12 @@
   (cond
    (vertico-reverse-mode
     (add-to-list 'minor-mode-map-alist `(vertico--input . ,vertico-reverse-map))
-    (advice-add #'vertico--display-candidates :override #'vertico-reverse--display-candidates))
+    (advice-add #'vertico--arrange-candidates :filter-return #'nreverse)
+    (advice-add #'vertico--display-candidates :override #'vertico-bottom--display-candidates))
    (t
     (setq minor-mode-map-alist (delete `(vertico--input . ,vertico-reverse-map) minor-mode-map-alist))
-    (advice-remove #'vertico--display-candidates #'vertico-reverse--display-candidates))))
+    (advice-remove #'vertico--arrange-candidates #'nreverse)
+    (advice-remove #'vertico--display-candidates #'vertico-bottom--display-candidates))))
 
 (provide 'vertico-reverse)
 ;;; vertico-reverse.el ends here
