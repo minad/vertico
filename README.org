@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 #+export_file_name: vertico.texi
-#+texinfo_dir_category: Emacs
+#+texinfo_dir_category: Emacs misc features
 #+texinfo_dir_title: Vertico: (vertico).
 #+texinfo_dir_desc: VERTical Interactive COmpletion.
 
