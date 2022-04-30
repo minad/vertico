@@ -126,7 +126,7 @@ See `resize-mini-windows' for documentation."
     (define-key map [remap forward-paragraph] #'vertico-next-group)
     (define-key map [remap exit-minibuffer] #'vertico-exit)
     (define-key map [remap kill-ring-save] #'vertico-save)
-    (define-key map "\e\r" #'vertico-exit-input)
+    (define-key map "\M-\r" #'vertico-exit-input)
     (define-key map "\t" #'vertico-insert)
     map)
   "Vertico minibuffer keymap derived from `minibuffer-local-map'.")
