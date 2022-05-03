@@ -93,7 +93,6 @@ configuration:
   (use-package emacs
     :init
     ;; Add prompt indicator to `completing-read-multiple'.
-    ;; Alternatively try `consult-completing-read-multiple'.
     (defun crm-indicator (args)
       (cons (concat "[CRM] " (car args)) (cdr args)))
     (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
@@ -213,16 +212,6 @@ minibuffer when =M-:= (~eval-expression~) is used.
 You may also want to look into my [[https://github.com/minad/corfu][Corfu]] package, which provides a minimal
 completion system for =completion-in-region= in a child frame popup. Corfu is also
 a narrowly focused package and developed in the same spirit as Vertico.
-
-** Completing-read-multiple (CRM)
-
-Consult offers an enhanced =completing-read-multiple= implementation which you can
-use with Vertico.
-
-#+begin_src emacs-lisp
-  (advice-add #'completing-read-multiple
-              :override #'consult-completing-read-multiple)
-#+end_src
 
 * Extensions
 :properties:
