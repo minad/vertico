@@ -716,15 +716,14 @@ When the prefix argument is 0, the group order is reset."
 (defun vertico-insert ()
   "Insert current candidate in minibuffer."
   (interactive)
-  ;; XXX There is a small bug here, depending on interpretation. When
-  ;; completing "~/emacs/master/li|/calc" where "|" is the cursor,
-  ;; then the returned candidate only includes the prefix
-  ;; "~/emacs/master/lisp/", but not the suffix "/calc". Default
-  ;; completion has the same problem when selecting in the
-  ;; *Completions* buffer. See bug#48356.
-  (when-let (cand (and (>= vertico--index 0) (vertico--candidate)))
-    (delete-minibuffer-contents)
-    (insert cand)))
+  ;; XXX There is a small bug here, depending on interpretation. When completing
+  ;; "~/emacs/master/li|/calc" where "|" is the cursor, then the returned
+  ;; candidate only includes the prefix "~/emacs/master/lisp/", but not the
+  ;; suffix "/calc". Default completion has the same problem when selecting in
+  ;; the *Completions* buffer. See bug#48356.
+  (when (or (>= vertico--index 0) (= vertico--total 1))
+    (let ((vertico--index (max 0 vertico--index)))
+      (insert (prog1 (vertico--candidate) (delete-minibuffer-contents))))))
 
 (defun vertico--candidate (&optional hl)
   "Return current candidate string with optional highlighting if HL is non-nil."
