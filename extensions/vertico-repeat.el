@@ -78,8 +78,8 @@
     (vertico--exhibit)
     (when-let (idx (seq-position vertico--candidates (caddr session)))
       (setq vertico--index idx
-            vertico--lock-candidate t)
-      (vertico--exhibit))))
+            vertico--lock-candidate t)))
+  (vertico--exhibit))
 
 ;;;###autoload
 (defun vertico-repeat-save ()
