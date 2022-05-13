@@ -26,8 +26,10 @@
 
 ;;; Commentary:
 
-;; This package is a Vertico extension, which prefixes candidates with
-;; indices and allows you to select with prefix arguments.
+;; This package is a Vertico extension, which prefixes candidates with indices
+;; if enabled via `vertico-indexed-mode'. It allows you to select candidates
+;; with prefix arguments. This is designed to be a faster alternative to
+;; selecting a candidate with `vertico-next' and `vertico-previous'.
 
 ;;; Code:
 
