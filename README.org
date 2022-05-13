@@ -243,13 +243,14 @@ following extensions come with the Vertico ELPA package:
 - [[https://github.com/minad/vertico/blob/main/extensions/vertico-reverse.el][vertico-reverse]]: =vertico-reverse-mode= to reverse the display.
 - [[https://github.com/minad/vertico/blob/main/extensions/vertico-unobtrusive.el][vertico-unobtrusive]]: =vertico-unobtrusive-mode= displays only the topmost candidate.
 
-With these extensions it is possible to adapt Vertico such that it matches your
-preference or behaves similar to other familiar UIs. For example, the
-combination =vertico-flat= plus =vertico-directory= resembles Ido in look and feel.
-For an interface similar to Helm, the extension =vertico-buffer= allows you to
-configure freely where the completion buffer opens, instead of growing the
-minibuffer. Furthermore =vertico-buffer= will adjust the number of displayed
-candidates according to the buffer height.
+See the Commentary of those files for configuration details. With these
+extensions it is possible to adapt Vertico such that it matches your preference
+or behaves similar to other familiar UIs. For example, the combination
+=vertico-flat= plus =vertico-directory= resembles Ido in look and feel. For an
+interface similar to Helm, the extension =vertico-buffer= allows you to configure
+freely where the completion buffer opens, instead of growing the minibuffer.
+Furthermore =vertico-buffer= will adjust the number of displayed candidates
+according to the buffer height.
 
 Configuration example for =vertico-directory=:
 
