@@ -721,9 +721,8 @@ When the prefix argument is 0, the group order is reset."
   ;; candidate only includes the prefix "~/emacs/master/lisp/", but not the
   ;; suffix "/calc". Default completion has the same problem when selecting in
   ;; the *Completions* buffer. See bug#48356.
-  (when (or (>= vertico--index 0) (= vertico--total 1))
-    (let ((vertico--index (max 0 vertico--index)))
-      (insert (prog1 (vertico--candidate) (delete-minibuffer-contents))))))
+  (when (>= vertico--index 0)
+    (insert (prog1 (vertico--candidate) (delete-minibuffer-contents)))))
 
 (defun vertico--candidate (&optional hl)
   "Return current candidate string with optional highlighting if HL is non-nil."
