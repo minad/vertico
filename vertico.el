@@ -94,6 +94,11 @@ See `resize-mini-windows' for documentation."
   "Override sort function which overrides the `display-sort-function'."
   :type '(choice (const nil) function))
 
+(defcustom vertico-activate-functions '(t)
+  "List of functions that activate the UI.
+Special value `(t)' means always. "
+  :type '(list symbol))
+
 (defgroup vertico-faces nil
   "Faces used by Vertico."
   :group 'vertico
@@ -755,8 +760,15 @@ When the prefix argument is 0, the group order is reset."
   (add-hook 'post-command-hook #'vertico--exhibit nil 'local))
 
 (defun vertico--advice (&rest args)
-  "Advice for completion function, receiving ARGS."
-  (minibuffer-with-setup-hook #'vertico--setup (apply args)))
+  "Advice for completion function, receiving ARGS.
+The advice only sets up vertico if either the command that activated it is a member of
+`vertico-activate-functions', or `vertico-activate-functions' is equal to `(t)'.
+"
+  (let ((fun (if (or (equal vertico-activate-functions '(t))
+                     (memq this-command vertico-activate-functions))
+                 #'vertico--setup
+               #'(lambda (&rest _args) nil))))
+    (minibuffer-with-setup-hook fun (apply args))))
 
 ;;;###autoload
 (define-minor-mode vertico-mode
