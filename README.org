@@ -612,7 +612,7 @@ In both cases the empty string can be submitted. In the first case no explicit
 default value is specified and Vertico preselects the *first* candidate. In order
 to exit with the empty string, press =M-RET=. In the second case the explicit
 default value "" is specified and Vertico preselects the prompt, such that
-existing with the empty string is possible by pressing =RET= only.
+exiting with the empty string is possible by pressing =RET= only.
 
 ** Tramp hostname completion
 
