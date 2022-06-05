@@ -37,8 +37,7 @@
 ;;; Code:
 
 (require 'vertico)
-(eval-when-compile
-  (require 'cl-lib))
+(eval-when-compile (require 'cl-lib))
 
 (defcustom vertico-grid-min-columns 2
   "Minimal number of grid columns."
