@@ -57,7 +57,7 @@
 
 (defun vertico-repeat--save-input ()
   "Save current minibuffer input."
-  (setq vertico-repeat--input (minibuffer-contents)))
+  (setq vertico-repeat--input (minibuffer-contents-no-properties)))
 
 (defun vertico-repeat--save-exit ()
   "Save command session in `vertico-repeat-history'."
@@ -68,7 +68,8 @@
     vertico-repeat--input
     (and vertico--lock-candidate
          (>= vertico--index 0)
-         (nth vertico--index vertico--candidates)))))
+         (substring-no-properties
+          (nth vertico--index vertico--candidates))))))
 
 (defun vertico-repeat--restore (session)
   "Restore Vertico SESSION for `vertico-repeat'."
@@ -85,7 +86,8 @@
 (defun vertico-repeat-save ()
   "Save Vertico session for `vertico-repeat'.
 This function must be registered as `minibuffer-setup-hook'."
-  (when (and vertico--input (not (memq this-command vertico-repeat-filter)))
+  (when (and vertico--input (symbolp this-command)
+             (not (memq this-command vertico-repeat-filter)))
     (setq vertico-repeat--command this-command)
     (add-hook 'post-command-hook #'vertico-repeat--save-input nil 'local)
     (add-hook 'minibuffer-exit-hook #'vertico-repeat--save-exit nil 'local)))
