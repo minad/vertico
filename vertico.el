@@ -602,7 +602,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Exhibit completion UI."
   (let* ((buffer-undo-list t) ;; Overlays affect point position and undo list!
          (pt (max 0 (- (point) (minibuffer-prompt-end))))
-         (content (minibuffer-contents)))
+         (content (minibuffer-contents-no-properties)))
     (unless (or (input-pending-p) (equal vertico--input (cons content pt)))
       (vertico--update-candidates pt content))
     (vertico--prompt-selection)
@@ -728,7 +728,7 @@ When the prefix argument is 0, the group order is reset."
 
 (defun vertico--candidate (&optional hl)
   "Return current candidate string with optional highlighting if HL is non-nil."
-  (let ((content (substring (or (car-safe vertico--input) (minibuffer-contents)))))
+  (let ((content (substring (or (car-safe vertico--input) (minibuffer-contents-no-properties)))))
     (cond
      ((>= vertico--index 0)
       (let ((cand (substring (nth vertico--index vertico--candidates))))
@@ -739,8 +739,7 @@ When the prefix argument is 0, the group order is reset."
         (concat vertico--base
                 (if hl (car (funcall vertico--highlight-function (list cand))) cand))))
      ((and (equal content "") (or (car-safe minibuffer-default) minibuffer-default)))
-     (t (vertico--remove-face 0 (length content) 'vertico-current content) ;; Remove prompt face
-        content))))
+     (t content))))
 
 (defun vertico--setup ()
   "Setup completion UI."
