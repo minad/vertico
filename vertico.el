@@ -184,22 +184,19 @@ See `resize-mini-windows' for documentation."
   (or (and (equal (car vertico--history-hash) vertico--base) (cdr vertico--history-hash))
       (let* ((base vertico--base)
              (base-size (length base))
-             ;; History disabled if `minibuffer-history-variable' eq `t'.
-             (hist (and (not (eq minibuffer-history-variable t))
+             (hist (and (not (eq minibuffer-history-variable t)) ;; Disabled for `t'.
                         (symbol-value minibuffer-history-variable)))
              (hash (make-hash-table :test #'equal :size (length hist))))
-        (if (= base-size 0)
-            ;; Put history elements into the hash
-            (cl-loop for elem in hist for index from 0 do
-                     (unless (gethash elem hash)
-                       (puthash elem index hash)))
-          ;; Drop base string from history elements, before putting them into the hash
-          (cl-loop for elem in hist for index from 0 do
-                   (when (and (>= (length elem) base-size)
-                              (eq t (compare-strings base 0 base-size elem 0 base-size)))
-                     (setq elem (substring elem base-size))
-                     (unless (gethash elem hash)
-                       (puthash elem index hash)))))
+        (cl-loop for elem in hist for index from 0 do
+                 (when (or (= base-size 0)
+                           (and (>= (length elem) base-size)
+                                (eq t (compare-strings base 0 base-size elem 0 base-size))))
+                   (let ((file-sep (and (eq minibuffer-history-variable 'file-name-history)
+                                        (string-match-p "/" elem base-size))))
+                     ;; Drop base string from history elements & special file handling.
+                     (when (or (> base-size 0) file-sep)
+                       (setq elem (substring elem base-size (and file-sep (1+ file-sep)))))
+                     (unless (gethash elem hash) (puthash elem index hash)))))
         (cdr (setq vertico--history-hash (cons base hash))))))
 
 (defun vertico--length-string< (x y)
