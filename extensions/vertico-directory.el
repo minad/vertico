@@ -40,17 +40,6 @@
 
 (require 'vertico)
 
-(defun vertico-directory--completing-file-p ()
-  "Return non-nil when completing file names."
-  (eq 'file
-      (completion-metadata-get
-       (completion-metadata
-        (buffer-substring (minibuffer-prompt-end)
-                          (max (minibuffer-prompt-end) (point)))
-        minibuffer-completion-table
-        minibuffer-completion-predicate)
-       'category)))
-
 ;;;###autoload
 (defun vertico-directory-enter ()
   "Enter directory or exit completion with current candidate."
@@ -60,7 +49,7 @@
              (or (string-suffix-p "/" cand)
                  (and (vertico--remote-p cand)
                       (string-suffix-p ":" cand))))
-           (vertico-directory--completing-file-p))
+           (eq 'file (vertico--metadata-get 'category)))
       (vertico-insert)
     (vertico-exit)))
 
@@ -70,7 +59,7 @@
   (interactive "p")
   (when (and (> (point) (minibuffer-prompt-end))
              (eq (char-before) ?/)
-             (vertico-directory--completing-file-p))
+             (eq 'file (vertico--metadata-get 'category)))
     (let ((path (buffer-substring (minibuffer-prompt-end) (point))) found)
       (when (string-match-p "\\`~[^/]*/\\'" path)
         (delete-minibuffer-contents)
