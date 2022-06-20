@@ -91,13 +91,15 @@
 ;;;###autoload
 (defun vertico-directory-tidy ()
   "Tidy shadowed file name, see `rfn-eshadow-overlay'."
-  (when (and (eq this-command #'self-insert-command)
-             (bound-and-true-p rfn-eshadow-overlay)
-             (overlay-buffer rfn-eshadow-overlay)
-             (= (point) (point-max))
-             (or (>= (- (point) (overlay-end rfn-eshadow-overlay)) 2)
-                 (eq ?/ (char-before (- (point) 2)))))
-    (delete-region (overlay-start rfn-eshadow-overlay) (overlay-end rfn-eshadow-overlay))))
+  (when (eq this-command #'self-insert-command)
+    (dolist (ov '(tramp-rfn-eshadow-overlay rfn-eshadow-overlay))
+      (when (and (boundp ov)
+                 (setq ov (symbol-value ov))
+                 (overlay-buffer ov)
+                 (= (point) (point-max))
+                 (or (>= (- (point) (overlay-end ov)) 2)
+                     (eq ?/ (char-before (- (point) 2)))))
+        (delete-region (overlay-start ov) (overlay-end ov))))))
 
 ;; Emacs 28: Do not show Vertico commands in M-X
 (dolist (sym '(vertico-directory-up vertico-directory-enter
