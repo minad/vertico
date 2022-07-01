@@ -94,6 +94,10 @@ See `resize-mini-windows' for documentation."
   "Override sort function which overrides the `display-sort-function'."
   :type '(choice (const nil) function))
 
+(defcustom vertico-candidate-action-hook nil
+  "Functions to run before a candidate is acted on, such as by `vertico-insert'."
+  :type 'hook)
+
 (defgroup vertico-faces nil
   "Faces used by Vertico."
   :group 'vertico
@@ -672,8 +676,10 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 (defun vertico-exit (&optional arg)
   "Exit minibuffer with current candidate or input if prefix ARG is given."
   (interactive "P")
-  (when (and (not arg) (>= vertico--index 0))
-    (vertico-insert))
+  (if (and (not arg) (>= vertico--index 0))
+      (vertico-insert)
+    ;; This hook also called by `vertico-insert'.
+    (mapc #'funcall vertico-candidate-action-hook))
   (when (vertico--match-p (minibuffer-contents-no-properties))
     (exit-minibuffer)))
 
@@ -714,6 +720,10 @@ When the prefix argument is 0, the group order is reset."
       (call-interactively #'kill-ring-save)
     (kill-new (vertico--candidate))))
 
+(defcustom vertico-candidate-inserted-hook nil
+  "Functions to run before a candidate is inserted via `vertico-insert'."
+  :type 'hook)
+
 (defun vertico-insert ()
   "Insert current candidate in minibuffer."
   (interactive)
@@ -724,6 +734,7 @@ When the prefix argument is 0, the group order is reset."
   ;; the *Completions* buffer. See bug#48356.
   (when (or (>= vertico--index 0) (= vertico--total 1))
     (let ((vertico--index (max 0 vertico--index)))
+      (mapc #'funcall vertico-candidate-action-hook)
       (insert (prog1 (vertico--candidate) (delete-minibuffer-contents))))))
 
 (defun vertico--candidate (&optional hl)
