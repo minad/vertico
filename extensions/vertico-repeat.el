@@ -51,9 +51,24 @@
   :type '(repeat symbol)
   :group 'vertico)
 
+(defcustom vertico-repeat-transformers
+  (list #'vertico-repeat--filter-empty
+        #'vertico-repeat--filter-commands)
+  "List of functions to apply to history element before saving."
+  :type '(repeat function)
+  :group 'vertico)
+
 (defvar vertico-repeat-history nil)
 (defvar-local vertico-repeat--command nil)
 (defvar-local vertico-repeat--input nil)
+
+(defun vertico-repeat--filter-commands (session)
+  "Filter SESSION if command is listed in `vertico-repeat-filter'."
+  (and (not (memq (car session) vertico-repeat-filter)) session))
+
+(defun vertico-repeat--filter-empty (session)
+  "Filter SESSION if input is empty."
+  (and (cadr session) (not (equal (cadr session) "")) session))
 
 (defun vertico-repeat--save-input ()
   "Save current minibuffer input."
@@ -61,15 +76,16 @@
 
 (defun vertico-repeat--save-exit ()
   "Save command session in `vertico-repeat-history'."
-  (add-to-history
-   'vertico-repeat-history
-   (list
-    vertico-repeat--command
-    vertico-repeat--input
-    (and vertico--lock-candidate
-         (>= vertico--index 0)
-         (substring-no-properties
-          (nth vertico--index vertico--candidates))))))
+  (let ((session `(,vertico-repeat--command
+                   ,vertico-repeat--input
+                   ,@(and vertico--lock-candidate
+                          (>= vertico--index 0)
+                          (list (substring-no-properties
+                                 (nth vertico--index vertico--candidates))))))
+        (transform vertico-repeat-transformers))
+    (while (and transform (setq session (funcall (pop transform) session))))
+    (when session
+      (add-to-history 'vertico-repeat-history session))))
 
 (defun vertico-repeat--restore (session)
   "Restore Vertico SESSION for `vertico-repeat'."
@@ -86,8 +102,7 @@
 (defun vertico-repeat-save ()
   "Save Vertico session for `vertico-repeat'.
 This function must be registered as `minibuffer-setup-hook'."
-  (when (and vertico--input (symbolp this-command)
-             (not (memq this-command vertico-repeat-filter)))
+  (when (and vertico--input (symbolp this-command))
     (setq vertico-repeat--command this-command)
     (add-hook 'post-command-hook #'vertico-repeat--save-input nil 'local)
     (add-hook 'minibuffer-exit-hook #'vertico-repeat--save-exit nil 'local)))
