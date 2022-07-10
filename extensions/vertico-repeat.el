@@ -160,6 +160,7 @@ This function must be registered as `minibuffer-setup-hook'."
                        (make-string (- max-input (string-width input) -4) ?\s)
                        (and cand (propertize cand 'face 'font-lock-comment-face)))
                       session)))
+         (enable-recursive-minibuffers t)
          (selected (or (cdr (assoc (completing-read
                                     "History: "
                                     (lambda (str pred action)
