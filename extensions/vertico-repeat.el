@@ -109,7 +109,10 @@ This function must be registered as `minibuffer-setup-hook'."
 
 ;;;###autoload
 (defun vertico-repeat-last (&optional session)
-  "Repeat last Vertico completion SESSION."
+  "Repeat last Vertico completion SESSION.
+If called interactively from an existing Vertico session,
+`vertico-repeat-last' will restore the last input and
+last selected candidate for the current command."
   (interactive
    (list (or (if vertico-repeat--command
                  (seq-find (lambda (x) (eq (car x) vertico-repeat--command))
@@ -124,7 +127,9 @@ This function must be registered as `minibuffer-setup-hook'."
 
 ;;;###autoload
 (defun vertico-repeat-select ()
-  "Select a Vertico session from the session history and repeat it."
+  "Select a Vertico session from the session history and repeat it.
+If called from an existing Vertico session, you can select among
+previous sessions for the current command."
   (interactive)
   (let* ((cmd vertico-repeat--command)
          (trimmed
