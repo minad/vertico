@@ -133,13 +133,13 @@ last selected candidate for the current command."
 If called from an existing Vertico session, you can select among
 previous sessions for the current command."
   (interactive)
-  (let* ((cmd vertico-repeat--command)
+  (let* ((current-cmd vertico-repeat--command)
          (trimmed
           (delete-dups
            (or
             (cl-loop
              for session in vertico-repeat-history
-             if (or (not cmd) (eq (car session) cmd))
+             if (or (not current-cmd) (eq (car session) current-cmd))
              collect
              (list
               (symbol-name (car session))
@@ -161,15 +161,19 @@ previous sessions for the current command."
                      for (cmd input cand session) in trimmed collect
                      (cons
                       (concat
-                       (propertize cmd 'face 'font-lock-function-name-face)
-                       (make-string (- max-cmd (string-width cmd) -4) ?\s)
-                       (propertize input 'face 'font-lock-string-face)
+                       (and (not current-cmd)
+                            (propertize cmd 'face 'font-lock-function-name-face))
+                       (and (not current-cmd)
+                            (make-string (- max-cmd (string-width cmd) -4) ?\s))
+                       input
                        (make-string (- max-input (string-width input) -4) ?\s)
                        (and cand (propertize cand 'face 'font-lock-comment-face)))
                       session)))
          (enable-recursive-minibuffers t)
          (selected (or (cdr (assoc (completing-read
-                                    "History: "
+                                    (if current-cmd
+                                        (format "History of %s: " current-cmd)
+                                      "Completion history: ")
                                     (lambda (str pred action)
                                       (if (eq action 'metadata)
                                           '(metadata (display-sort-function . identity)
