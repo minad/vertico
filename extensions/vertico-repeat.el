@@ -111,21 +111,29 @@ This function must be registered as `minibuffer-setup-hook'."
 (defun vertico-repeat-last (&optional session)
   "Repeat last Vertico completion SESSION."
   (interactive
-   (list (or (car vertico-repeat-history)
+   (list (or (if vertico-repeat--command
+                 (seq-find (lambda (x) (eq (car x) vertico-repeat--command))
+                           vertico-repeat-history)
+               (car vertico-repeat-history))
              (user-error "No repeatable Vertico session"))))
-  (minibuffer-with-setup-hook
-      (apply-partially #'vertico-repeat--restore session)
-    (command-execute (setq this-command (car session)))))
+  (if (and vertico-repeat--command (eq vertico-repeat--command (car session)))
+      (vertico-repeat--restore session)
+    (minibuffer-with-setup-hook
+        (apply-partially #'vertico-repeat--restore session)
+      (command-execute (setq this-command (car session))))))
 
 ;;;###autoload
 (defun vertico-repeat-select ()
   "Select a Vertico session from the session history and repeat it."
   (interactive)
-  (let* ((trimmed
+  (let* ((cmd vertico-repeat--command)
+         (trimmed
           (delete-dups
            (or
             (cl-loop
-             for session in vertico-repeat-history collect
+             for session in vertico-repeat-history
+             if (or (not cmd) (eq (car session) cmd))
+             collect
              (list
               (symbol-name (car session))
               (replace-regexp-in-string
