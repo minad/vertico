@@ -343,9 +343,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (when completing-file (setq all (vertico--filter-files all)))
     ;; Sort using the `display-sort-function' or the Vertico sort functions
     (setq all (delete-consecutive-dups (funcall (or (vertico--sort-function) #'identity) all)))
-    ;; Move special candidates: "field" appears at the top, before "field/", before default value
-    (when (stringp def)
-      (setq all (vertico--move-to-front def all)))
+    ;; Move input to the top: "field" and "field/"
     (when (and completing-file (not (string-suffix-p "/" field)))
       (setq all (vertico--move-to-front (concat field "/") all)))
     (setq all (vertico--move-to-front field all))
@@ -355,10 +353,11 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
           ;; Default value is missing from collection
           (and def (equal content "") (not (member def all)))
           ;; Find position of old candidate in the new list.
-          (when vertico--lock-candidate
-            (if (< vertico--index 0)
-                vertico--index
-              (seq-position all (nth vertico--index vertico--candidates))))
+          (if vertico--lock-candidate
+              (if (< vertico--index 0)
+                  vertico--index
+                (seq-position all (nth vertico--index vertico--candidates)))
+            (and def (equal content "") (seq-position all def)))
           all (cadr groups) (or (caddr groups) vertico--all-groups) hl)))
 
 (defun vertico--cycle (list n)
