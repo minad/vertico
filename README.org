@@ -383,7 +383,7 @@ UI. These packages are fully supported:
 - [[https://github.com/oantolin/embark][Embark]]: Minibuffer actions and context menu
 - [[https://github.com/oantolin/orderless][Orderless]]: Advanced completion style
 
-In order to get accustomed with the package ecosystem, I recommed the following
+In order to get accustomed with the package ecosystem, I recommend the following
 quick start approach:
 
 1. Start with plain Emacs (~emacs -Q~).
@@ -455,7 +455,7 @@ There are other interactive completion UIs, which follow a similar philosophy:
   ~*Completions*~ buffer and enhances it with automatic updates and additional
   keybindings, to select a candidate and move between minibuffer and completions
   buffer. Since Mct uses a fully functional buffer you can reuse all your
-  familar buffer commands inside the completions buffer. The main distinction to
+  familiar buffer commands inside the completions buffer. The main distinction to
   Vertico's approach is that ~*Completions*~ buffer displays all matching
   candidates. This has the advantage that you can interact freely with the
   candidates and jump around with Isearch or Avy. On the other hand it
