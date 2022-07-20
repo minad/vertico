@@ -485,6 +485,7 @@ If you want to learn more about Vertico and minibuffer completion, check out the
 following resources:
 
 - [[https://github.com/hlissner/doom-emacs/tree/develop/modules/completion/vertico][Doom Emacs Vertico Module]]: Vertico is Doom's default completion system.
+- [[https://www.youtube.com/watch?v=fnE0lXoe7Y0][Emacs Completion Explained]] (2022-07-19) by Andrew Tropin.
 - [[https://www.youtube.com/watch?v=w9hHMDyF9V4][Emacs Minibuffer Completions]] (2022-02-12) by Greg Yut.
 - [[https://www.youtube.com/watch?v=hPwDbx--Waw][Vertico Extensions for Emacs]] (2022-01-08) by Karthik Chikmagalur.
 - [[https://youtu.be/5ffb2at2d7w][Using Emacs Episode 80 - Vertico, Marginalia, Consult and Embark]] (2021-10-26) by Mike Zamansky.
