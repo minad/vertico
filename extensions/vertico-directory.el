@@ -49,6 +49,8 @@
              (or (string-suffix-p "/" cand)
                  (and (vertico--remote-p cand)
                       (string-suffix-p ":" cand))))
+           ;; Check vertico--base for stepwise file path completion
+           (not (equal vertico--base ""))
            (eq 'file (vertico--metadata-get 'category)))
       (vertico-insert)
     (vertico-exit)))
