@@ -11,8 +11,6 @@
 #+html: <a href="http://elpa.gnu.org/devel/vertico.html"><img alt="GNU-devel ELPA" src="https://elpa.gnu.org/devel/vertico.svg"/></a>
 #+html: <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Vertigomovie_restoration.jpg/800px-Vertigomovie_restoration.jpg" align="right" width="30%">
 
-* Introduction
-
 Vertico provides a performant and minimalistic vertical completion UI based on
 the default completion system. The main focus of Vertico is to provide a UI
 which behaves /correctly/ under all circumstances. By reusing the built-in
@@ -22,6 +20,8 @@ UI but aims to be highly flexible, extensible and modular. Additional
 enhancements are available as [[#extensions][extensions]] or [[#complementary-packages][complementary packages]]. The code
 base is small and maintainable. The main ~vertico.el~ package is only about 600
 lines of code without white space and comments.
+
+#+toc: headlines 8
 
 * Features
 
