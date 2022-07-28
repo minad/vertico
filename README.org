@@ -469,11 +469,11 @@ There are other interactive completion UIs, which follow a similar philosophy:
   perspective, candidate rotation feels a bit less intuitive than the UI of
   Vertico or Selectrum. Note that Emacs 28 offers a built-in
   ~icomplete-vertical-mode~.
-- [[https://github.com/raxod502/selectrum][Selectrum]]: Selectrum is the predecessor of Vertico, since it directly inspired
+- [[https://github.com/radian-software/selectrum][Selectrum]]: Selectrum is the predecessor of Vertico, since it directly inspired
   Vertico. Selectrum has a similar UI and interaction model as Vertico. Vertico
   offers additional features and is more flexible than Selectrum thanks to its
   [[#extensions][extensions]]. Unfortunately Selectrum is not fully compatible with every Emacs
-  completion command and dynamic completion tables ([[https://github.com/raxod502/selectrum/issues/481][selectrum#481]]), since it uses
+  completion command and dynamic completion tables ([[https://github.com/radian-software/selectrum/issues/481][selectrum#481]]), since it uses
   its own filtering infrastructure, which deviates from the standard Emacs
   completion facilities. The filtering infrastructure also leads to a larger and
   more complex code base. Selectrum is likely getting deprecated in favor of
