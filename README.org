@@ -437,47 +437,39 @@ a minimal code base, relying purely on ~completing-read~ while avoiding to inven
 its own APIs. Inventing a custom API as Helm or Ivy is explicitly avoided in
 order to increase flexibility and package reuse. Due to its small code base and
 reuse of the Emacs built-in facilities, bugs and compatibility issues are less
-likely to occur in comparison to completion UIs or full completion systems,
-which reimplement a lot of functionality.
+likely to occur in comparison to completion UIs or monolithic completion systems.
 
 Since Vertico only provides the UI, you may want to combine it with some of the
 complementary packages, to give a full-featured completion experience similar to
-Helm or Ivy. Overall the packages in the spirit of Vertico have a different
-style than Helm or Ivy. The idea is to have smaller independent components,
-which one can add and understand step by step. Each component focuses on its
-niche and tries to be as non-intrusive as possible. Vertico targets users
-interested in crafting their Emacs precisely to their liking - completion plays
-an integral part in how the users interacts with Emacs.
+Helm or Ivy. The idea is to have smaller independent components, which one can
+add and understand step by step. Each component focuses on its niche and tries
+to be as non-intrusive as possible. Vertico targets users interested in crafting
+their Emacs precisely to their liking - completion plays an integral part in how
+the users interacts with Emacs.
 
 There are other interactive completion UIs, which follow a similar philosophy:
 
 - [[https://git.sr.ht/~protesilaos/mct][Mct]]: Minibuffer and Completions in Tandem. Mct reuses the default
   ~*Completions*~ buffer and enhances it with automatic updates and additional
   keybindings, to select a candidate and move between minibuffer and completions
-  buffer. Since Mct uses a fully functional buffer you can reuse all your
-  familiar buffer commands inside the completions buffer. The main distinction to
-  Vertico's approach is that ~*Completions*~ buffer displays all matching
-  candidates. This has the advantage that you can interact freely with the
-  candidates and jump around with Isearch or Avy. On the other hand it
-  necessarily causes a slowdown in comparison to Vertico, which only displays a
-  subset of candidates. Mct supports completion in region via its
-  ~mct-region-mode~. Note that Mct development is currently [[https://protesilaos.com/codelog/2022-04-14-emacs-discontinue-mct/][discontinued]] due to
-  recent changes of the default completion UI on the Emacs master branch.
-- [[https://github.com/oantolin/icomplete-vertical][Icomplete-vertical]]: This package enhances the Emacs builtin Icomplete with a
-  vertical display. In contrast to Vertico, Icomplete rotates the candidates
-  such that the current candidate always appears at the top. From my
-  perspective, candidate rotation feels a bit less intuitive than the UI of
-  Vertico or Selectrum. Note that Emacs 28 offers a built-in
-  ~icomplete-vertical-mode~.
+  buffer. Since Mct uses a fully functional buffer you can use familiar buffer
+  commands inside the completions buffer. The main distinction to Vertico's
+  approach is that ~*Completions*~ buffer displays all matching candidates. This
+  has the advantage that you can interact freely with the candidates and jump
+  around with Isearch or Avy. On the other hand it necessarily causes a
+  slowdown. Mct supports completion in region via its ~mct-region-mode~. Note that
+  Mct development is currently [[https://protesilaos.com/codelog/2022-04-14-emacs-discontinue-mct/][discontinued]] due to recent changes of the default
+  completion UI on the Emacs master branch.
 - [[https://github.com/radian-software/selectrum][Selectrum]]: Selectrum is the predecessor of Vertico, since it directly inspired
-  Vertico. Selectrum has a similar UI and interaction model as Vertico. Vertico
-  offers additional features and is more flexible than Selectrum thanks to its
-  [[#extensions][extensions]]. Unfortunately Selectrum is not fully compatible with every Emacs
-  completion command and dynamic completion tables ([[https://github.com/radian-software/selectrum/issues/481][selectrum#481]]), since it uses
-  its own filtering infrastructure, which deviates from the standard Emacs
-  completion facilities. The filtering infrastructure also leads to a larger and
-  more complex code base. Selectrum is likely getting deprecated in favor of
-  Vertico ([[https://github.com/minad/vertico/issues/237][vertico#237]], [[https://github.com/radian-software/selectrum/issues/598][selectrum#598)]].
+  Vertico. Vertico offers more flexibility thanks to its [[#extensions][extensions]]. Selectrum
+  is not fully compatible with every Emacs completion command and dynamic
+  completion tables ([[https://github.com/radian-software/selectrum/issues/481][selectrum#481]]), since it uses its own filtering
+  infrastructure, which deviates from the standard Emacs completion facilities.
+  Therefore Selectrum is likely getting deprecated in favor of Vertico
+  ([[https://github.com/minad/vertico/issues/237][vertico#237]], [[https://github.com/radian-software/selectrum/issues/598][selectrum#598)]].
+- Icomplete: Emacs 28 comes with a builtin =icomplete-vertical-mode=, which is a
+  more bare-bone than Vertico. Vertico offers more flexibility thanks to its
+  [[#extensions][extensions]].
 
 * Resources
 
