@@ -76,15 +76,28 @@
   "Save current minibuffer input."
   (setq vertico-repeat--input (minibuffer-contents-no-properties)))
 
+(defun vertico-repeat--copy-string (str)
+  "Copy STR and preserve fontification."
+  (let ((new (substring-no-properties str)))
+    (dolist (prop '(face invisible) new)
+      (let ((pos 0) (len (length str)))
+        (while (< pos len)
+          (let* ((val (get-text-property pos prop str))
+                 (end (or (text-property-not-all pos len prop val str) len)))
+            (when val
+              (put-text-property pos end prop val new))
+            (setq pos end)))))))
+
 (defun vertico-repeat--save-exit ()
   "Save command session in `vertico-repeat-history'."
   (let ((session `(,vertico-repeat--command
                    ,vertico-repeat--input
                    ,@(and vertico--lock-candidate
                           (>= vertico--index 0)
-                          (list (substring-no-properties
+                          (list (vertico-repeat--copy-string
                                  (nth vertico--index vertico--candidates))))))
         (transform vertico-repeat-transformers))
+    (message "SESSION %S" session)
     (while (and transform (setq session (funcall (pop transform) session))))
     (when session
       (add-to-history 'vertico-repeat-history session))))
@@ -167,7 +180,7 @@ previous sessions for the current command."
                             (make-string (- max-cmd (string-width cmd) -4) ?\s))
                        input
                        (make-string (- max-input (string-width input) -4) ?\s)
-                       (and cand (propertize cand 'face 'font-lock-comment-face)))
+                       cand)
                       session)))
          (enable-recursive-minibuffers t)
          (selected (or (cdr (assoc (completing-read
