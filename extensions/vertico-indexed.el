@@ -40,6 +40,11 @@
   "Face used for the candidate index prefix."
   :group 'vertico-faces)
 
+(defcustom vertico-indexed-start 0
+  "Start of the indexing."
+  :group 'vertico
+  :type 'integer)
+
 (defvar vertico-indexed--commands
   '(vertico-insert vertico-exit vertico-directory-enter))
 (defvar-local vertico-indexed--min 0)
@@ -50,8 +55,9 @@
   (setq vertico-indexed--min start vertico-indexed--max index)
   (funcall orig cand
            (concat (propertize (format
-                                (format "%%%ds " (if (> vertico-count 10) 2 1))
-                                (- index start))
+                                (if (> (+ vertico-indexed-start vertico-count) 10)
+                                    "%2d " "%1d ")
+                                (+ (- index start) vertico-indexed-start))
                                'face 'vertico-indexed)
                    prefix)
            suffix index start))
@@ -59,7 +65,9 @@
 (defun vertico-indexed--handle-prefix (orig &rest args)
   "Handle prefix argument before calling ORIG function with ARGS."
   (if (and current-prefix-arg (called-interactively-p t))
-      (let ((vertico--index (+ vertico-indexed--min (prefix-numeric-value current-prefix-arg))))
+      (let ((vertico--index (+ vertico-indexed--min
+                               (- (prefix-numeric-value current-prefix-arg)
+                                  vertico-indexed-start))))
         (if (or (< vertico--index vertico-indexed--min)
                 (> vertico--index vertico-indexed--max)
                 (= vertico--total 0))
