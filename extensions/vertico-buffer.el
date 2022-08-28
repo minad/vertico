@@ -93,13 +93,13 @@
   (let* ((action vertico-buffer-display-action) tmp win
          (_ (unwind-protect
                 (progn
-                  (setf tmp (generate-new-buffer "*vertico-buffer*")
-                        ;; Set a fake major mode such that `display-buffer-reuse-mode-window'
-                        ;; does not take over!
-                        (buffer-local-value 'major-mode tmp) 'vertico-buffer-mode
-                        ;; Temporarily select the original window such
-                        ;; that `display-buffer-same-window' works.
-                        win (with-minibuffer-selected-window (display-buffer tmp action)))
+                  (with-current-buffer (setq tmp (generate-new-buffer "*vertico-buffer*"))
+                    ;; Set a fake major mode such that `display-buffer-reuse-mode-window'
+                    ;; does not take over!
+                    (setq major-mode 'vertico-buffer-mode))
+                  ;; Temporarily select the original window such
+                  ;; that `display-buffer-same-window' works.
+                  (setq win (with-minibuffer-selected-window (display-buffer tmp action)))
                   (set-window-buffer win (current-buffer)))
               (kill-buffer tmp)))
          (sym (make-symbol "vertico-buffer--destroy"))
