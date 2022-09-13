@@ -160,9 +160,9 @@ When scrolling beyond this limit, candidates may be truncated."
   "Grid display for Vertico."
   :global t :group 'vertico
   ;; Shrink current minibuffer window
-  (when-let* ((win (active-minibuffer-window))
-              ((not (frame-root-window-p win))))
-    (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise))
+  (when-let (win (active-minibuffer-window))
+    (unless (frame-root-window-p win)
+      (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise)))
   (cond
    (vertico-grid-mode
     (add-to-list 'minor-mode-map-alist `(vertico--input . ,vertico-grid-map))
