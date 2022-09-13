@@ -126,7 +126,8 @@
   "Flat, horizontal display for Vertico."
   :global t :group 'vertico
   ;; Shrink current minibuffer window
-  (when-let (win (active-minibuffer-window))
+  (when-let* ((win (active-minibuffer-window))
+              ((not (frame-root-window-p win))))
     (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise))
   (cond
    (vertico-flat-mode
