@@ -336,7 +336,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                (base (or (when-let (z (last all)) (prog1 (cdr z) (setcdr z nil))) 0))
                (vertico--base (substring content 0 base))
                (def (or (car-safe minibuffer-default) minibuffer-default))
-               (groups))
+               (groups) (def-missing) (lock))
     ;; Filter the ignored file extensions. We cannot use modified predicate for this filtering,
     ;; since this breaks the special casing in the `completion-file-name-table' for `file-exists-p'
     ;; and `file-directory-p'.
@@ -351,15 +351,23 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (setq all (vertico--move-to-front field all))
     (when-let (group-fun (and all (vertico--metadata-get 'group-function)))
       (setq groups (vertico--group-by group-fun all) all (car groups)))
-    (list vertico--base (length all)
-          ;; Default value is missing from collection
-          (and def (equal content "") (not (member def all)))
-          ;; Find position of old candidate in the new list.
-          (when vertico--lock-candidate
-            (if (< vertico--index 0)
-                vertico--index
-              (seq-position all (nth vertico--index vertico--candidates))))
-          all (cadr groups) (or (caddr groups) vertico--all-groups) hl)))
+    (setq def-missing (and def (equal content "") (not (member def all)))
+          lock (and vertico--lock-candidate ;; Locked position of old candidate.
+                    (if (< vertico--index 0) -1
+                      (seq-position all (nth vertico--index vertico--candidates)))))
+    (list vertico--base all (length all) hl def-missing lock
+          (cadr groups) (or (caddr groups) vertico--all-groups)
+          ;; Compute new index. Select the prompt under these conditions:
+          ;; * If there are no candidates
+          ;; * If the default is missing from the candidate list.
+          ;; * For matching content, as long as the full content
+          ;;   after the boundary is empty, including content after point.
+          (or lock
+              (if (or def-missing (not all)
+                      (and (= (length vertico--base) (length content))
+                           (test-completion content minibuffer-completion-table
+                                            minibuffer-completion-predicate)))
+                  -1 0)))))
 
 (defun vertico--cycle (list n)
   "Rotate LIST to position N."
@@ -423,8 +431,9 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
             (let ((non-essential t))
               (while-no-input (vertico--recompute-candidates pt content)))))
       ('nil (abort-recursive-edit))
-      (`(,base ,total ,def-missing ,index ,candidates ,groups ,all-groups ,hl)
+      (`(,base ,candidates ,total ,hl ,def-missing ,lock ,groups ,all-groups ,index)
        (setq vertico--input (cons content pt)
+             vertico--lock-candidate lock
              vertico--index index
              vertico--base base
              vertico--total total
@@ -433,21 +442,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
              vertico--all-groups all-groups
              vertico--candidates candidates
              vertico--default-missing def-missing
-             vertico--metadata metadata)
-       ;; If the current index is nil, compute new index. Select the prompt:
-       ;; * If there are no candidates
-       ;; * If the default is missing from the candidate list.
-       ;; * For matching content, as long as the full content after the boundary is empty,
-       ;;   including content after point.
-       (unless vertico--index
-         (setq vertico--lock-candidate nil
-               vertico--index
-               (if (or vertico--default-missing
-                       (= 0 vertico--total)
-                       (and (= (length base) (length content))
-                            (test-completion content minibuffer-completion-table
-                                             minibuffer-completion-predicate)))
-                   -1 0)))))))
+             vertico--metadata metadata)))))
 
 (defun vertico--display-string (str)
   "Return display STR without display and invisible properties."
