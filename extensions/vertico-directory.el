@@ -34,6 +34,8 @@
 ;; (define-key vertico-map "\r" #'vertico-directory-enter)
 ;; (define-key vertico-map "\d" #'vertico-directory-delete-char)
 ;; (define-key vertico-map "\M-\d" #'vertico-directory-delete-word)
+;; (define-key vertico-map (kbd "C-M-DEL") #'vertico-directory-delete-sexp)
+;; (define-key vertico-map (kbd "C-M-<backspace>") #'vertico-directory-delete-sexp)
 ;; (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 
 ;;; Code:
@@ -99,6 +101,15 @@
   (unless (vertico-directory-up n)
     (let ((pt (point)))
       (backward-word n)
+      (delete-region pt (point)))))
+
+;;;###autoload
+(defun vertico-directory-delete-sexp (&optional n)
+  "Delete N directories or sexps before point."
+  (interactive "p")
+  (unless (vertico-directory-up n)
+    (let ((pt (point)))
+      (backward-sexp n)
       (delete-region pt (point)))))
 
 ;;;###autoload
