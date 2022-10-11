@@ -7,8 +7,8 @@
 #+texinfo_dir_desc: VERTical Interactive COmpletion.
 
 #+html: <a href="https://www.gnu.org/software/emacs/"><img alt="GNU Emacs" src="https://github.com/minad/corfu/blob/screenshots/emacs.svg?raw=true"/></a>
-#+html: <a href="http://elpa.gnu.org/packages/vertico.html"><img alt="GNU ELPA" src="https://elpa.gnu.org/packages/vertico.svg"/></a>
-#+html: <a href="http://elpa.gnu.org/devel/vertico.html"><img alt="GNU-devel ELPA" src="https://elpa.gnu.org/devel/vertico.svg"/></a>
+#+html: <a href="https://elpa.gnu.org/packages/vertico.html"><img alt="GNU ELPA" src="https://elpa.gnu.org/packages/vertico.svg"/></a>
+#+html: <a href="https://elpa.gnu.org/devel/vertico.html"><img alt="GNU-devel ELPA" src="https://elpa.gnu.org/devel/vertico.svg"/></a>
 #+html: <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Vertigomovie_restoration.jpg/800px-Vertigomovie_restoration.jpg" align="right" width="30%">
 
 Vertico provides a performant and minimalistic vertical completion UI based on
@@ -59,7 +59,7 @@ binding of =TAB= to ~vertico-insert~ and the bindings of ~vertico-exit/exit-inpu
 
 * Configuration
 
-Vertico is available from [[http://elpa.gnu.org/packages/vertico.html][GNU ELPA]]. You can install it directly via
+Vertico is available from [[https://elpa.gnu.org/packages/vertico.html][GNU ELPA]]. You can install it directly via
 ~package-install~. After installation, you can activate the global minor mode with
 =M-x vertico-mode=. In order to configure Vertico and other packages in your
 init.el, you may want to take advantage of ~use-package~. Here is an example
@@ -488,7 +488,7 @@ following resources:
 
 * Contributions
 
-Since this package is part of [[http://elpa.gnu.org/packages/vertico.html][GNU ELPA]] contributions require a copyright
+Since this package is part of [[https://elpa.gnu.org/packages/vertico.html][GNU ELPA]] contributions require a copyright
 assignment to the FSF.
 
 * Problematic completion commands
