@@ -466,8 +466,9 @@ There are other interactive completion UIs, which follow a similar philosophy:
   completion command and dynamic completion tables ([[https://github.com/radian-software/selectrum/issues/481][selectrum#481]]), since it
   uses its own filtering infrastructure, which deviates from the standard Emacs
   completion facilities. Therefore Selectrum is getting deprecated in favor of
-  Vertico ([[https://github.com/minad/vertico/issues/237][vertico#237]], [[https://github.com/radian-software/selectrum/issues/598][selectrum#598)]]. Furthermore, Vertico offers more
-  flexibility thanks to its [[#extensions][extensions]].
+  Vertico ([[https://github.com/minad/vertico/issues/237][vertico#237]], [[https://github.com/radian-software/selectrum/issues/598][selectrum#598)]]. Furthermore, Vertico was designed with
+  flexibility in mind via its [[#extensions][extensions]]. See the [[https://github.com/minad/vertico/wiki/Migrating-from-Selectrum-to-Vertico][migration guide]] if you plan to
+  migrate from Selectrum to Vertico.
 - Icomplete: Emacs 28 comes with a builtin =icomplete-vertical-mode=, which is a
   more bare-bone than Vertico. Vertico offers more flexibility thanks to its
   [[#extensions][extensions]].
