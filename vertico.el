@@ -354,19 +354,26 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
           lock (and vertico--lock-candidate ;; Locked position of old candidate.
                     (if (< vertico--index 0) -1
                       (seq-position all (nth vertico--index vertico--candidates)))))
-    (list vertico--base all (length all) hl def-missing lock
-          (cadr groups) (or (caddr groups) vertico--all-groups)
-          ;; Compute new index. Select the prompt under these conditions:
-          ;; * If there are no candidates
-          ;; * If the default is missing from the candidate list.
-          ;; * For matching content, as long as the full content
-          ;;   after the boundary is empty, including content after point.
-          (or lock
-              (if (or def-missing (not all)
-                      (and (= (length vertico--base) (length content))
-                           (test-completion content minibuffer-completion-table
-                                            minibuffer-completion-predicate)))
-                  -1 0)))))
+    `((vertico--base . ,vertico--base)
+      (vertico--metadata . ,vertico--metadata)
+      (vertico--candidates . ,all)
+      (vertico--total . ,(length all))
+      (vertico--highlight-function . ,hl)
+      (vertico--default-missing . ,def-missing)
+      (vertico--lock-candidate . ,lock)
+      (vertico--groups . ,(cadr groups))
+      (vertico--all-groups . ,(or (caddr groups) vertico--all-groups))
+      ;; Compute new index. Select the prompt under these conditions:
+      ;; * If there are no candidates
+      ;; * If the default is missing from the candidate list.
+      ;; * For matching content, as long as the full content
+      ;;   after the boundary is empty, including content after point.
+      (vertico--index . ,(or lock
+                             (if (or def-missing (not all)
+                                     (and (= (length vertico--base) (length content))
+                                          (test-completion content minibuffer-completion-table
+                                                           minibuffer-completion-predicate)))
+                                 -1 0))))))
 
 (defun vertico--cycle (list n)
   "Rotate LIST to position N."
@@ -411,37 +418,36 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Return t if PATH is a remote path."
   (string-match-p "\\`/[^/|:]+:" (substitute-in-file-name path)))
 
-(defun vertico--update-state (pt content)
-  "Interruptibly update state given PT and CONTENT."
-  ;; Redisplay the minibuffer such that the input becomes immediately
-  ;; visible before the expensive candidate recomputation is performed (Issue #89).
-  ;; Do not redisplay during initialization, since this leads to flicker.
-  (when (consp vertico--input) (redisplay))
-  (let ((metadata (completion-metadata (substring content 0 pt)
-                                       minibuffer-completion-table
-                                       minibuffer-completion-predicate)))
-    (pcase
-        (let ((vertico--metadata metadata))
-          ;; If Tramp is used, do not compute the candidates in an interruptible fashion,
-          ;; since this will break the Tramp password and user name prompts (See #23).
-          (if (and (eq 'file (vertico--metadata-get 'category))
-                   (or (vertico--remote-p content) (vertico--remote-p default-directory)))
-              (vertico--recompute-state pt content)
-            (let ((non-essential t))
-              (while-no-input (vertico--recompute-state pt content)))))
-      ('nil (abort-recursive-edit))
-      (`(,base ,candidates ,total ,hl ,def-missing ,lock ,groups ,all-groups ,index)
-       (setq vertico--input (cons content pt)
-             vertico--lock-candidate lock
-             vertico--index index
-             vertico--base base
-             vertico--total total
-             vertico--highlight-function hl
-             vertico--groups groups
-             vertico--all-groups all-groups
-             vertico--candidates candidates
-             vertico--default-missing def-missing
-             vertico--metadata metadata)))))
+(defun vertico--ensure-state ()
+  "Ensure that the state is updated before running a command."
+  (when (and (symbolp this-command) (string-match-p "vertico" (symbol-name this-command)))
+    (vertico--update-state)))
+
+(defun vertico--update-state (&optional interruptible)
+  "Update state, optionally INTERRUPTIBLE."
+  (let* ((pt (max 0 (- (point) (minibuffer-prompt-end))))
+         (content (minibuffer-contents-no-properties))
+         (input (cons content pt)))
+    (unless (or (and interruptible (input-pending-p)) (equal vertico--input input))
+      ;; Redisplay the minibuffer such that the input becomes immediately
+      ;; visible before the expensive candidate recomputation (Issue #89).
+      ;; Do not redisplay during initialization, since this leads to flicker.
+      (when (and interruptible (consp vertico--input)) (redisplay))
+      (pcase (let ((vertico--metadata (completion-metadata (substring content 0 pt)
+                                                           minibuffer-completion-table
+                                                           minibuffer-completion-predicate)))
+               ;; If Tramp is used, do not compute the candidates in an interruptible fashion,
+               ;; since this will break the Tramp password and user name prompts (See #23).
+               (if (or (not interruptible)
+                       (and (eq 'file (vertico--metadata-get 'category))
+                            (or (vertico--remote-p content) (vertico--remote-p default-directory))))
+                   (vertico--recompute-state pt content)
+                 (let ((non-essential t))
+                   (while-no-input (vertico--recompute-state pt content)))))
+        ('nil (abort-recursive-edit))
+        ((and state (pred consp))
+         (setq vertico--input input)
+         (dolist (s state) (set (car s) (cdr s))))))))
 
 (defun vertico--display-string (str)
   "Return display STR without display and invisible properties."
@@ -591,11 +597,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (defun vertico--exhibit ()
   "Exhibit completion UI."
-  (let* ((buffer-undo-list t) ;; Overlays affect point position and undo list!
-         (pt (max 0 (- (point) (minibuffer-prompt-end))))
-         (content (minibuffer-contents-no-properties)))
-    (unless (or (input-pending-p) (equal vertico--input (cons content pt)))
-      (vertico--update-state pt content))
+  (let ((buffer-undo-list t)) ;; Overlays affect point position and undo list!
+    (vertico--update-state 'interruptible)
     (vertico--prompt-selection)
     (vertico--display-count)
     (vertico--display-candidates (vertico--arrange-candidates))))
@@ -740,6 +743,7 @@ When the prefix argument is 0, the group order is reset."
   (setq-local completion-auto-help nil
               completion-show-inline-help nil)
   (use-local-map vertico-map)
+  (add-hook 'pre-command-hook #'vertico--ensure-state nil 'local)
   (add-hook 'post-command-hook #'vertico--exhibit nil 'local))
 
 (defun vertico--advice (&rest args)
