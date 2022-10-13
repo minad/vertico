@@ -65,8 +65,7 @@ The value should lie between 0 and vertico-count/2."
   :type 'integer)
 
 (defcustom vertico-resize resize-mini-windows
-  "How to resize the Vertico minibuffer window.
-See `resize-mini-windows' for documentation."
+  "How to resize the Vertico minibuffer window, see `resize-mini-windows'."
   :type '(choice (const :tag "Fixed" nil)
                  (const :tag "Shrink and grow" t)
                  (const :tag "Grow-only" grow-only)))
@@ -654,8 +653,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Return t if INPUT is a valid match."
   (or (memq minibuffer--require-match '(nil confirm-after-completion))
       (and (equal input "") (or (car-safe minibuffer-default) minibuffer-default))
-      (test-completion input minibuffer-completion-table
-                       minibuffer-completion-predicate)
+      (test-completion input minibuffer-completion-table minibuffer-completion-predicate)
       (if (eq minibuffer--require-match 'confirm)
           (eq (ignore-errors (read-char "Confirm")) 13)
         (and (minibuffer-message "Match required") nil))))
@@ -676,14 +674,12 @@ When the prefix argument is 0, the group order is reset."
   (interactive "p")
   (when (cdr vertico--groups)
     (if (setq vertico--lock-groups (not (eq n 0)))
-        (setq vertico--groups
-              (vertico--cycle vertico--groups
-                              (let ((len (length vertico--groups)))
-                                (- len (mod (- (or n 1)) len))))
-              vertico--all-groups
-              (vertico--cycle vertico--all-groups
-                              (seq-position vertico--all-groups
-                                            (car vertico--groups))))
+        (setq vertico--groups (vertico--cycle vertico--groups
+                                              (let ((len (length vertico--groups)))
+                                                (- len (mod (- (or n 1)) len))))
+              vertico--all-groups (vertico--cycle vertico--all-groups
+                                                  (seq-position vertico--all-groups
+                                                                (car vertico--groups))))
       (setq vertico--groups nil
             vertico--all-groups nil))
     (setq vertico--lock-candidate nil
