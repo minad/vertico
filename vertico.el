@@ -315,8 +315,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                     "\\)\\'")))
     (or (seq-remove (lambda (x) (string-match-p re x)) files) files)))
 
-(defun vertico--recompute-candidates (pt content)
-  "Recompute candidates given PT and CONTENT."
+(defun vertico--recompute-state (pt content)
+  "Recompute state given PT and CONTENT."
   (pcase-let* ((before (substring content 0 pt))
                (after (substring content pt))
                ;; bug#47678: `completion-boundaries` fails for `partial-completion`
@@ -412,8 +412,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Return t if PATH is a remote path."
   (string-match-p "\\`/[^/|:]+:" (substitute-in-file-name path)))
 
-(defun vertico--update-candidates (pt content)
-  "Preprocess candidates given PT and CONTENT."
+(defun vertico--update-state (pt content)
+  "Interruptibly update state given PT and CONTENT."
   ;; Redisplay the minibuffer such that the input becomes immediately
   ;; visible before the expensive candidate recomputation is performed (Issue #89).
   ;; Do not redisplay during initialization, since this leads to flicker.
@@ -427,9 +427,9 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
           ;; since this will break the Tramp password and user name prompts (See #23).
           (if (and (eq 'file (vertico--metadata-get 'category))
                    (or (vertico--remote-p content) (vertico--remote-p default-directory)))
-              (vertico--recompute-candidates pt content)
+              (vertico--recompute-state pt content)
             (let ((non-essential t))
-              (while-no-input (vertico--recompute-candidates pt content)))))
+              (while-no-input (vertico--recompute-state pt content)))))
       ('nil (abort-recursive-edit))
       (`(,base ,candidates ,total ,hl ,def-missing ,lock ,groups ,all-groups ,index)
        (setq vertico--input (cons content pt)
@@ -596,7 +596,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
          (pt (max 0 (- (point) (minibuffer-prompt-end))))
          (content (minibuffer-contents-no-properties)))
     (unless (or (input-pending-p) (equal vertico--input (cons content pt)))
-      (vertico--update-candidates pt content))
+      (vertico--update-state pt content))
     (vertico--prompt-selection)
     (vertico--display-count)
     (vertico--display-candidates (vertico--arrange-candidates))))
