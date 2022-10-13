@@ -130,7 +130,7 @@ The value should lie between 0 and vertico-count/2."
     map)
   "Vertico minibuffer keymap derived from `minibuffer-local-map'.")
 
-(defvar-local vertico--highlight-function #'identity
+(defvar-local vertico--highlight #'identity
   "Deferred candidate highlighting function.")
 
 (defvar-local vertico--history-hash nil
@@ -358,7 +358,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
       (vertico--metadata . ,vertico--metadata)
       (vertico--candidates . ,all)
       (vertico--total . ,(length all))
-      (vertico--highlight-function . ,hl)
+      (vertico--highlight . ,hl)
       (vertico--default-missing . ,def-missing)
       (vertico--lock-candidate . ,lock)
       (vertico--groups . ,(cadr groups))
@@ -497,7 +497,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Format group TITLE given the current CAND."
   (when (string-prefix-p title cand)
     ;; Highlight title if title is a prefix of the candidate
-    (setq title (substring (car (funcall vertico--highlight-function
+    (setq title (substring (car (funcall vertico--highlight
                                          (list (propertize cand 'face 'vertico-group-title))))
                            0 (length title)))
     (vertico--remove-face 0 (length title) 'completions-first-difference title))
@@ -513,7 +513,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
            (candidates
             (thread-last (seq-subseq vertico--candidates index
                                      (min (+ index vertico-count) vertico--total))
-              (funcall vertico--highlight-function)
+              (funcall vertico--highlight)
               (vertico--affixate))))
       (pcase-dolist ((and cand `(,str . ,_)) candidates)
         (when-let (new-title (and group-fun (funcall group-fun str nil)))
@@ -570,7 +570,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   (format (car vertico-count-format)
           (format (cdr vertico-count-format)
                   (cond ((>= vertico--index 0) (1+ vertico--index))
-                        ((vertico--allow-prompt-selection-p) "*")
+                        ((vertico--allow-prompt-p) "*")
                         (t "!"))
                   vertico--total)))
 
@@ -583,7 +583,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 (defun vertico--prompt-selection ()
   "Highlight the prompt if selected."
   (let ((inhibit-modification-hooks t))
-    (if (and (< vertico--index 0) (vertico--allow-prompt-selection-p))
+    (if (and (< vertico--index 0) (vertico--allow-prompt-p))
         (add-face-text-property (minibuffer-prompt-end) (point-max) 'vertico-current 'append)
       (vertico--remove-face (minibuffer-prompt-end) (point-max) 'vertico-current))))
 
@@ -603,14 +603,14 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (vertico--display-count)
     (vertico--display-candidates (vertico--arrange-candidates))))
 
-(defun vertico--allow-prompt-selection-p ()
+(defun vertico--allow-prompt-p ()
   "Return t if prompt can be selected."
   (or vertico--default-missing (memq minibuffer--require-match
                                      '(nil confirm confirm-after-completion))))
 
 (defun vertico--goto (index)
   "Go to candidate with INDEX."
-  (let ((prompt (vertico--allow-prompt-selection-p)))
+  (let ((prompt (vertico--allow-prompt-p)))
     (setq vertico--index
           (max (if (or prompt (= 0 vertico--total)) -1 0)
                (min index (1- vertico--total)))
@@ -644,7 +644,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
      (cond
       ((not vertico-cycle) index)
       ((= vertico--total 0) -1)
-      ((vertico--allow-prompt-selection-p) (1- (mod (1+ index) (1+ vertico--total))))
+      ((vertico--allow-prompt-p) (1- (mod (1+ index) (1+ vertico--total))))
       (t (mod index vertico--total))))))
 
 (defun vertico-previous (&optional n)
@@ -729,7 +729,7 @@ When the prefix argument is 0, the group order is reset."
         ;; code is already marked with a FIXME. Should this be reported as a bug?
         (vertico--remove-face 0 (length cand) 'completions-common-part cand)
         (concat vertico--base
-                (if hl (car (funcall vertico--highlight-function (list cand))) cand))))
+                (if hl (car (funcall vertico--highlight (list cand))) cand))))
      ((and (equal content "") (or (car-safe minibuffer-default) minibuffer-default)))
      (t content))))
 

@@ -105,7 +105,7 @@ When scrolling beyond this limit, candidates may be truncated."
                                 (lambda (x) (apply #'propertize " " (text-properties-at 0 x)))
                                 (vertico--format-candidate cand "" "" index start)))
                               width))
-                           (funcall vertico--highlight-function
+                           (funcall vertico--highlight
                                     (seq-subseq vertico--candidates start
                                                 (min (+ start count)
                                                      vertico--total)))))
