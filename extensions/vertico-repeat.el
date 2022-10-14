@@ -94,7 +94,7 @@
   (delete-minibuffer-contents)
   (insert (cadr session))
   (when (caddr session)
-    (vertico--exhibit)
+    (vertico--update)
     (when-let (idx (seq-position vertico--candidates (caddr session)))
       (setq vertico--index idx
             vertico--lock-candidate t)))
