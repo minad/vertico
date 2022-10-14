@@ -655,7 +655,6 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 (defun vertico--match-p (input)
   "Return t if INPUT is a valid match."
   (or (memq minibuffer--require-match '(nil confirm-after-completion))
-      (and (equal input "") (or (car-safe minibuffer-default) minibuffer-default))
       (test-completion input minibuffer-completion-table minibuffer-completion-predicate)
       (if (eq minibuffer--require-match 'confirm)
           (eq (ignore-errors (read-char "Confirm")) 13)
