@@ -655,6 +655,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 (defun vertico--match-p (input)
   "Return t if INPUT is a valid match."
   (or (memq minibuffer--require-match '(nil confirm-after-completion))
+      (equal "" input) ;; Null completion, returns default value
       (test-completion input minibuffer-completion-table minibuffer-completion-predicate)
       (if (eq minibuffer--require-match 'confirm)
           (eq (ignore-errors (read-char "Confirm")) 13)
@@ -665,10 +666,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   (interactive "P")
   (when (and (not arg) (>= vertico--index 0))
     (vertico-insert))
-  (let ((input (minibuffer-contents-no-properties)))
-    ;; Allow null completion only if explicitly requested (M-RET)
-    (when (or (and arg (equal input "")) (vertico--match-p input))
-      (exit-minibuffer))))
+  (when (vertico--match-p (minibuffer-contents-no-properties))
+    (exit-minibuffer)))
 
 (defun vertico-next-group (&optional n)
   "Cycle N groups forward.
