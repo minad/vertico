@@ -314,7 +314,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                     "\\)\\'")))
     (or (seq-remove (lambda (x) (string-match-p re x)) files) files)))
 
-(defun vertico--recompute-state (pt content)
+(defun vertico--recompute (pt content)
   "Recompute state given PT and CONTENT."
   (pcase-let* ((before (substring content 0 pt))
                (after (substring content pt))
@@ -418,12 +418,12 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Return t if PATH is a remote path."
   (string-match-p "\\`/[^/|:]+:" (substitute-in-file-name path)))
 
-(defun vertico--ensure-state ()
-  "Ensure that the state is updated before running a command."
+(defun vertico--prepare ()
+  "Ensure that the state is prepared before running the next command."
   (when (and (symbolp this-command) (string-prefix-p "vertico-" (symbol-name this-command)))
-    (vertico--update-state)))
+    (vertico--update)))
 
-(defun vertico--update-state (&optional interruptible)
+(defun vertico--update (&optional interruptible)
   "Update state, optionally INTERRUPTIBLE."
   (let* ((pt (max 0 (- (point) (minibuffer-prompt-end))))
          (content (minibuffer-contents-no-properties))
@@ -441,9 +441,9 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                (if (or (not interruptible)
                        (and (eq 'file (vertico--metadata-get 'category))
                             (or (vertico--remote-p content) (vertico--remote-p default-directory))))
-                   (vertico--recompute-state pt content)
+                   (vertico--recompute pt content)
                  (let ((non-essential t))
-                   (while-no-input (vertico--recompute-state pt content)))))
+                   (while-no-input (vertico--recompute pt content)))))
         ('nil (abort-recursive-edit))
         ((and state (pred consp))
          (setq vertico--input input)
@@ -485,8 +485,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (add-face-text-property 0 (length cand) 'vertico-current 'append cand))
   cand)
 
-(defun vertico--update-scroll ()
-  "Update scroll position."
+(defun vertico--compute-scroll ()
+  "Compute new scroll position."
   (let ((off (max (min vertico-scroll-margin (/ vertico-count 2)) 0))
         (corr (if (= vertico-scroll-margin (/ vertico-count 2)) (1- (mod vertico-count 2)) 0)))
     (setq vertico--scroll (min (max 0 (- vertico--total vertico-count))
@@ -505,7 +505,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (defun vertico--arrange-candidates ()
   "Arrange candidates."
-  (vertico--update-scroll)
+  (vertico--compute-scroll)
   (let ((curr-line 0) lines)
     ;; Compute group titles
     (let* (title (index vertico--scroll)
@@ -598,7 +598,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 (defun vertico--exhibit ()
   "Exhibit completion UI."
   (let ((buffer-undo-list t)) ;; Overlays affect point position and undo list!
-    (vertico--update-state 'interruptible)
+    (vertico--update 'interruptible)
     (vertico--prompt-selection)
     (vertico--display-count)
     (vertico--display-candidates (vertico--arrange-candidates))))
@@ -743,7 +743,7 @@ When the prefix argument is 0, the group order is reset."
   (setq-local completion-auto-help nil
               completion-show-inline-help nil)
   (use-local-map vertico-map)
-  (add-hook 'pre-command-hook #'vertico--ensure-state nil 'local)
+  (add-hook 'pre-command-hook #'vertico--prepare nil 'local)
   (add-hook 'post-command-hook #'vertico--exhibit nil 'local))
 
 (defun vertico--advice (&rest args)
