@@ -204,6 +204,8 @@ MODE defaults to the vertical display."
       (vertico-multiform--temporary-mode mode 1))
     (setq vertico-multiform--display-last last)))
 
+(put #'vertico-multiform-vertical 'completion-predicate #'vertico--command-p)
+
 (defmacro vertico-multiform--define-display-toggle (name)
   "Define toggle for display mode NAME."
   (let ((sym (intern (format "vertico-multiform-%s" name))))
