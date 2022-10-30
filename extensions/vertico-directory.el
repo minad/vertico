@@ -1,4 +1,4 @@
-;;; vertico-directory.el --- Ido-like direction navigation for Vertico -*- lexical-binding: t -*-
+;;; vertico-directory.el --- Ido-like directory navigation for Vertico -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2021, 2022  Free Software Foundation, Inc.
 
