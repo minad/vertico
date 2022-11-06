@@ -175,8 +175,8 @@ The value should lie between 0 and vertico-count/2."
 (defvar-local vertico--groups nil
   "List of current group titles.")
 
-(defvar-local vertico--default-missing nil
-  "Default candidate is missing from candidates list.")
+(defvar-local vertico--allow-prompt nil
+  "Prompt selection is allowed.")
 
 (defun vertico--history-hash ()
   "Recompute history hash table and return it."
@@ -359,7 +359,9 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
       (vertico--candidates . ,all)
       (vertico--total . ,(length all))
       (vertico--highlight . ,hl)
-      (vertico--default-missing . ,def-missing)
+      (vertico--allow-prompt . ,(or def-missing
+                                    (memq minibuffer--require-match
+                                          '(nil confirm confirm-after-completion))))
       (vertico--lock-candidate . ,lock)
       (vertico--groups . ,(cadr groups))
       (vertico--all-groups . ,(or (caddr groups) vertico--all-groups))
@@ -570,7 +572,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   (format (car vertico-count-format)
           (format (cdr vertico-count-format)
                   (cond ((>= vertico--index 0) (1+ vertico--index))
-                        ((vertico--allow-prompt-p) "*")
+                        (vertico--allow-prompt "*")
                         (t "!"))
                   vertico--total)))
 
@@ -583,7 +585,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 (defun vertico--prompt-selection ()
   "Highlight the prompt if selected."
   (let ((inhibit-modification-hooks t))
-    (if (and (< vertico--index 0) (vertico--allow-prompt-p))
+    (if (and (< vertico--index 0) vertico--allow-prompt)
         (add-face-text-property (minibuffer-prompt-end) (point-max) 'vertico-current 'append)
       (vertico--remove-face (minibuffer-prompt-end) (point-max) 'vertico-current))))
 
@@ -603,18 +605,12 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (vertico--display-count)
     (vertico--display-candidates (vertico--arrange-candidates))))
 
-(defun vertico--allow-prompt-p ()
-  "Return t if prompt can be selected."
-  (or vertico--default-missing (memq minibuffer--require-match
-                                     '(nil confirm confirm-after-completion))))
-
 (defun vertico--goto (index)
   "Go to candidate with INDEX."
-  (let ((prompt (vertico--allow-prompt-p)))
-    (setq vertico--index
-          (max (if (or prompt (= 0 vertico--total)) -1 0)
-               (min index (1- vertico--total)))
-          vertico--lock-candidate (or (>= vertico--index 0) prompt))))
+  (setq vertico--index
+        (max (if (or vertico--allow-prompt (= 0 vertico--total)) -1 0)
+             (min index (1- vertico--total)))
+        vertico--lock-candidate (or (>= vertico--index 0) vertico--allow-prompt)))
 
 (defun vertico-first ()
   "Go to first candidate, or to the prompt when the first candidate is selected."
@@ -644,7 +640,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
      (cond
       ((not vertico-cycle) index)
       ((= vertico--total 0) -1)
-      ((vertico--allow-prompt-p) (1- (mod (1+ index) (1+ vertico--total))))
+      (vertico--allow-prompt (1- (mod (1+ index) (1+ vertico--total))))
       (t (mod index vertico--total))))))
 
 (defun vertico-previous (&optional n)
