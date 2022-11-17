@@ -232,9 +232,9 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
               (sort (aref buckets ,(1- bsize)) #',pred)))))
 
 (vertico--define-sort (history length alpha) 32 (length %) string< vertico--length-string<)
-(vertico--define-sort (history alpha) 32 (if (eq % "") 0 (/ (aref % 0) 4)) string< string<)
+(vertico--define-sort (history alpha) 32 (if (equal % "") 0 (/ (aref % 0) 4)) string< string<)
 (vertico--define-sort (length alpha) 32 (length %) string< vertico--length-string<)
-(vertico--define-sort (alpha) 32 (if (eq % "") 0 (/ (aref % 0) 4)) string< string<)
+(vertico--define-sort (alpha) 32 (if (equal % "") 0 (/ (aref % 0) 4)) string< string<)
 
 (defun vertico--affixate (cands)
   "Annotate CANDS with annotation function."
