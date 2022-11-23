@@ -75,7 +75,7 @@ The value should lie between 0 and vertico-count/2."
   :type 'boolean)
 
 (defcustom vertico-multiline
-  (cons #("⤶" 0 1 (face vertico-multiline)) #("…" 0 1 (face vertico-multiline)))
+  (cons #("↲" 0 1 (face vertico-multiline)) #("…" 0 1 (face vertico-multiline)))
   "Replacements for multiline strings."
   :type '(cons (string :tag "Newline") (string :tag "Truncation")))
 
