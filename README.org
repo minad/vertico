@@ -460,14 +460,13 @@ There are other interactive completion UIs, which follow a similar philosophy:
   slowdown. Mct supports completion in region via its ~mct-region-mode~. Note that
   Mct development is currently [[https://protesilaos.com/codelog/2022-04-14-emacs-discontinue-mct/][discontinued]] due to recent changes of the default
   completion UI on the Emacs master branch.
-- [[https://github.com/radian-software/selectrum][Selectrum]]: Selectrum was the predecessor of Vertico. Vertico was designed
-  specifically to address the technical shortcomings of Selectrum. Selectrum is
-  not fully compatible with every Emacs completion command and dynamic
-  completion tables, since it uses its own filtering infrastructure, which
-  deviates from the standard Emacs completion facilities. Therefore Selectrum
-  has been deprecated in favor of Vertico. Furthermore, Vertico was designed
-  with flexibility in mind via its [[#extensions][extensions]]. See the [[https://github.com/minad/vertico/wiki/Migrating-from-Selectrum-to-Vertico][migration guide]] if you
-  plan to migrate from Selectrum to Vertico.
+- [[https://github.com/radian-software/selectrum][Selectrum]]: Selectrum is the predecessor of Vertico has been deprecated in
+  favor of Vertico. See the [[https://github.com/minad/vertico/wiki/Migrating-from-Selectrum-to-Vertico][migration guide]] if you want to migrate from
+  Selectrum to Vertico. Vertico was designed specifically to address the
+  technical shortcomings of Selectrum. Selectrum is not fully compatible with
+  every Emacs completion command and dynamic completion tables, since it uses
+  its own filtering infrastructure, which deviates from the standard Emacs
+  completion facilities.
 - Icomplete: Emacs 28 comes with a builtin =icomplete-vertical-mode=, which is a
   more bare-bone than Vertico. Vertico offers more flexibility thanks to its
   [[#extensions][extensions]].
