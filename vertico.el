@@ -307,13 +307,6 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
       (vertico--metadata-get 'display-sort-function)
       vertico-sort-function))
 
-(defun vertico--filter-files (files)
-  "Filter FILES by `completion-ignored-extensions'."
-  (let ((re (concat "\\(?:\\(?:\\`\\|/\\)\\.\\.?/\\|"
-                    (regexp-opt completion-ignored-extensions)
-                    "\\)\\'")))
-    (or (seq-remove (lambda (x) (string-match-p re x)) files) files)))
-
 (defun vertico--recompute (pt content)
   "Recompute state given PT and CONTENT."
   (pcase-let* ((before (substring content 0 pt))
@@ -339,7 +332,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     ;; Filter the ignored file extensions. We cannot use modified predicate for this filtering,
     ;; since this breaks the special casing in the `completion-file-name-table' for `file-exists-p'
     ;; and `file-directory-p'.
-    (when completing-file (setq all (vertico--filter-files all)))
+    (when completing-file (setq all (completion-pcm--filename-try-filter all)))
     ;; Sort using the `display-sort-function' or the Vertico sort functions
     (setq all (delete-consecutive-dups (funcall (or (vertico--sort-function) #'identity) all)))
     ;; Move special candidates: "field" appears at the top, before "field/", before default value
