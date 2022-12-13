@@ -90,7 +90,7 @@
 (defun vertico-buffer--setup ()
   "Setup buffer display."
   (add-hook 'pre-redisplay-functions 'vertico-buffer--redisplay nil 'local)
-  (let* ((action vertico-buffer-display-action) tmp win
+  (let* ((action vertico-buffer-display-action) tmp win old-buf
          (_ (unwind-protect
                 (progn
                   (with-current-buffer (setq tmp (generate-new-buffer "*vertico-buffer*"))
@@ -99,7 +99,9 @@
                     (setq major-mode 'vertico-buffer-mode))
                   ;; Temporarily select the original window such
                   ;; that `display-buffer-same-window' works.
-                  (setq win (with-minibuffer-selected-window (display-buffer tmp action)))
+                  (setq old-buf (mapcar (lambda (win) (cons win (window-buffer win))) (window-list))
+                        win (with-minibuffer-selected-window (display-buffer tmp action))
+                        old-buf (alist-get win old-buf))
                   (set-window-buffer win (current-buffer)))
               (kill-buffer tmp)))
          (sym (make-symbol "vertico-buffer--destroy"))
@@ -109,9 +111,11 @@
     (fset sym (lambda ()
                 (when (= depth (recursion-depth))
                   (with-selected-window (active-minibuffer-window)
-                    (when (window-live-p win)
+                    (if (not (and (window-live-p win) (buffer-live-p old-buf)))
+                        (delete-window win)
                       (set-window-parameter win 'no-other-window now)
-                      (set-window-parameter win 'no-delete-other-windows ndow))
+                      (set-window-parameter win 'no-delete-other-windows ndow)
+                      (set-window-buffer win old-buf))
                     (when vertico-buffer-hide-prompt
                       (set-window-vscroll nil 0))
                     (remove-hook 'minibuffer-exit-hook sym)))))
