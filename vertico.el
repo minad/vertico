@@ -358,11 +358,10 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
       (vertico--lock-candidate . ,lock)
       (vertico--groups . ,(cadr groups))
       (vertico--all-groups . ,(or (caddr groups) vertico--all-groups))
-      ;; Compute new index. Select the prompt under these conditions:
-      ;; * If there are no candidates
-      ;; * If the default is missing from the candidate list.
-      ;; * For matching content, as long as the full content
-      ;;   after the boundary is empty, including content after point.
+      ;; Index computation: The prompt is selected if there are no candidates,
+      ;; if the default is missing from the candidate list and for matching
+      ;; input at the field end. The latter is important for directory selection
+      ;; when renaming files.
       (vertico--index . ,(or lock
                              (if (or def-missing (not all)
                                      (and (= (length vertico--base) (length content))
