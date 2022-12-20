@@ -358,9 +358,17 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
       (vertico--lock-candidate . ,lock)
       (vertico--groups . ,(cadr groups))
       (vertico--all-groups . ,(or (caddr groups) vertico--all-groups))
-      ;; Compute new index. Select the prompt if there are no candidates or if
-      ;; the default is missing from the candidate list.
-      (vertico--index . ,(or lock (if (or def-missing (not all)) -1 0))))))
+      ;; Compute new index. Select the prompt under these conditions:
+      ;; * If there are no candidates
+      ;; * If the default is missing from the candidate list.
+      ;; * For matching content, as long as the full content
+      ;;   after the boundary is empty, including content after point.
+      (vertico--index . ,(or lock
+                             (if (or def-missing (not all)
+                                     (and (= (length vertico--base) (length content))
+                                          (test-completion content minibuffer-completion-table
+                                                           minibuffer-completion-predicate)))
+                                 -1 0))))))
 
 (defun vertico--cycle (list n)
   "Rotate LIST to position N."

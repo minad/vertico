@@ -4,8 +4,6 @@
 
 * Development
 
-- BREAKING CHANGE: Always preselect the first candidate. This mainly changes the
-  behavior of =find-file=. In order to open directories, press =M-RET=.
 - Emacs 29: Add support for =REQUIRE-MATCH= functions
 
 * Version 0.29 (2022-11-22)
