@@ -309,22 +309,20 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (defun vertico--recompute (pt content)
   "Recompute state given PT and CONTENT."
-  (pcase-let* ((before (substring content 0 pt))
+  (pcase-let* ((table minibuffer-completion-table)
+               (pred minibuffer-completion-predicate)
+               (before (substring content 0 pt))
                (after (substring content pt))
                ;; bug#47678: `completion-boundaries` fails for `partial-completion`
                ;; if the cursor is moved between the slashes of "~//".
                ;; See also marginalia.el which has the same issue.
                (bounds (or (condition-case nil
-                               (completion-boundaries
-                                before minibuffer-completion-table
-                                minibuffer-completion-predicate after)
+                               (completion-boundaries before table pred after)
                              (t (cons 0 (length after))))))
                (field (substring content (car bounds) (+ pt (cdr bounds))))
                ;; `minibuffer-completing-file-name' has been obsoleted by the completion category
                (completing-file (eq 'file (vertico--metadata-get 'category)))
-               (`(,all . ,hl) (vertico--all-completions
-                               content minibuffer-completion-table
-                               minibuffer-completion-predicate pt vertico--metadata))
+               (`(,all . ,hl) (vertico--all-completions content table pred pt vertico--metadata))
                (base (or (when-let (z (last all)) (prog1 (cdr z) (setcdr z nil))) 0))
                (vertico--base (substring content 0 base))
                (def (or (car-safe minibuffer-default) minibuffer-default))
@@ -365,8 +363,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
       (vertico--index . ,(or lock
                              (if (or def-missing (not all)
                                      (and (= (length vertico--base) (length content))
-                                          (test-completion content minibuffer-completion-table
-                                                           minibuffer-completion-predicate)))
+                                          (test-completion content table pred)))
                                  -1 0))))))
 
 (defun vertico--cycle (list n)
