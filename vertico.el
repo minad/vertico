@@ -59,6 +59,13 @@
   "Maximal number of candidates to show."
   :type 'integer)
 
+(defcustom vertico-preselect 'directory
+  "Configure if the prompt or first candidate is preselected.
+- prompt: Always select the prompt.
+- first: Always select the first candidate.
+- directory: Like first, but select the prompt if it is a directory."
+  :type '(choice (const prompt) (const first) (const directory)))
+
 (defcustom vertico-scroll-margin 2
   "Number of lines at the top and bottom when scrolling.
 The value should lie between 0 and vertico-count/2."
@@ -350,19 +357,16 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
       (vertico--candidates . ,all)
       (vertico--total . ,(length all))
       (vertico--highlight . ,hl)
-      (vertico--allow-prompt . ,(or def-missing
+      (vertico--allow-prompt . ,(or def-missing (eq vertico-preselect 'prompt)
                                     (memq minibuffer--require-match
                                           '(nil confirm confirm-after-completion))))
       (vertico--lock-candidate . ,lock)
       (vertico--groups . ,(cadr groups))
       (vertico--all-groups . ,(or (caddr groups) vertico--all-groups))
-      ;; Index computation: The prompt is selected if there are no candidates,
-      ;; if the default is missing from the candidate list and for matching
-      ;; input at the field end. The latter is important for directory selection
-      ;; when renaming files.
       (vertico--index . ,(or lock
-                             (if (or def-missing (not all)
-                                     (and (= (length vertico--base) (length content))
+                             (if (or def-missing (eq vertico-preselect 'prompt) (not all)
+                                     (and completing-file (eq vertico-preselect 'directory)
+                                          (= (length vertico--base) (length content))
                                           (test-completion content table pred)))
                                  -1 0))))))
 
