@@ -350,24 +350,20 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
       (vertico--candidates . ,all)
       (vertico--total . ,(length all))
       (vertico--highlight . ,hl)
-      (vertico--allow-prompt . ,(or def-missing
+      (vertico--allow-prompt . ,(or def-missing (eq vertico-preselect 'prompt)
                                     (memq minibuffer--require-match
                                           '(nil confirm confirm-after-completion))))
       (vertico--lock-candidate . ,lock)
       (vertico--groups . ,(cadr groups))
       (vertico--all-groups . ,(or (caddr groups) vertico--all-groups))
       (vertico--index . ,(or lock
-                             (if (or def-missing (not all) (eq vertico-preselect 'prompt)
-                                     (and (eq vertico-preselect 'valid)
-                                        (not (equal field (car all)))
-                                        (not (and completing-file (equal (concat field "/") (car all))))
-                                        (test-completion content table pred))
+                             (if (or def-missing (eq vertico-preselect 'prompt) (not all)
                                      (and completing-file (eq vertico-preselect 'directory)
                                           (= (length vertico--base) (length content))
                                           (test-completion content table pred)))
                                  -1 0))))))
 
-(defvar vertico-preselect 'directory) ;; 'directory 'prompt 'first 'valid
+(defvar vertico-preselect 'directory) ;; 'directory 'prompt 'first
 
 (defun vertico--cycle (list n)
   "Rotate LIST to position N."
