@@ -356,15 +356,18 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
       (vertico--lock-candidate . ,lock)
       (vertico--groups . ,(cadr groups))
       (vertico--all-groups . ,(or (caddr groups) vertico--all-groups))
-      ;; Index computation: The prompt is selected if there are no candidates,
-      ;; if the default is missing from the candidate list and for matching
-      ;; input at the field end. The latter is important for directory selection
-      ;; when renaming files.
       (vertico--index . ,(or lock
-                             (if (or def-missing (not all)
-                                     (and (= (length vertico--base) (length content))
+                             (if (or def-missing (not all) (eq vertico-preselect 'prompt)
+                                     (and (eq vertico-preselect 'valid)
+                                        (not (equal field (car all)))
+                                        (not (and completing-file (equal (concat field "/") (car all))))
+                                        (test-completion content table pred))
+                                     (and completing-file (eq vertico-preselect 'directory)
+                                          (= (length vertico--base) (length content))
                                           (test-completion content table pred)))
                                  -1 0))))))
+
+(defvar vertico-preselect 'directory) ;; 'directory 'prompt 'first 'valid
 
 (defun vertico--cycle (list n)
   "Rotate LIST to position N."
