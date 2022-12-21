@@ -66,7 +66,7 @@
       (when (string-match-p "\\`~[^/]*/\\'" path)
         (delete-minibuffer-contents)
         (insert (expand-file-name path)))
-      (dotimes (_ n found)
+      (dotimes (_ (or n 1) found)
         (save-excursion
           (let ((end (point)))
             (goto-char (1- end))
