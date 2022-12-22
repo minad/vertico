@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 1.0 (2022-12-22)
 
 - Emacs 29: Add support for =REQUIRE-MATCH= functions
 - =vertico-directory-enter=: Handle selection of ./ and ../ candidates specially.
