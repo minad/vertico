@@ -1,6 +1,6 @@
 ;;; vertico-buffer.el --- Display Vertico in a buffer instead of the minibuffer -*- lexical-binding: t -*-
 
-;; Copyright (C) 2021, 2022  Free Software Foundation, Inc.
+;; Copyright (C) 2021-2023 Free Software Foundation, Inc.
 
 ;; Author: Daniel Mendler <mail@daniel-mendler.de>
 ;; Maintainer: Daniel Mendler <mail@daniel-mendler.de>
