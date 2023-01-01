@@ -458,18 +458,17 @@ There are other interactive completion UIs, which follow a similar philosophy:
   has the advantage that you can interact freely with the candidates and jump
   around with Isearch or Avy. On the other hand it necessarily causes a
   slowdown. Mct supports completion in region via its ~mct-region-mode~. Note that
-  Mct development is currently [[https://protesilaos.com/codelog/2022-04-14-emacs-discontinue-mct/][discontinued]] due to recent changes of the default
-  completion UI on the Emacs master branch.
+  Mct development has been [[https://protesilaos.com/codelog/2022-04-14-emacs-discontinue-mct/][discontinued]] due to recent developments of the
+  default completion UI in Emacs 29.
 - [[https://github.com/radian-software/selectrum][Selectrum]]: Selectrum is the predecessor of Vertico has been deprecated in
-  favor of Vertico. See the [[https://github.com/minad/vertico/wiki/Migrating-from-Selectrum-to-Vertico][migration guide]] if you want to migrate from
-  Selectrum to Vertico. Vertico was designed specifically to address the
-  technical shortcomings of Selectrum. Selectrum is not fully compatible with
-  every Emacs completion command and dynamic completion tables, since it uses
-  its own filtering infrastructure, which deviates from the standard Emacs
-  completion facilities.
+  favor of Vertico. Read the [[https://github.com/minad/vertico/wiki/Migrating-from-Selectrum-to-Vertico][migration guide]] when migrating from Selectrum.
+  Vertico was designed specifically to address the technical shortcomings of
+  Selectrum. Selectrum is not fully compatible with every Emacs completion
+  command and dynamic completion tables, since it uses its own filtering
+  infrastructure, which deviates from the standard Emacs completion facilities.
 - Icomplete: Emacs 28 comes with a builtin =icomplete-vertical-mode=, which is a
-  more bare-bone than Vertico. Vertico offers more flexibility thanks to its
-  [[#extensions][extensions]].
+  more bare-bone than Vertico. Vertico offers additional flexibility thanks to
+  its [[#extensions][extensions]].
 
 * Resources
 
