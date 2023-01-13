@@ -32,7 +32,7 @@
 ;; command or completion category. Alternatively the flat display can be
 ;; toggled temporarily if `vertico-multiform-mode' is enabled:
 ;;
-;; (define-key vertico-map "\M-F" #'vertico-multiform-flat)
+;; (keymap-set vertico-map "M-F" #'vertico-multiform-flat)
 ;;
 ;; The flat display can be made to look like `ido-mode' by setting
 ;; `vertico-cycle' to t. See also the `vertico-flat-format'

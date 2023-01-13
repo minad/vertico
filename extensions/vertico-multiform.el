@@ -49,11 +49,11 @@
 ;; Temporary toggling between the different display modes is
 ;; possible. Bind the following commands:
 ;;
-;; (define-key vertico-map "\M-V" #'vertico-multiform-vertical)
-;; (define-key vertico-map "\M-G" #'vertico-multiform-grid)
-;; (define-key vertico-map "\M-F" #'vertico-multiform-flat)
-;; (define-key vertico-map "\M-R" #'vertico-multiform-reverse)
-;; (define-key vertico-map "\M-U" #'vertico-multiform-unobtrusive)
+;; (keymap-set vertico-map "M-V" #'vertico-multiform-vertical)
+;; (keymap-set vertico-map "M-G" #'vertico-multiform-grid)
+;; (keymap-set vertico-map "M-F" #'vertico-multiform-flat)
+;; (keymap-set vertico-map "M-R" #'vertico-multiform-reverse)
+;; (keymap-set vertico-map "M-U" #'vertico-multiform-unobtrusive)
 ;;
 ;;; Code:
 

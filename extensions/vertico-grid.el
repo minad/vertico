@@ -32,7 +32,7 @@
 ;; command or completion category. Alternatively the grid display can be
 ;; toggled temporarily if `vertico-multiform-mode' is enabled:
 ;;
-;; (define-key vertico-map "\M-G" #'vertico-multiform-grid)
+;; (keymap-set vertico-map "M-G" #'vertico-multiform-grid)
 
 ;;; Code:
 

@@ -31,9 +31,9 @@
 ;; `vertico-map'. Furthermore a cleanup function for shadowed file paths
 ;; is provided.
 ;;
-;; (define-key vertico-map "\r" #'vertico-directory-enter)
-;; (define-key vertico-map "\d" #'vertico-directory-delete-char)
-;; (define-key vertico-map "\M-\d" #'vertico-directory-delete-word)
+;; (keymap-set vertico-map "RET" #'vertico-directory-enter)
+;; (keymap-set vertico-map "DEL" #'vertico-directory-delete-char)
+;; (keymap-set vertico-map "M-DEL" #'vertico-directory-delete-word)
 ;; (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 
 ;;; Code:

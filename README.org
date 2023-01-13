@@ -158,9 +158,9 @@ completion commands behave as usual. For example you can use =M-TAB= to cycle
 between candidates if you have set ~completion-cycle-threshold~.
 
 #+begin_src emacs-lisp
-  (define-key vertico-map "?" #'minibuffer-completion-help)
-  (define-key vertico-map (kbd "M-RET") #'minibuffer-force-complete-and-exit)
-  (define-key vertico-map (kbd "M-TAB") #'minibuffer-complete)
+  (keymap-set vertico-map "?" #'minibuffer-completion-help)
+  (keymap-set vertico-map "M-RET" #'minibuffer-force-complete-and-exit)
+  (keymap-set vertico-map "M-TAB" #'minibuffer-complete)
 #+end_src
 
 The ~orderless~ completion style does not support completion of a common prefix
@@ -304,11 +304,11 @@ Temporary toggling between the different display modes is possible. Bind the
 following commands:
 
 #+begin_src emacs-lisp
-  (define-key vertico-map "\M-V" #'vertico-multiform-vertical)
-  (define-key vertico-map "\M-G" #'vertico-multiform-grid)
-  (define-key vertico-map "\M-F" #'vertico-multiform-flat)
-  (define-key vertico-map "\M-R" #'vertico-multiform-reverse)
-  (define-key vertico-map "\M-U" #'vertico-multiform-unobtrusive)
+  (keymap-set vertico-map "M-V" #'vertico-multiform-vertical)
+  (keymap-set vertico-map "M-G" #'vertico-multiform-grid)
+  (keymap-set vertico-map "M-F" #'vertico-multiform-flat)
+  (keymap-set vertico-map "M-R" #'vertico-multiform-reverse)
+  (keymap-set vertico-map "M-U" #'vertico-multiform-unobtrusive)
 #+end_src
 
 You can use your own functions or even lambdas to configure the completion

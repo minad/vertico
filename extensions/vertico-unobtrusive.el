@@ -34,7 +34,7 @@
 ;; command or completion category. Alternatively the unobtrusive display
 ;; can be toggled temporarily if `vertico-multiform-mode' is enabled:
 ;;
-;; (define-key vertico-map "\M-U" #'vertico-multiform-unobtrusive)
+;; (keymap-set vertico-map "M-U" #'vertico-multiform-unobtrusive)
 
 ;;; Code:
 

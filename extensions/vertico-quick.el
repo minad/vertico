@@ -31,8 +31,8 @@
 ;; candidate in front of them. This is designed to be a faster
 ;; alternative to selecting a candidate with `vertico-next' and
 ;; `vertico-previous'.
-;; (define-key vertico-map "\M-q" #'vertico-quick-insert)
-;; (define-key vertico-map "\C-q" #'vertico-quick-exit)
+;; (keymap-set vertico-map "M-q" #'vertico-quick-insert)
+;; (keymap-set vertico-map "C-q" #'vertico-quick-exit)
 
 ;;; Code:
 

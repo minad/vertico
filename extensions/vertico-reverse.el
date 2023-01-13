@@ -32,7 +32,7 @@
 ;; command or completion category. Alternatively the reverse display can be
 ;; toggled temporarily if `vertico-multiform-mode' is enabled:
 ;;
-;; (define-key vertico-map "\M-R" #'vertico-multiform-reverse)
+;; (keymap-set vertico-map "M-R" #'vertico-multiform-reverse)
 
 ;;; Code:
 
