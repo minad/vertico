@@ -63,8 +63,9 @@
   "Configure if the prompt or first candidate is preselected.
 - prompt: Always select the prompt.
 - first: Always select the first candidate.
-- directory: Like first, but select the prompt if it is a directory."
-  :type '(choice (const prompt) (const first) (const directory)))
+- directory: Like first, but select the prompt if it is a directory.
+- A custom function taking the list of candidates as argument."
+  :type '(choice (const prompt) (const first) (const directory) function))
 
 (defcustom vertico-scroll-margin 2
   "Number of lines at the top and bottom when scrolling.
@@ -364,11 +365,13 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
       (vertico--groups . ,(cadr groups))
       (vertico--all-groups . ,(or (caddr groups) vertico--all-groups))
       (vertico--index . ,(or lock
-                             (if (or def-missing (eq vertico-preselect 'prompt) (not all)
-                                     (and completing-file (eq vertico-preselect 'directory)
-                                          (= (length vertico--base) (length content))
-                                          (test-completion content table pred)))
-                                 -1 0))))))
+                             (if (memq vertico-preselect '(prompt directory first))
+                                 (if (or def-missing (eq vertico-preselect 'prompt) (not all)
+                                         (and completing-file (eq vertico-preselect 'directory)
+                                              (= (length vertico--base) (length content))
+                                              (test-completion content table pred)))
+                                     -1 0)
+                               (funcall vertico-preselect all)))))))
 
 (defun vertico--cycle (list n)
   "Rotate LIST to position N."
