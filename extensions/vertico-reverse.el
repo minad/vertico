@@ -38,21 +38,19 @@
 
 (require 'vertico)
 
-(defvar vertico-reverse-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map [remap beginning-of-buffer] #'vertico-last)
-    (define-key map [remap minibuffer-beginning-of-buffer] #'vertico-last)
-    (define-key map [remap end-of-buffer] #'vertico-first)
-    (define-key map [remap scroll-down-command] #'vertico-scroll-up)
-    (define-key map [remap scroll-up-command] #'vertico-scroll-down)
-    (define-key map [remap next-line] #'vertico-previous)
-    (define-key map [remap previous-line] #'vertico-next)
-    (define-key map [remap next-line-or-history-element] #'vertico-previous)
-    (define-key map [remap previous-line-or-history-element] #'vertico-next)
-    (define-key map [remap backward-paragraph] #'vertico-next-group)
-    (define-key map [remap forward-paragraph] #'vertico-previous-group)
-    map)
-  "Additional keymap activated in reverse mode.")
+(defvar-keymap vertico-reverse-map
+  :doc "Additional keymap activated in reverse mode."
+  "<remap> <beginning-of-buffer>" #'vertico-last
+  "<remap> <minibuffer-beginning-of-buffer>" #'vertico-last
+  "<remap> <end-of-buffer>" #'vertico-first
+  "<remap> <scroll-down-command>" #'vertico-scroll-up
+  "<remap> <scroll-up-command>" #'vertico-scroll-down
+  "<remap> <next-line>" #'vertico-previous
+  "<remap> <previous-line>" #'vertico-next
+  "<remap> <next-line-or-history-element>" #'vertico-previous
+  "<remap> <previous-line-or-history-element>" #'vertico-next
+  "<remap> <backward-paragraph>" #'vertico-next-group
+  "<remap> <forward-paragraph>" #'vertico-previous-group)
 
 (defun vertico-reverse--display-candidates (lines)
   "Display LINES in reverse."

@@ -6,7 +6,7 @@
 ;; Maintainer: Daniel Mendler <mail@daniel-mendler.de>
 ;; Created: 2021
 ;; Version: 1.0
-;; Package-Requires: ((emacs "27.1"))
+;; Package-Requires: ((emacs "27.1") (compat "29.1.1.0"))
 ;; Homepage: https://github.com/minad/vertico
 
 ;; This file is part of GNU Emacs.
@@ -33,6 +33,7 @@
 
 ;;; Code:
 
+(require 'compat)
 (require 'seq)
 (eval-when-compile
   (require 'cl-lib)
@@ -117,25 +118,24 @@ The value should lie between 0 and vertico-count/2."
 (defface vertico-current '((t :inherit highlight :extend t))
   "Face used to highlight the currently selected candidate.")
 
-(defvar vertico-map
-  (let ((map (make-composed-keymap nil minibuffer-local-map)))
-    (define-key map [remap beginning-of-buffer] #'vertico-first)
-    (define-key map [remap minibuffer-beginning-of-buffer] #'vertico-first)
-    (define-key map [remap end-of-buffer] #'vertico-last)
-    (define-key map [remap scroll-down-command] #'vertico-scroll-down)
-    (define-key map [remap scroll-up-command] #'vertico-scroll-up)
-    (define-key map [remap next-line] #'vertico-next)
-    (define-key map [remap previous-line] #'vertico-previous)
-    (define-key map [remap next-line-or-history-element] #'vertico-next)
-    (define-key map [remap previous-line-or-history-element] #'vertico-previous)
-    (define-key map [remap backward-paragraph] #'vertico-previous-group)
-    (define-key map [remap forward-paragraph] #'vertico-next-group)
-    (define-key map [remap exit-minibuffer] #'vertico-exit)
-    (define-key map [remap kill-ring-save] #'vertico-save)
-    (define-key map "\M-\r" #'vertico-exit-input)
-    (define-key map "\t" #'vertico-insert)
-    map)
-  "Vertico minibuffer keymap derived from `minibuffer-local-map'.")
+(defvar-keymap vertico-map
+  :doc "Vertico minibuffer keymap derived from `minibuffer-local-map'."
+  :parent minibuffer-local-map
+  "<remap> <beginning-of-buffer>" #'vertico-first
+  "<remap> <minibuffer-beginning-of-buffer>" #'vertico-first
+  "<remap> <end-of-buffer>" #'vertico-last
+  "<remap> <scroll-down-command>" #'vertico-scroll-down
+  "<remap> <scroll-up-command>" #'vertico-scroll-up
+  "<remap> <next-line>" #'vertico-next
+  "<remap> <previous-line>" #'vertico-previous
+  "<remap> <next-line-or-history-element>" #'vertico-next
+  "<remap> <previous-line-or-history-element>" #'vertico-previous
+  "<remap> <backward-paragraph>" #'vertico-previous-group
+  "<remap> <forward-paragraph>" #'vertico-next-group
+  "<remap> <exit-minibuffer>" #'vertico-exit
+  "<remap> <kill-ring-save>" #'vertico-save
+  "M-RET" #'vertico-exit-input
+  "TAB" #'vertico-insert)
 
 (defvar-local vertico--highlight #'identity
   "Deferred candidate highlighting function.")
@@ -198,7 +198,7 @@ The value should lie between 0 and vertico-count/2."
                            (and (>= (length elem) base-size)
                                 (eq t (compare-strings base 0 base-size elem 0 base-size))))
                    (let ((file-sep (and (eq minibuffer-history-variable 'file-name-history)
-                                        (string-match-p "/" elem base-size))))
+                                        (string-search "/" elem base-size))))
                      ;; Drop base string from history elements & special file handling.
                      (when (or (> base-size 0) file-sep)
                        (setq elem (substring elem base-size (and file-sep (1+ file-sep)))))
@@ -532,7 +532,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                (pcase (car line)
                  (`(,index ,cand ,prefix ,suffix)
                   (setq start (or start index))
-                  (when (string-match-p "\n" cand)
+                  (when (string-search "\n" cand)
                     (setq cand (vertico--truncate-multiline cand max-width)))
                   (setcar line (vertico--format-candidate cand prefix suffix index start))))))
     lines))

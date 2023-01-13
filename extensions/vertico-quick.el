@@ -109,7 +109,7 @@ TWO is non-nil if two keys should be displayed."
                 (pcase-let ((`(,keys . ,events) (vertico-quick--keys first index start)))
                   (setq list (nconc events list))
                   (if (bound-and-true-p vertico-flat-mode)
-                      (setq keys (replace-regexp-in-string " " "" keys)
+                      (setq keys (string-replace " " "" keys)
                             cand (string-trim cand)
                             cand (substring cand (min (length cand) (length keys))))
                     (setq keys (concat keys (make-string (max 1 (- (length prefix) 2)) ?\s))))

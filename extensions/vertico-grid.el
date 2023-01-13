@@ -66,14 +66,12 @@ When scrolling beyond this limit, candidates may be truncated."
   :type 'integer
   :group 'vertico)
 
-(defvar vertico-grid-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map [remap left-char] #'vertico-grid-left)
-    (define-key map [remap right-char] #'vertico-grid-right)
-    (define-key map [remap scroll-down-command] #'vertico-grid-scroll-down)
-    (define-key map [remap scroll-up-command] #'vertico-grid-scroll-up)
-    map)
-  "Additional keymap activated in grid mode.")
+(defvar-keymap vertico-grid-map
+  :doc "Additional keymap activated in grid mode."
+  "<remap> <left-char>" #'vertico-grid-left
+  "<remap> <right-char>" #'vertico-grid-right
+  "<remap> <scroll-down-command>" #'vertico-grid-scroll-down
+  "<remap> <scroll-up-command>" #'vertico-grid-scroll-up)
 
 (defvar-local vertico-grid--columns vertico-grid-min-columns
   "Current number of grid columns.")
@@ -96,7 +94,7 @@ When scrolling beyond this limit, candidates may be truncated."
          (cands
           (seq-map-indexed (lambda (cand index)
                              (cl-incf index start)
-                             (when (string-match-p "\n" cand)
+                             (when (string-search "\n" cand)
                                (setq cand (vertico--truncate-multiline cand width)))
                              (truncate-string-to-width
                               (string-trim

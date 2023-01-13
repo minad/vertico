@@ -61,12 +61,10 @@
   :type 'plist
   :group 'vertico)
 
-(defvar vertico-flat-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map [remap left-char] #'vertico-previous)
-    (define-key map [remap right-char] #'vertico-next)
-    map)
-  "Additional keymap activated in flat mode.")
+(defvar-keymap vertico-flat-map
+  :doc "Additional keymap activated in flat mode."
+  "<remap> <left-char>" #'vertico-previous
+  "<remap> <right-char>" #'vertico-next)
 
 (defun vertico-flat--display-candidates (candidates)
   "Display CANDIDATES horizontally."
@@ -99,7 +97,7 @@
                 (> width 0) (> count 0))
       (let ((cand (car candidates)))
         (setq cand (car (funcall vertico--highlight (list cand))))
-        (when (string-match-p "\n" cand)
+        (when (string-search "\n" cand)
           (setq cand (vertico--truncate-multiline cand width)))
         (setq cand (string-trim
                     (replace-regexp-in-string
