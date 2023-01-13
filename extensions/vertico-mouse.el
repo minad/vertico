@@ -39,18 +39,17 @@
 
 (defun vertico-mouse--candidate-map (index)
   "Return keymap for candidate with INDEX."
-  (let ((map (make-sparse-keymap)))
-    (define-key map [mouse-1] (lambda ()
-                                (interactive)
-                                (with-selected-window (active-minibuffer-window)
-                                  (let ((vertico--index index))
-                                    (vertico-exit)))))
-    (define-key map [mouse-3] (lambda ()
-                                (interactive)
-                                (with-selected-window (active-minibuffer-window)
-                                  (let ((vertico--index index))
-                                    (vertico-insert)))))
-    map))
+  (define-keymap
+    "<mouse-1>" (lambda ()
+                  (interactive)
+                  (with-selected-window (active-minibuffer-window)
+                    (let ((vertico--index index))
+                      (vertico-exit))))
+    "<mouse-3>" (lambda ()
+                  (interactive)
+                  (with-selected-window (active-minibuffer-window)
+                    (let ((vertico--index index))
+                      (vertico-insert))))))
 
 (defun vertico-mouse--format-candidate (orig cand prefix suffix index start)
   "Format candidate, see `vertico--format-candidate' for arguments."
