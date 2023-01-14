@@ -28,7 +28,7 @@
 
 ;; This package is a Vertico extension for fine tuning the Vertico
 ;; display and other minibuffer modes per command or completion
-;; category. For some commands you may want to use the `vertico-buffer'
+;; category.  For some commands you may want to use the `vertico-buffer'
 ;; display and for completion categories like file you prefer the
 ;; `vertico-grid-mode'.
 ;;
@@ -47,7 +47,7 @@
 ;;    (vertico-multiform-mode)
 ;;
 ;; Temporary toggling between the different display modes is
-;; possible. Bind the following commands:
+;; possible.  Bind the following commands:
 ;;
 ;; (keymap-set vertico-map "M-V" #'vertico-multiform-vertical)
 ;; (keymap-set vertico-map "M-G" #'vertico-multiform-grid)
@@ -62,16 +62,16 @@
 
 (defcustom vertico-multiform-commands nil
   "Alist of commands/regexps and list of settings to turn on per command.
-Takes precedence over `vertico-multiform-categories'. A setting can
+Takes precedence over `vertico-multiform-categories'.  A setting can
 either be a mode symbol, a function, an inverted mode symbol or
-function, or a cons cell of variable name and value. The key t can be
+function, or a cons cell of variable name and value.  The key t can be
 used to specify catch all/default settings."
   :group 'vertico
   :type '(alist :key-type (choice symbol regexp (const t)) :value-type (repeat sexp)))
 
 (defcustom vertico-multiform-categories nil
   "Alist of categories/regexps and list of settings to turn on per category.
-See `vertico-multiform-commands' on details about the settings. The
+See `vertico-multiform-commands' on details about the settings.  The
 category settings have lower precedence than
 `vertico-multiform-commands'."
   :group 'vertico

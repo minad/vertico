@@ -28,11 +28,11 @@
 
 ;; This package is a Vertico extension, which enables repetition of
 ;; Vertico sessions via the `vertico-repeat', `vertico-repeat-last' and
-;; `vertico-repeat-select' commands. If the repeat commands are called
+;; `vertico-repeat-select' commands.  If the repeat commands are called
 ;; from an existing Vertico minibuffer session, only sessions
 ;; corresponding to the current minibuffer command are offered via
-;; completion. It is necessary to register a minibuffer setup hook,
-;; which saves the Vertico state for repetition. In order to save the
+;; completion.  It is necessary to register a minibuffer setup hook,
+;; which saves the Vertico state for repetition.  In order to save the
 ;; history across Emacs sessions, enable `savehist-mode' and add
 ;; `vertico-repeat-history' to `savehist-additional-variables'.
 ;;

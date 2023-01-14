@@ -27,7 +27,7 @@
 ;;; Commentary:
 
 ;; Vertico provides a performant and minimalistic vertical completion UI
-;; based on the default completion system. By reusing the built-in
+;; based on the default completion system.  By reusing the built-in
 ;; facilities, Vertico achieves full compatibility with built-in Emacs
 ;; completion commands and completion tables.
 
@@ -587,7 +587,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   (while (< beg end)
     (let ((next (next-single-property-change beg 'face obj end)))
       (when-let (val (get-text-property beg 'face obj))
-        (put-text-property beg next 'face (remq face (if (listp val) val (list val))) obj))
+        (put-text-property beg next 'face (remq face (ensure-list val)) obj))
       (setq beg next))))
 
 (defun vertico--exhibit ()

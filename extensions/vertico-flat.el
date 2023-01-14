@@ -29,7 +29,7 @@
 ;; This package is a Vertico extension providing a horizontal display.
 ;;
 ;; The mode can be enabled globally or via `vertico-multiform-mode' per
-;; command or completion category. Alternatively the flat display can be
+;; command or completion category.  Alternatively the flat display can be
 ;; toggled temporarily if `vertico-multiform-mode' is enabled:
 ;;
 ;; (keymap-set vertico-map "M-F" #'vertico-multiform-flat)
