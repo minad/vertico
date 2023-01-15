@@ -45,14 +45,14 @@
 (defun vertico-directory-enter ()
   "Enter directory or exit completion with current candidate."
   (interactive)
-  (if-let* (((>= vertico--index 0))
-            ((eq 'file (vertico--metadata-get 'category)))
-            ;; Check vertico--base for stepwise file path completion
-            ((not (equal vertico--base "")))
-            (cand (vertico--candidate))
-            ((or (string-suffix-p "/" cand)
-                 (and (vertico--remote-p cand)
-                      (string-suffix-p ":" cand)))))
+  (if-let (((>= vertico--index 0))
+           ((eq 'file (vertico--metadata-get 'category)))
+           ;; Check vertico--base for stepwise file path completion
+           ((not (equal vertico--base "")))
+           (cand (vertico--candidate))
+           ((or (string-suffix-p "/" cand)
+                (and (vertico--remote-p cand)
+                     (string-suffix-p ":" cand)))))
       (progn
         ;; Handle ./ and ../ manually instead of via `expand-file-name' and
         ;; `abbreviate-file-name', such that we don't accidentially perform
