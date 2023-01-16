@@ -5,6 +5,7 @@
 * Development
 
 - Add =vertico-preselect= configuration option.
+- =vertico-directory-up= moves up even if point is not located directly after /.
 
 * Version 1.0 (2022-12-22)
 
