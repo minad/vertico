@@ -74,18 +74,19 @@
   "Redisplay window WIN."
   (when-let (mbwin (active-minibuffer-window))
     (when (eq (window-buffer mbwin) (current-buffer))
+      (unless (eq win mbwin)
+        (setq-local truncate-lines (< (window-point win)
+                                      (* 0.8 (window-width win))))
+        (set-window-point win (point))
+        (set-window-hscroll win 0))
+      (when vertico-buffer-hide-prompt
+        (window-resize mbwin (- (window-pixel-height mbwin)) nil nil 'pixelwise)
+        (set-window-vscroll mbwin 100))
       (let ((old cursor-in-non-selected-windows)
             (new (and (eq (selected-window) mbwin) 'box)))
         (unless (eq new old)
           (setq-local cursor-in-non-selected-windows new)
-          (force-mode-line-update t)))
-      (unless (eq win mbwin)
-        (setq-local truncate-lines (< (window-point win)
-                                      (* 0.8 (window-width win))))
-        (set-window-point win (point)))
-      (when vertico-buffer-hide-prompt
-        (window-resize mbwin (- (window-pixel-height mbwin)) nil nil 'pixelwise)
-        (set-window-vscroll mbwin 100)))))
+          (force-mode-line-update t))))))
 
 (defun vertico-buffer--setup ()
   "Setup buffer display."
