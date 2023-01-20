@@ -41,6 +41,8 @@
 
 (defgroup vertico nil
   "VERTical Interactive COmpletion."
+  :link '(url-link "https://github.com/minad/vertico")
+  :link '(info-link "(vertico)")
   :group 'convenience
   :group 'minibuffer
   :prefix "vertico-")
