@@ -496,7 +496,7 @@ When you observe an error in the =vertico--exhibit= post command hook, you shoul
 install an advice to enforce debugging. This allows you to obtain a stack trace
 in order to narrow down the location of the error. The reason is that post
 command hooks are automatically disabled (and not debugged) by Emacs. Otherwise
-Emacs could become unusable, given that the hooks are executed after every
+Emacs would become unusable, given that the hooks are executed after every
 command.
 
 #+begin_src emacs-lisp
@@ -589,12 +589,13 @@ disabled as follows.
 ** ~completion-table-dynamic~
 
 Dynamic completion tables (~completion-table-dynamic~, ~completion-table-in-turn~,
-etc.) should work well with Vertico. However the requirement is that the =basic=
+...) should work well with Vertico. The only requirement is that the =basic=
 completion style is enabled. The =basic= style performs prefix filtering by
 passing the input to the completion table (or the dynamic completion table
 function). The =basic= completion style must not necessarily be configured with
 highest priority, it can also come after other completion styles like =orderless=,
-=substring= or =flex=.
+=substring= or =flex=, as is also recommended by the Orderless documentation because
+of ~completion-table-dynamic~.
 
 #+begin_src emacs-lisp
   (setq completion-styles '(basic))
