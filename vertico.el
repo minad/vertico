@@ -427,10 +427,12 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
          (content (minibuffer-contents-no-properties))
          (input (cons content pt)))
     (unless (or (and interruptible (input-pending-p)) (equal vertico--input input))
-      ;; Redisplay the minibuffer such that the input becomes immediately
-      ;; visible before the expensive candidate recomputation (Issue #89).
-      ;; Do not redisplay during initialization, since this leads to flicker.
-      (when (and interruptible (consp vertico--input)) (redisplay))
+      ;; Redisplay to make input immediately visible before expensive candidate
+      ;; recomputation (#89).  No redisplay during init because of flicker.
+      ;; Bind `vertico--input' to nil to prevent recursive exhibit from a timer,
+      ;; e.g., `consult--vertico-refresh'.
+      (when (and interruptible (consp vertico--input))
+        (let (vertico--input) (redisplay)))
       (pcase (let ((vertico--metadata (completion-metadata (substring content 0 pt)
                                                            minibuffer-completion-table
                                                            minibuffer-completion-predicate)))
