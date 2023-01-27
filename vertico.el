@@ -429,10 +429,9 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (unless (or (and interruptible (input-pending-p)) (equal vertico--input input))
       ;; Redisplay to make input immediately visible before expensive candidate
       ;; recomputation (#89).  No redisplay during init because of flicker.
-      ;; Bind `vertico--input' to nil to prevent recursive exhibit from a timer,
-      ;; e.g., `consult--vertico-refresh'.
       (when (and interruptible (consp vertico--input))
-        (let (vertico--input) (redisplay)))
+        ;; Prevent recursive exhibit from timer (`consult-vertico--refresh').
+        (cl-letf (((symbol-function #'vertico--exhibit) #'ignore)) (redisplay)))
       (pcase (let ((vertico--metadata (completion-metadata (substring content 0 pt)
                                                            minibuffer-completion-table
                                                            minibuffer-completion-predicate)))
