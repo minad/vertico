@@ -265,8 +265,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 (defun vertico--move-to-front (elem list)
   "Move ELEM to front of LIST."
   (if-let (found (member elem list))
-      (let ((head (list (car found))))
-        (nconc head (delq (setcar found nil) list)))
+      (nconc (list (car found)) (delq (setcar found nil) list))
     list))
 
 ;; bug#47711: Deferred highlighting for `completion-all-completions'
