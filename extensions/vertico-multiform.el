@@ -135,9 +135,7 @@ The keys in LIST can be symbols or regexps."
     (vertico-multiform--toggle 1)
     (vertico--setup)))
 
-(defun vertico-multiform--advice (&rest app)
-  "Override advice for `vertico--advice' switching modes on and off.
-APP is the original function call."
+(cl-defmethod vertico--advice (&context (vertico-multiform-mode (eql t)) &rest app)
   (unwind-protect
       (progn
         (vertico-multiform--toggle -1)
@@ -153,10 +151,7 @@ APP is the original function call."
     (warn "vertico-multiform must not be toggled from recursive minibuffers"))
   (when vertico-multiform--stack
     (warn "vertico-multiform state is inconsistent")
-    (setq vertico-multiform--stack nil))
-  (if vertico-multiform-mode
-      (advice-add #'vertico--advice :override #'vertico-multiform--advice)
-    (advice-remove #'vertico--advice #'vertico-multiform--advice)))
+    (setq vertico-multiform--stack nil)))
 
 (defun vertico-multiform--ensure ()
   "Ensure that multiform mode is enabled."

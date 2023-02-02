@@ -88,8 +88,9 @@
           (setq-local cursor-in-non-selected-windows new)
           (force-mode-line-update t))))))
 
-(defun vertico-buffer--setup ()
-  "Setup buffer display."
+(cl-defmethod vertico--resize-window (_height &context (vertico-buffer-mode (eql t))))
+
+(cl-defmethod vertico--setup :after (&context (vertico-buffer-mode (eql t)))
   (add-hook 'pre-redisplay-functions 'vertico-buffer--redisplay nil 'local)
   (let* ((action vertico-buffer-display-action) tmp win old-buf
          (_ (unwind-protect
@@ -150,14 +151,7 @@
 ;;;###autoload
 (define-minor-mode vertico-buffer-mode
   "Display Vertico in a buffer instead of the minibuffer."
-  :global t :group 'vertico
-  (cond
-   (vertico-buffer-mode
-    (advice-add #'vertico--setup :after #'vertico-buffer--setup)
-    (advice-add #'vertico--resize-window :override #'ignore))
-   (t
-    (advice-remove #'vertico--setup #'vertico-buffer--setup)
-    (advice-remove #'vertico--resize-window #'ignore))))
+  :global t :group 'vertico)
 
 (provide 'vertico-buffer)
 ;;; vertico-buffer.el ends here

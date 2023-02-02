@@ -50,18 +50,6 @@
 (defvar-local vertico-indexed--min 0)
 (defvar-local vertico-indexed--max 0)
 
-(defun vertico-indexed--format-candidate (orig cand prefix suffix index start)
-  "Format candidate, see `vertico--format-candidate' for arguments."
-  (setq vertico-indexed--min start vertico-indexed--max index)
-  (funcall orig cand
-           (concat (propertize (format
-                                (if (> (+ vertico-indexed-start vertico-count) 10)
-                                    "%2d " "%1d ")
-                                (+ (- index start) vertico-indexed-start))
-                               'face 'vertico-indexed)
-                   prefix)
-           suffix index start))
-
 (defun vertico-indexed--handle-prefix (orig &rest args)
   "Handle prefix argument before calling ORIG function with ARGS."
   (if (and current-prefix-arg (called-interactively-p t))
@@ -75,19 +63,30 @@
           (funcall orig)))
     (apply orig args)))
 
+(cl-defmethod vertico--format-candidate :around
+  (cand prefix suffix index start &context (vertico-indexed-mode (eql t)))
+  (setq vertico-indexed--min start vertico-indexed--max index)
+  (cl-call-next-method
+   cand
+   (concat (propertize (format
+                        (if (> (+ vertico-indexed-start vertico-count) 10)
+                            "%2d " "%1d ")
+                        (+ (- index start) vertico-indexed-start))
+                       'face 'vertico-indexed)
+           prefix)
+   suffix index start))
+
 ;;;###autoload
 (define-minor-mode vertico-indexed-mode
   "Prefix candidates with indices."
   :global t :group 'vertico
-  (cond
-   (vertico-indexed-mode
-    (advice-add #'vertico--format-candidate :around #'vertico-indexed--format-candidate)
-    (dolist (cmd vertico-indexed--commands)
-      (advice-add cmd :around #'vertico-indexed--handle-prefix)))
-   (t
-    (advice-remove #'vertico--format-candidate #'vertico-indexed--format-candidate)
-    (dolist (cmd vertico-indexed--commands)
-      (advice-remove cmd #'vertico-indexed--handle-prefix)))))
+  ;; TODO I had forgotten that `vertico-indexed-mode' is double evil, since it
+  ;; uses advices and the forbidden function `called-interactively-p'. Find a
+  ;; better implementation which avoids these kludges.
+  (dolist (cmd vertico-indexed--commands)
+    (if vertico-indexed-mode
+        (advice-add cmd :around #'vertico-indexed--handle-prefix)
+      (advice-remove cmd #'vertico-indexed--handle-prefix))))
 
 (provide 'vertico-indexed)
 ;;; vertico-indexed.el ends here

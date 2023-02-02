@@ -66,8 +66,7 @@
   "<remap> <left-char>" #'vertico-previous
   "<remap> <right-char>" #'vertico-next)
 
-(defun vertico-flat--display-candidates (candidates)
-  "Display CANDIDATES horizontally."
+(cl-defmethod vertico--display-candidates (candidates &context (vertico-flat-mode (eql t)))
   (setq-local truncate-lines nil
               resize-mini-windows t)
   (move-overlay vertico--candidates-ov (point-max) (point-max))
@@ -82,8 +81,7 @@
             (t (format (plist-get vertico-flat-format (if (< vertico--index 0) :prompt :multiple))
                        (string-join candidates (plist-get vertico-flat-format :separator))))))))
 
-(defun vertico-flat--arrange-candidates ()
-  "Arrange candidates."
+(cl-defmethod vertico--arrange-candidates (&context (vertico-flat-mode (eql t)))
   (let* ((index (max 0 vertico--index)) (count vertico-count)
          (candidates (nthcdr vertico--index vertico--candidates))
          (width (- (* vertico-flat-max-lines (- (vertico--window-width) 4))
@@ -127,15 +125,9 @@
   (when-let (win (active-minibuffer-window))
     (unless (frame-root-window-p win)
       (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise)))
-  (cond
-   (vertico-flat-mode
-    (add-to-list 'minor-mode-map-alist `(vertico--input . ,vertico-flat-map))
-    (advice-add #'vertico--arrange-candidates :override #'vertico-flat--arrange-candidates)
-    (advice-add #'vertico--display-candidates :override #'vertico-flat--display-candidates))
-   (t
-    (setq minor-mode-map-alist (delete `(vertico--input . ,vertico-flat-map) minor-mode-map-alist))
-    (advice-remove #'vertico--arrange-candidates #'vertico-flat--arrange-candidates)
-    (advice-remove #'vertico--display-candidates #'vertico-flat--display-candidates))))
+  (if vertico-flat-mode
+      (add-to-list 'minor-mode-map-alist `(vertico--input . ,vertico-flat-map))
+    (setq minor-mode-map-alist (delete `(vertico--input . ,vertico-flat-map) minor-mode-map-alist))))
 
 (provide 'vertico-flat)
 ;;; vertico-flat.el ends here

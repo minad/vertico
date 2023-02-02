@@ -52,8 +52,7 @@
   "<remap> <backward-paragraph>" #'vertico-next-group
   "<remap> <forward-paragraph>" #'vertico-previous-group)
 
-(defun vertico-reverse--display-candidates (lines)
-  "Display LINES in reverse."
+(cl-defmethod vertico--display-candidates (lines &context (vertico-reverse-mode (eql t)))
   (move-overlay vertico--candidates-ov (point-min) (point-min))
   (setq lines (nreverse lines))
   (unless (eq vertico-resize t)
@@ -72,13 +71,9 @@
   (dolist (buf (buffer-list))
     (when-let (ov (buffer-local-value 'vertico--candidates-ov buf))
       (overlay-put ov 'before-string nil)))
-  (cond
-   (vertico-reverse-mode
-    (add-to-list 'minor-mode-map-alist `(vertico--input . ,vertico-reverse-map))
-    (advice-add #'vertico--display-candidates :override #'vertico-reverse--display-candidates))
-   (t
-    (setq minor-mode-map-alist (delete `(vertico--input . ,vertico-reverse-map) minor-mode-map-alist))
-    (advice-remove #'vertico--display-candidates #'vertico-reverse--display-candidates))))
+  (if vertico-reverse-mode
+      (add-to-list 'minor-mode-map-alist `(vertico--input . ,vertico-reverse-map))
+    (setq minor-mode-map-alist (delete `(vertico--input . ,vertico-reverse-map) minor-mode-map-alist))))
 
 (provide 'vertico-reverse)
 ;;; vertico-reverse.el ends here

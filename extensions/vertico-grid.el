@@ -76,8 +76,7 @@ When scrolling beyond this limit, candidates may be truncated."
 (defvar-local vertico-grid--columns vertico-grid-min-columns
   "Current number of grid columns.")
 
-(defun vertico-grid--arrange-candidates ()
-  "Arrange candidates."
+(cl-defmethod vertico--arrange-candidates (&context (vertico-grid-mode (eql t)))
   (when (<= vertico--index 0)
     (let ((cand vertico--candidates) (w 1) (n 0))
       (while (and cand (< n vertico-grid-lookahead))
@@ -161,13 +160,9 @@ When scrolling beyond this limit, candidates may be truncated."
   (when-let (win (active-minibuffer-window))
     (unless (frame-root-window-p win)
       (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise)))
-  (cond
-   (vertico-grid-mode
-    (add-to-list 'minor-mode-map-alist `(vertico--input . ,vertico-grid-map))
-    (advice-add #'vertico--arrange-candidates :override #'vertico-grid--arrange-candidates))
-   (t
-    (setq minor-mode-map-alist (delete `(vertico--input . ,vertico-grid-map) minor-mode-map-alist))
-    (advice-remove #'vertico--arrange-candidates #'vertico-grid--arrange-candidates))))
+  (if vertico-grid-mode
+      (add-to-list 'minor-mode-map-alist `(vertico--input . ,vertico-grid-map))
+    (setq minor-mode-map-alist (delete `(vertico--input . ,vertico-grid-map) minor-mode-map-alist))))
 
 ;; Emacs 28: Do not show Vertico commands in M-X
 (dolist (sym '(vertico-grid-left vertico-grid-right

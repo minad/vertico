@@ -51,9 +51,9 @@
                     (let ((vertico--index index))
                       (vertico-insert))))))
 
-(defun vertico-mouse--format-candidate (orig cand prefix suffix index start)
-  "Format candidate, see `vertico--format-candidate' for arguments."
-  (setq cand (funcall orig cand prefix suffix index start))
+(cl-defmethod vertico--format-candidate
+  :around (cand prefix suffix index start &context (vertico-mouse-mode (eql t)))
+  (setq cand (cl-call-next-method cand prefix suffix index start))
   (when (equal suffix "")
     (setq cand (concat (substring cand 0 -1)
                        (propertize " " 'display '(space :align-to right))
@@ -73,22 +73,14 @@
   "Scroll down by N lines."
   (vertico-mouse--scroll-up (- n)))
 
-(defun vertico-mouse--setup ()
-  "Setup mouse scrolling."
+(cl-defmethod vertico--setup :after (&context (vertico-mouse-mode (eql t)))
   (setq-local mwheel-scroll-up-function #'vertico-mouse--scroll-up
               mwheel-scroll-down-function #'vertico-mouse--scroll-down))
 
 ;;;###autoload
 (define-minor-mode vertico-mouse-mode
   "Mouse support for Vertico."
-  :global t :group 'vertico
-  (cond
-   (vertico-mouse-mode
-    (advice-add #'vertico--format-candidate :around #'vertico-mouse--format-candidate)
-    (advice-add #'vertico--setup :after #'vertico-mouse--setup))
-   (t
-    (advice-remove #'vertico--format-candidate #'vertico-mouse--format-candidate)
-    (advice-remove #'vertico--setup #'vertico-mouse--setup))))
+  :global t :group 'vertico)
 
 (provide 'vertico-mouse)
 ;;; vertico-mouse.el ends here
