@@ -6,6 +6,7 @@
 
 - Add =vertico-preselect= configuration option.
 - =vertico-directory-up= moves up even if point is not located directly after /.
+- Use =cl-defgeneric= to support overriding internals within extensions.
 
 * Version 1.0 (2022-12-22)
 
