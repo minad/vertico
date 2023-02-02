@@ -415,11 +415,6 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Return t if PATH is a remote path."
   (string-match-p "\\`/[^/|:]+:" (substitute-in-file-name path)))
 
-(defun vertico--prepare ()
-  "Ensure that the state is prepared before running the next command."
-  (when (and (symbolp this-command) (string-prefix-p "vertico-" (symbol-name this-command)))
-    (vertico--update)))
-
 (defun vertico--update (&optional interruptible)
   "Update state, optionally INTERRUPTIBLE."
   (let* ((pt (max 0 (- (point) (minibuffer-prompt-end))))
@@ -633,6 +628,11 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
       (when (or (and (> dp 0) (/= height 0))
                 (and (< dp 0) (eq vertico-resize t)))
         (window-resize nil dp nil nil 'pixelwise)))))
+
+(cl-defgeneric vertico--prepare ()
+  "Ensure that the state is prepared before running the next command."
+  (when (and (symbolp this-command) (string-prefix-p "vertico-" (symbol-name this-command)))
+    (vertico--update)))
 
 (cl-defgeneric vertico--setup ()
   "Setup completion UI."

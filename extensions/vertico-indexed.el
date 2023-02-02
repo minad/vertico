@@ -50,18 +50,17 @@
 (defvar-local vertico-indexed--min 0)
 (defvar-local vertico-indexed--max 0)
 
-(defun vertico-indexed--handle-prefix (orig &rest args)
-  "Handle prefix argument before calling ORIG function with ARGS."
-  (if (and current-prefix-arg (called-interactively-p t))
-      (let ((vertico--index (+ vertico-indexed--min
-                               (- (prefix-numeric-value current-prefix-arg)
-                                  vertico-indexed-start))))
-        (if (or (< vertico--index vertico-indexed--min)
-                (> vertico--index vertico-indexed--max)
-                (= vertico--total 0))
-            (minibuffer-message "Out of range")
-          (funcall orig)))
-    (apply orig args)))
+(cl-defmethod vertico--prepare :before (&context (vertico-indexed-mode (eql t)))
+  (when (and prefix-arg (memq this-command vertico-indexed--commands))
+    (let ((index (+ vertico-indexed--min
+                    (- (prefix-numeric-value prefix-arg)
+                       vertico-indexed-start))))
+        (if (and (>= index vertico-indexed--min)
+                 (< index vertico-indexed--max)
+                 (/= vertico--total 0))
+            (setq vertico--index index)
+          (minibuffer-message "Out of range")
+          (setq this-command #'ignore)))))
 
 (cl-defmethod vertico--format-candidate :around
   (cand prefix suffix index start &context (vertico-indexed-mode (eql t)))
@@ -79,14 +78,7 @@
 ;;;###autoload
 (define-minor-mode vertico-indexed-mode
   "Prefix candidates with indices."
-  :global t :group 'vertico
-  ;; TODO I had forgotten that `vertico-indexed-mode' is double evil, since it
-  ;; uses advices and the forbidden function `called-interactively-p'. Find a
-  ;; better implementation which avoids these kludges.
-  (dolist (cmd vertico-indexed--commands)
-    (if vertico-indexed-mode
-        (advice-add cmd :around #'vertico-indexed--handle-prefix)
-      (advice-remove cmd #'vertico-indexed--handle-prefix))))
+  :global t :group 'vertico)
 
 (provide 'vertico-indexed)
 ;;; vertico-indexed.el ends here
