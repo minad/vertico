@@ -66,6 +66,18 @@
   "<remap> <left-char>" #'vertico-previous
   "<remap> <right-char>" #'vertico-next)
 
+;;;###autoload
+(define-minor-mode vertico-flat-mode
+  "Flat, horizontal display for Vertico."
+  :global t :group 'vertico
+  ;; Shrink current minibuffer window
+  (when-let (win (active-minibuffer-window))
+    (unless (frame-root-window-p win)
+      (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise)))
+  (if vertico-flat-mode
+      (add-to-list 'minor-mode-map-alist `(vertico--input . ,vertico-flat-map))
+    (setq minor-mode-map-alist (delete `(vertico--input . ,vertico-flat-map) minor-mode-map-alist))))
+
 (cl-defmethod vertico--display-candidates (candidates &context (vertico-flat-mode (eql t)))
   (setq-local truncate-lines nil
               resize-mini-windows t)
@@ -116,18 +128,6 @@
             (and (/= vertico--total 0) (/= index vertico--total)))
       (push (plist-get vertico-flat-format :ellipsis) result))
     (nreverse result)))
-
-;;;###autoload
-(define-minor-mode vertico-flat-mode
-  "Flat, horizontal display for Vertico."
-  :global t :group 'vertico
-  ;; Shrink current minibuffer window
-  (when-let (win (active-minibuffer-window))
-    (unless (frame-root-window-p win)
-      (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise)))
-  (if vertico-flat-mode
-      (add-to-list 'minor-mode-map-alist `(vertico--input . ,vertico-flat-map))
-    (setq minor-mode-map-alist (delete `(vertico--input . ,vertico-flat-map) minor-mode-map-alist))))
 
 (provide 'vertico-flat)
 ;;; vertico-flat.el ends here

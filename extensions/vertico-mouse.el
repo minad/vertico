@@ -51,6 +51,19 @@
                     (let ((vertico--index index))
                       (vertico-insert))))))
 
+(defun vertico-mouse--scroll-up (n)
+  "Scroll up by N lines."
+  (vertico--goto (max 0 (+ vertico--index n))))
+
+(defun vertico-mouse--scroll-down (n)
+  "Scroll down by N lines."
+  (vertico-mouse--scroll-up (- n)))
+
+;;;###autoload
+(define-minor-mode vertico-mouse-mode
+  "Mouse support for Vertico."
+  :global t :group 'vertico)
+
 (cl-defmethod vertico--format-candidate
   :around (cand prefix suffix index start &context (vertico-mouse-mode (eql t)))
   (setq cand (cl-call-next-method cand prefix suffix index start))
@@ -65,22 +78,9 @@
                        cand)
   cand)
 
-(defun vertico-mouse--scroll-up (n)
-  "Scroll up by N lines."
-  (vertico--goto (max 0 (+ vertico--index n))))
-
-(defun vertico-mouse--scroll-down (n)
-  "Scroll down by N lines."
-  (vertico-mouse--scroll-up (- n)))
-
 (cl-defmethod vertico--setup :after (&context (vertico-mouse-mode (eql t)))
   (setq-local mwheel-scroll-up-function #'vertico-mouse--scroll-up
               mwheel-scroll-down-function #'vertico-mouse--scroll-down))
-
-;;;###autoload
-(define-minor-mode vertico-mouse-mode
-  "Mouse support for Vertico."
-  :global t :group 'vertico)
 
 (provide 'vertico-mouse)
 ;;; vertico-mouse.el ends here

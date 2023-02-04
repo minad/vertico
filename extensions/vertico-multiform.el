@@ -135,14 +135,6 @@ The keys in LIST can be symbols or regexps."
     (vertico-multiform--toggle 1)
     (vertico--setup)))
 
-(cl-defmethod vertico--advice (&context (vertico-multiform-mode (eql t)) &rest app)
-  (unwind-protect
-      (progn
-        (vertico-multiform--toggle -1)
-        (minibuffer-with-setup-hook #'vertico-multiform--setup
-          (apply app)))
-    (vertico-multiform--toggle 1)))
-
 ;;;###autoload
 (define-minor-mode vertico-multiform-mode
   "Configure Vertico in various forms per command."
@@ -152,6 +144,14 @@ The keys in LIST can be symbols or regexps."
   (when vertico-multiform--stack
     (warn "vertico-multiform state is inconsistent")
     (setq vertico-multiform--stack nil)))
+
+(cl-defmethod vertico--advice (&context (vertico-multiform-mode (eql t)) &rest app)
+  (unwind-protect
+      (progn
+        (vertico-multiform--toggle -1)
+        (minibuffer-with-setup-hook #'vertico-multiform--setup
+          (apply app)))
+    (vertico-multiform--toggle 1)))
 
 (defun vertico-multiform--ensure ()
   "Ensure that multiform mode is enabled."

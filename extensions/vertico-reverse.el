@@ -52,17 +52,6 @@
   "<remap> <backward-paragraph>" #'vertico-next-group
   "<remap> <forward-paragraph>" #'vertico-previous-group)
 
-(cl-defmethod vertico--display-candidates (lines &context (vertico-reverse-mode (eql t)))
-  (move-overlay vertico--candidates-ov (point-min) (point-min))
-  (setq lines (nreverse lines))
-  (unless (eq vertico-resize t)
-    (setq lines (nconc (make-list (max 0 (- vertico-count (length lines))) "\n") lines)))
-  (let ((string (apply #'concat lines)))
-    (add-face-text-property 0 (length string) 'default 'append string)
-    (overlay-put vertico--candidates-ov 'before-string string)
-    (overlay-put vertico--candidates-ov 'after-string nil))
-  (vertico--resize-window (length lines)))
-
 ;;;###autoload
 (define-minor-mode vertico-reverse-mode
   "Reverse the Vertico display."
@@ -74,6 +63,17 @@
   (if vertico-reverse-mode
       (add-to-list 'minor-mode-map-alist `(vertico--input . ,vertico-reverse-map))
     (setq minor-mode-map-alist (delete `(vertico--input . ,vertico-reverse-map) minor-mode-map-alist))))
+
+(cl-defmethod vertico--display-candidates (lines &context (vertico-reverse-mode (eql t)))
+  (move-overlay vertico--candidates-ov (point-min) (point-min))
+  (setq lines (nreverse lines))
+  (unless (eq vertico-resize t)
+    (setq lines (nconc (make-list (max 0 (- vertico-count (length lines))) "\n") lines)))
+  (let ((string (apply #'concat lines)))
+    (add-face-text-property 0 (length string) 'default 'append string)
+    (overlay-put vertico--candidates-ov 'before-string string)
+    (overlay-put vertico--candidates-ov 'after-string nil))
+  (vertico--resize-window (length lines)))
 
 (provide 'vertico-reverse)
 ;;; vertico-reverse.el ends here

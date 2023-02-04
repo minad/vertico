@@ -88,6 +88,11 @@
           (setq-local cursor-in-non-selected-windows new)
           (force-mode-line-update t))))))
 
+;;;###autoload
+(define-minor-mode vertico-buffer-mode
+  "Display Vertico in a buffer instead of the minibuffer."
+  :global t :group 'vertico)
+
 (cl-defmethod vertico--resize-window (_height &context (vertico-buffer-mode (eql t))))
 
 (cl-defmethod vertico--setup :after (&context (vertico-buffer-mode (eql t)))
@@ -147,11 +152,6 @@
                 cursor-in-non-selected-windows 'box
                 vertico-count (- (/ (window-pixel-height win)
                                     (default-line-height)) 2))))
-
-;;;###autoload
-(define-minor-mode vertico-buffer-mode
-  "Display Vertico in a buffer instead of the minibuffer."
-  :global t :group 'vertico)
 
 (provide 'vertico-buffer)
 ;;; vertico-buffer.el ends here

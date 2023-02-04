@@ -43,9 +43,6 @@
 (defvar vertico-unobtrusive--orig-count nil)
 (defvar vertico-unobtrusive--orig-count-format nil)
 
-(cl-defmethod vertico--setup :before (&context (vertico-unobtrusive-mode (eql t)))
-  (redisplay))
-
 ;;;###autoload
 (define-minor-mode vertico-unobtrusive-mode
   "Unobtrusive display for Vertico."
@@ -69,6 +66,9 @@
             vertico-flat-format (nthcdr 4 vertico-flat-format)
             vertico-unobtrusive--orig-count nil))))
   (vertico-flat-mode (if vertico-unobtrusive-mode 1 -1)))
+
+(cl-defmethod vertico--setup :before (&context (vertico-unobtrusive-mode (eql t)))
+  (redisplay))
 
 (provide 'vertico-unobtrusive)
 ;;; vertico-unobtrusive.el ends here

@@ -50,6 +50,11 @@
 (defvar-local vertico-indexed--min 0)
 (defvar-local vertico-indexed--max 0)
 
+;;;###autoload
+(define-minor-mode vertico-indexed-mode
+  "Prefix candidates with indices."
+  :global t :group 'vertico)
+
 (cl-defmethod vertico--prepare :before (&context (vertico-indexed-mode (eql t)))
   (when (and prefix-arg (memq this-command vertico-indexed--commands))
     (let ((index (+ vertico-indexed--min
@@ -74,11 +79,6 @@
                        'face 'vertico-indexed)
            prefix)
    suffix index start))
-
-;;;###autoload
-(define-minor-mode vertico-indexed-mode
-  "Prefix candidates with indices."
-  :global t :group 'vertico)
 
 (provide 'vertico-indexed)
 ;;; vertico-indexed.el ends here
