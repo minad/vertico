@@ -37,19 +37,23 @@
   "Face used for mouse highlighting."
   :group 'vertico-faces)
 
+(defun vertico-mouse--candidate-click (index key)
+  "Return command handling click on candidate with INDEX.
+The command will behave like KEY."
+  (when-let ((cmd (keymap-lookup vertico-map key)))
+    (lambda ()
+      (interactive)
+      ;; Ensure that the command is always executed in the minibuffer.
+      ;; Mouse clicks can also happen if another window is selected.
+      (with-selected-window (active-minibuffer-window)
+        (let ((vertico--index index))
+          (funcall cmd))))))
+
 (defun vertico-mouse--candidate-map (index)
   "Return keymap for candidate with INDEX."
   (define-keymap
-    "<mouse-1>" (lambda ()
-                  (interactive)
-                  (with-selected-window (active-minibuffer-window)
-                    (let ((vertico--index index))
-                      (vertico-exit))))
-    "<mouse-3>" (lambda ()
-                  (interactive)
-                  (with-selected-window (active-minibuffer-window)
-                    (let ((vertico--index index))
-                      (vertico-insert))))))
+    "<mouse-1>" (vertico-mouse--candidate-click index "RET")
+    "<mouse-3>" (vertico-mouse--candidate-click index "TAB")))
 
 (defun vertico-mouse--scroll-up (n)
   "Scroll up by N lines."
