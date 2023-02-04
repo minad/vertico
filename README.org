@@ -580,10 +580,11 @@ The command ~ffap-menu~ shows the =*Completions*= buffer by default like
 disabled as follows.
 
 #+begin_src emacs-lisp
-  (advice-add #'ffap-menu-ask :around (lambda (&rest args)
-                                   (cl-letf (((symbol-function #'minibuffer-completion-help)
-                                              #'ignore))
-                                     (apply args))))
+  (advice-add #'ffap-menu-ask :around
+              (lambda (&rest args)
+                (cl-letf (((symbol-function #'minibuffer-completion-help)
+                           #'ignore))
+                  (apply args))))
 #+end_src
 
 ** ~completion-table-dynamic~
