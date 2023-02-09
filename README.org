@@ -300,21 +300,20 @@ problem.
           (consult-grep buffer)))
 #+end_src
 
-Temporary toggling between the different display modes is possible. Bind the
-following commands:
+Temporary toggling between the different display modes is possible. The
+following commands are bound by default in the =vertico-multiform-map=. You can of
+course change these bindings if you like.
 
-#+begin_src emacs-lisp
-  (keymap-set vertico-map "M-V" #'vertico-multiform-vertical)
-  (keymap-set vertico-map "M-G" #'vertico-multiform-grid)
-  (keymap-set vertico-map "M-F" #'vertico-multiform-flat)
-  (keymap-set vertico-map "M-R" #'vertico-multiform-reverse)
-  (keymap-set vertico-map "M-U" #'vertico-multiform-unobtrusive)
-#+end_src
+- =M-V= -> ~vertico-multiform-vertical~
+- =M-G= -> ~vertico-multiform-grid~
+- =M-F= -> ~vertico-multiform-flat~
+- =M-R= -> ~vertico-multiform-reverse~
+- =M-U= -> ~vertico-multiform-unobtrusive~
 
-You can use your own functions or even lambdas to configure the completion
-behavior per command or per completion category. The function must have the
-calling convention of a mode, i.e., it takes a single argument, which is either
-1 to turn on the mode and -1 to turn off the mode.
+For special configuration you can use your own functions or even lambdas to
+configure the completion behavior per command or per completion category.
+Functions must have the calling convention of a mode, i.e., take a single
+argument, which is either 1 to turn on the mode and -1 to turn off the mode.
 
 #+begin_src emacs-lisp
   ;; Configure `consult-outline' as a scaled down TOC in a separate buffer

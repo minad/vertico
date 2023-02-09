@@ -28,11 +28,10 @@
 
 ;; This package is a Vertico extension providing a horizontal display.
 ;;
-;; The mode can be enabled globally or via `vertico-multiform-mode' per
-;; command or completion category.  Alternatively the flat display can be
-;; toggled temporarily if `vertico-multiform-mode' is enabled:
-;;
-;; (keymap-set vertico-map "M-F" #'vertico-multiform-flat)
+;; The mode can be enabled globally or via `vertico-multiform-mode'
+;; per command or completion category.  Alternatively the flat display
+;; can be toggled temporarily with M-F if `vertico-multiform-mode' is
+;; enabled.
 ;;
 ;; The flat display can be made to look like `ido-mode' by setting
 ;; `vertico-cycle' to t. See also the `vertico-flat-format'

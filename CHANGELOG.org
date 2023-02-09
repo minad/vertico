@@ -8,6 +8,7 @@
 - =vertico-directory-up= moves up even if point is not located directly after /.
 - Use =cl-defgeneric= internally as mechanism to allow extensions to override
   functionality, e.g., the candidate formatting and display.
+- =vertico-multiform-mode=: Add =vertico-multiform-map= with default key bindings.
 
 * Version 1.0 (2022-12-22)
 

@@ -26,15 +26,14 @@
 
 ;;; Commentary:
 
-;; This package is a Vertico extension providing a unobtrusive display.
-;; The unobtrusive display only shows the topmost candidate and nothing
-;; else, it is a simple derivative of `vertico-flat-mode'.
+;; This package is a Vertico extension providing a unobtrusive
+;; display.  The unobtrusive display only shows the topmost candidate
+;; and nothing else, it is a simple derivative of `vertico-flat-mode'.
 ;;
-;; The mode can be enabled globally or via `vertico-multiform-mode' per
-;; command or completion category.  Alternatively the unobtrusive display
-;; can be toggled temporarily if `vertico-multiform-mode' is enabled:
-;;
-;; (keymap-set vertico-map "M-U" #'vertico-multiform-unobtrusive)
+;; The mode can be enabled globally or via `vertico-multiform-mode'
+;; per command or completion category.  Alternatively the unobtrusive
+;; display can be toggled temporarily with M-U if
+;; `vertico-multiform-mode' is enabled.
 
 ;;; Code:
 

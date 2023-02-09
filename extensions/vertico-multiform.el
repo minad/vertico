@@ -28,9 +28,9 @@
 
 ;; This package is a Vertico extension for fine tuning the Vertico
 ;; display and other minibuffer modes per command or completion
-;; category.  For some commands you may want to use the `vertico-buffer'
-;; display and for completion categories like file you prefer the
-;; `vertico-grid-mode'.
+;; category.  For some commands you may want to use the
+;; `vertico-buffer' display and for completion categories like file
+;; you prefer the `vertico-grid-mode'.
 ;;
 ;; Example:
 ;;
@@ -46,14 +46,14 @@
 ;;
 ;;    (vertico-multiform-mode)
 ;;
-;; Temporary toggling between the different display modes is
-;; possible.  Bind the following commands:
+;; Temporary toggling between the different display modes is possible.
+;; The following keys are bound in the `vertico-multiform-map'.
 ;;
-;; (keymap-set vertico-map "M-V" #'vertico-multiform-vertical)
-;; (keymap-set vertico-map "M-G" #'vertico-multiform-grid)
-;; (keymap-set vertico-map "M-F" #'vertico-multiform-flat)
-;; (keymap-set vertico-map "M-R" #'vertico-multiform-reverse)
-;; (keymap-set vertico-map "M-U" #'vertico-multiform-unobtrusive)
+;;   M-V -> `vertico-multiform-vertical'
+;;   M-G -> `vertico-multiform-grid'
+;;   M-F -> `vertico-multiform-flat'
+;;   M-R -> `vertico-multiform-reverse'
+;;   M-U -> `vertico-multiform-unobtrusive'
 ;;
 ;;; Code:
 
@@ -135,6 +135,14 @@ The keys in LIST can be symbols or regexps."
     (vertico-multiform--toggle 1)
     (vertico--setup)))
 
+(defvar-keymap vertico-multiform-map
+  :doc "Additional keymap activated in multiform mode."
+  "M-V" 'vertico-multiform-vertical
+  "M-G" 'vertico-multiform-grid
+  "M-F" 'vertico-multiform-flat
+  "M-R" 'vertico-multiform-reverse
+  "M-U" 'vertico-multiform-unobtrusive)
+
 ;;;###autoload
 (define-minor-mode vertico-multiform-mode
   "Configure Vertico in various forms per command."
@@ -143,7 +151,10 @@ The keys in LIST can be symbols or regexps."
     (warn "vertico-multiform must not be toggled from recursive minibuffers"))
   (when vertico-multiform--stack
     (warn "vertico-multiform state is inconsistent")
-    (setq vertico-multiform--stack nil)))
+    (setq vertico-multiform--stack nil))
+  (if vertico-multiform-mode
+      (add-to-list 'minor-mode-map-alist `(vertico--input . ,vertico-multiform-map))
+    (setq minor-mode-map-alist (delete `(vertico--input . ,vertico-multiform-map) minor-mode-map-alist))))
 
 (cl-defmethod vertico--advice (&context (vertico-multiform-mode (eql t)) &rest app)
   (unwind-protect

@@ -26,13 +26,13 @@
 
 ;;; Commentary:
 
-;; This package is a Vertico extension, which reverses the list of candidates.
+;; This package is a Vertico extension, which reverses the list of
+;; candidates.
 ;;
-;; The mode can be enabled globally or via `vertico-multiform-mode' per
-;; command or completion category.  Alternatively the reverse display can be
-;; toggled temporarily if `vertico-multiform-mode' is enabled:
-;;
-;; (keymap-set vertico-map "M-R" #'vertico-multiform-reverse)
+;; The mode can be enabled globally or via `vertico-multiform-mode'
+;; per command or completion category.  Alternatively the reverse
+;; display can be toggled temporarily with M-R if
+;; `vertico-multiform-mode' is enabled.
 
 ;;; Code:
 
