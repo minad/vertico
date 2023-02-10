@@ -631,12 +631,17 @@ to exit with the empty string, press =M-RET=. In the second case the explicit
 default value "" is specified and Vertico preselects the prompt, such that
 exiting with the empty string is possible by pressing =RET= only.
 
-** Tramp hostname completion
+** Tramp hostname and username completion
 
-In combination with Orderless, hostnames are not made available for completion
-after entering =/ssh:=. In order to avoid this problem, the =basic= completion style
-should be specified for the file completion category, such that =basic= is tried
-before =orderless=.
+*NOTE:* On Emacs 30 the workarounds described in this section will likely become
+unnecessary, since the Tramp maintainer improved the relevant completion tables.
+Confirmation would be welcome if you already use a very recent build of Emacs
+master.
+
+In combination with Orderless, host names and user names are not made available
+for completion after entering =/ssh:=. In order to avoid this problem, the =basic=
+completion style should be specified for the file completion category, such that
+=basic= is tried before =orderless=.
 
 #+begin_src emacs-lisp
   (setq completion-styles '(orderless basic)
