@@ -633,23 +633,27 @@ exiting with the empty string is possible by pressing =RET= only.
 
 ** Tramp hostname and username completion
 
-*NOTE:* On Emacs 30 the workarounds described in this section will likely become
-unnecessary, since the Tramp maintainer improved the relevant completion tables.
-Confirmation would be welcome if you already use a very recent build of Emacs
-master.
+*NOTE:* On upcoming Emacs 30 and the upcoming Tramp 2.6.0.2 the workarounds
+described in this section will likely become unnecessary, since the Tramp
+maintainer improved the relevant completion tables. Confirmation would be
+welcome if you already use a very recent build of Emacs master.
 
-In combination with Orderless, host names and user names are not made available
-for completion after entering =/ssh:=. In order to avoid this problem, the =basic=
+In combination with Orderless or other non-prefix completion styles like
+=substring= or =flex=, host names and user names are not made available for
+completion after entering =/ssh:=. In order to avoid this problem, the =basic=
 completion style should be specified for the file completion category, such that
-=basic= is tried before =orderless=.
+=basic= is tried before =orderless=. This can be achieved by putting =basic= first in
+the completion style overrides for the file completion category.
 
 #+begin_src emacs-lisp
   (setq completion-styles '(orderless basic)
         completion-category-overrides '((file (styles basic partial-completion))))
 #+end_src
 
-For users who are familiar with the =completion-style= machinery: You may also
-define a custom completion style which sets in only for remote files!
+For users who are familiar with the =completion-style= machinery and who want to
+dig a bit deeper. You may also define a custom completion style which sets in
+only for remote files. This way =orderless= will stay the preferred style in most
+cases.
 
 #+begin_src emacs-lisp
   (defun basic-remote-try-completion (string table pred point)
