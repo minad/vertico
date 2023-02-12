@@ -122,6 +122,7 @@
                         (delete-window win)
                       (set-window-parameter win 'no-other-window now)
                       (set-window-parameter win 'no-delete-other-windows ndow)
+                      (set-window-dedicated-p win nil)
                       (set-window-buffer win old-buf))
                     (when vertico-buffer-hide-prompt
                       (set-window-vscroll nil 0))
@@ -132,6 +133,7 @@
     (add-hook 'minibuffer-exit-hook sym)
     (set-window-parameter win 'no-other-window t)
     (set-window-parameter win 'no-delete-other-windows t)
+    (set-window-dedicated-p win t)
     (overlay-put vertico--candidates-ov 'window win)
     (when (and vertico-buffer-hide-prompt vertico--count-ov)
       (overlay-put vertico--count-ov 'window win))
