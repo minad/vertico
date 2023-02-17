@@ -137,11 +137,11 @@ The keys in LIST can be symbols or regexps."
 
 (defvar-keymap vertico-multiform-map
   :doc "Additional keymap activated in multiform mode."
-  "M-V" 'vertico-multiform-vertical
-  "M-G" 'vertico-multiform-grid
-  "M-F" 'vertico-multiform-flat
-  "M-R" 'vertico-multiform-reverse
-  "M-U" 'vertico-multiform-unobtrusive)
+  "M-V" #'vertico-multiform-vertical
+  "M-G" #'vertico-multiform-grid
+  "M-F" #'vertico-multiform-flat
+  "M-R" #'vertico-multiform-reverse
+  "M-U" #'vertico-multiform-unobtrusive)
 
 ;;;###autoload
 (define-minor-mode vertico-multiform-mode
