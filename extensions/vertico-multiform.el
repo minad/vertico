@@ -192,24 +192,25 @@ ARG can be nil, t, -1, 1 or toggle."
           (setcar vertico-multiform--stack (remove mode modes))
         (push not-mode (car vertico-multiform--stack))))))
 
-(defvar vertico-multiform--modes '(vertico-unobtrusive-mode vertico-flat-mode
-                                   vertico-grid-mode vertico-reverse-mode))
-(defvar-local vertico-multiform--last nil)
+(defvar vertico-multiform--display-modes
+  '(vertico-unobtrusive-mode vertico-flat-mode
+    vertico-grid-mode vertico-reverse-mode))
+(defvar-local vertico-multiform--display-last nil)
 
 (defun vertico-multiform-vertical (&optional mode)
   "Toggle to display MODE temporarily in minibuffer.
 MODE defaults to the vertical display."
   (interactive)
   (let (last)
-    (dolist (m vertico-multiform--modes)
+    (dolist (m vertico-multiform--display-modes)
       (when (and (boundp m) (symbol-value m))
         (setq last m)
         (vertico-multiform--temporary-mode m -1)))
     (when (eq last mode)
-      (setq mode vertico-multiform--last))
+      (setq mode vertico-multiform--display-last))
     (when mode
       (vertico-multiform--temporary-mode mode 1))
-    (setq vertico-multiform--last last)))
+    (setq vertico-multiform--display-last last)))
 
 (defmacro vertico-multiform--define-display-toggle (name)
   "Define toggle for display mode NAME."
