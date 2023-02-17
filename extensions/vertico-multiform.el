@@ -192,23 +192,24 @@ ARG can be nil, t, -1, 1 or toggle."
           (setcar vertico-multiform--stack (remove mode modes))
         (push not-mode (car vertico-multiform--stack))))))
 
-(defvar-local vertico-multiform--display-last nil)
+(defvar vertico-multiform--modes '(vertico-unobtrusive-mode vertico-flat-mode
+                                   vertico-grid-mode vertico-reverse-mode))
+(defvar-local vertico-multiform--last nil)
 
 (defun vertico-multiform-vertical (&optional mode)
   "Toggle to display MODE temporarily in minibuffer.
 MODE defaults to the vertical display."
   (interactive)
   (let (last)
-    (dolist (m '(vertico-unobtrusive-mode vertico-flat-mode
-                 vertico-grid-mode vertico-reverse-mode))
+    (dolist (m vertico-multiform--modes)
       (when (and (boundp m) (symbol-value m))
         (setq last m)
         (vertico-multiform--temporary-mode m -1)))
     (when (eq last mode)
-      (setq mode vertico-multiform--display-last))
+      (setq mode vertico-multiform--last))
     (when mode
       (vertico-multiform--temporary-mode mode 1))
-    (setq vertico-multiform--display-last last)))
+    (setq vertico-multiform--last last)))
 
 (put #'vertico-multiform-vertical 'completion-predicate #'vertico--command-p)
 
