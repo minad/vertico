@@ -164,13 +164,6 @@ The keys in LIST can be symbols or regexps."
           (apply app)))
     (vertico-multiform--toggle 1)))
 
-(defun vertico-multiform--ensure ()
-  "Ensure that multiform mode is enabled."
-  (unless (minibufferp)
-    (user-error "`%s' must be called inside the minibuffer" this-command))
-  (unless vertico-multiform-mode
-    (user-error "`vertico-multiform-mode' is not enabled")))
-
 (defun vertico-multiform--temporary-mode (mode arg)
   "Enable or disable MODE temporarily in minibuffer given ARG.
 ARG can be nil, t, -1, 1 or toggle."
