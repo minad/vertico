@@ -36,7 +36,7 @@
 ;; history across Emacs sessions, enable `savehist-mode' and add
 ;; `vertico-repeat-history' to `savehist-additional-variables'.
 ;;
-;; (global-set-key "\M-R" #'vertico-repeat)
+;; (keymap-global-set "M-R" #'vertico-repeat)
 ;; (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
 
 ;;; Code:

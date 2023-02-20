@@ -568,7 +568,7 @@ be disabled with an advice. If you disabled the standard GUI menu bar and prefer
 the Vertico interface you may also overwrite the default F10 keybinding.
 
 #+begin_src emacs-lisp
-  (global-set-key [f10] #'tmm-menubar)
+  (keymap-global-set "<f10>" #'tmm-menubar)
   (advice-add #'tmm-add-prompt :after #'minibuffer-hide-completions)
 #+end_src
 
