@@ -83,7 +83,8 @@
         (window-resize mbwin (- (window-pixel-height mbwin)) nil nil 'pixelwise)
         (set-window-vscroll mbwin 100))
       (let ((old cursor-in-non-selected-windows)
-            (new (and (eq (selected-window) mbwin) 'box)))
+            (new (and (eq (selected-window) mbwin)
+                      (if (memq cursor-type '(nil t)) 'box cursor-type))))
         (unless (eq new old)
           (setq-local cursor-in-non-selected-windows new)
           (force-mode-line-update t))))))
@@ -151,7 +152,6 @@
                                         (minibuffer-prompt))
                                        depth)
                                'face 'mode-line-buffer-id)))
-                cursor-in-non-selected-windows 'box
                 vertico-count (- (/ (window-pixel-height win)
                                     (default-line-height)) 2))))
 
