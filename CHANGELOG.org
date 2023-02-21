@@ -2,6 +2,12 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- =vertico-buffer=: Inherit =cursor-type= in minibuffer window, instead of always
+  using the =box= cursor type. This change is particularly useful for Evil users,
+  where the cursor reflect the Evil editing state.
+
 * Version 1.1 (2023-02-17)
 
 - Add =vertico-preselect= configuration option.
