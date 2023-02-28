@@ -87,7 +87,7 @@
   "Delete N directories or chars before point."
   (interactive "p")
   (unless (and (eq (char-before) ?/) (vertico-directory-up n))
-    (backward-delete-char n)))
+    (delete-char (- n))))
 
 ;;;###autoload
 (defun vertico-directory-delete-word (&optional n)
