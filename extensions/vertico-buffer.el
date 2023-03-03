@@ -70,6 +70,19 @@
                   (side . bottom)))
           (sexp :tag "Other")))
 
+(defcustom vertico-buffer-restore-function
+  'set-window-buffer
+  "Function to display the original buffer in the Vertico buffer's window.
+
+This function is called during teardown of Vertico sessions.  It
+receives two arguments: the window and the buffer to be
+displayed."
+  :group 'vertico
+  :type '(choice
+          (const :tag "Set window buffer explicitly"
+                 'set-window-buffer)
+          (function :tag "Other")))
+
 (defun vertico-buffer--redisplay (win)
   "Redisplay window WIN."
   (when-let (mbwin (active-minibuffer-window))
@@ -124,7 +137,7 @@
                       (set-window-parameter win 'no-other-window now)
                       (set-window-parameter win 'no-delete-other-windows ndow)
                       (set-window-dedicated-p win nil)
-                      (set-window-buffer win old-buf))
+                      (funcall vertico-buffer-restore-function win old-buf))
                     (when vertico-buffer-hide-prompt
                       (set-window-vscroll nil 0))
                     (remove-hook 'minibuffer-exit-hook sym)))))
