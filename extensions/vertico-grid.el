@@ -40,12 +40,12 @@
 
 (defcustom vertico-grid-min-columns 2
   "Minimal number of grid columns."
-  :type 'integer
+  :type 'natnum
   :group 'vertico)
 
 (defcustom vertico-grid-max-columns 8
   "Maximal number of grid columns."
-  :type 'integer
+  :type 'natnum
   :group 'vertico)
 
 (defcustom vertico-grid-separator
@@ -56,13 +56,13 @@
 
 (defcustom vertico-grid-rows 6
   "Number of grid rows."
-  :type 'integer
+  :type 'natnum
   :group 'vertico)
 
 (defcustom vertico-grid-lookahead 100
   "Number of candidates to lookahead for column number computation.
 When scrolling beyond this limit, candidates may be truncated."
-  :type 'integer
+  :type 'natnum
   :group 'vertico)
 
 (defvar-keymap vertico-grid-map

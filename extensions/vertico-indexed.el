@@ -43,7 +43,7 @@
 (defcustom vertico-indexed-start 0
   "Start of the indexing."
   :group 'vertico
-  :type 'integer)
+  :type 'natnum)
 
 (defvar vertico-indexed--commands
   '(vertico-insert vertico-exit vertico-directory-enter))

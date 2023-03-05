@@ -6,7 +6,7 @@
 ;; Maintainer: Daniel Mendler <mail@daniel-mendler.de>
 ;; Created: 2021
 ;; Version: 1.1
-;; Package-Requires: ((emacs "27.1") (compat "29.1.3.4"))
+;; Package-Requires: ((emacs "27.1") (compat "29.1.4.0"))
 ;; Homepage: https://github.com/minad/vertico
 
 ;; This file is part of GNU Emacs.
@@ -60,7 +60,7 @@
 
 (defcustom vertico-count 10
   "Maximal number of candidates to show."
-  :type 'integer)
+  :type 'natnum)
 
 (defcustom vertico-preselect 'directory
   "Configure if the prompt or first candidate is preselected.
@@ -72,7 +72,7 @@
 (defcustom vertico-scroll-margin 2
   "Number of lines at the top and bottom when scrolling.
 The value should lie between 0 and vertico-count/2."
-  :type 'integer)
+  :type 'natnum)
 
 (defcustom vertico-resize resize-mini-windows
   "How to resize the Vertico minibuffer window, see `resize-mini-windows'."

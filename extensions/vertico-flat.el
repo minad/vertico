@@ -43,7 +43,7 @@
 
 (defcustom vertico-flat-max-lines 1
   "Maximal number of lines to use."
-  :type 'integer
+  :type 'natnum
   :group 'vertico)
 
 (defcustom vertico-flat-format
