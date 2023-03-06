@@ -61,7 +61,7 @@
                     (- (prefix-numeric-value prefix-arg)
                        vertico-indexed-start))))
         (if (and (>= index vertico-indexed--min)
-                 (< index vertico-indexed--max)
+                 (<= index vertico-indexed--max)
                  (/= vertico--total 0))
             (setq vertico--index index)
           (minibuffer-message "Out of range")
