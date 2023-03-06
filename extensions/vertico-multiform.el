@@ -119,11 +119,7 @@ The keys in LIST can be symbols or regexps."
                    (vertico-multiform--toggle -1)
                    (pop vertico-multiform--stack))))
     (add-hook 'minibuffer-exit-hook exit)
-    (dolist (x (cdr (or (vertico-multiform--lookup
-                         (if (boundp 'current-minibuffer-command)
-                             current-minibuffer-command ;; Available on Emacs 28
-                           this-command)
-                         vertico-multiform-commands)
+    (dolist (x (cdr (or (vertico-multiform--lookup this-command vertico-multiform-commands)
                         (vertico-multiform--lookup cat vertico-multiform-categories))))
       (pcase x
         (`(:not . ,fs)
