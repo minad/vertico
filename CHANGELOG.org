@@ -7,6 +7,8 @@
 - =vertico-buffer=: Inherit =cursor-type= in minibuffer window, instead of always
   using the =box= cursor type. This change is particularly useful for Evil users,
   where the cursor reflect the Evil editing state.
+- =vertico-indexed=: Fix a regression introduced in version 1.1.
+- Use =natnum= custom type, ported back by the Compat package, version 29.1.4.0.
 
 * Version 1.1 (2023-02-17)
 
