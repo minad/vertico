@@ -60,12 +60,12 @@
     (let ((index (+ vertico-indexed--min
                     (- (prefix-numeric-value prefix-arg)
                        vertico-indexed-start))))
-        (if (and (>= index vertico-indexed--min)
-                 (<= index vertico-indexed--max)
-                 (/= vertico--total 0))
-            (setq vertico--index index)
-          (minibuffer-message "Out of range")
-          (setq this-command #'ignore)))))
+      (if (and (>= index vertico-indexed--min)
+               (<= index vertico-indexed--max)
+               (/= vertico--total 0))
+          (setq vertico--index index prefix-arg nil)
+        (minibuffer-message "Out of range")
+        (setq this-command #'ignore)))))
 
 (cl-defmethod vertico--format-candidate :around
   (cand prefix suffix index start &context (vertico-indexed-mode (eql t)))
