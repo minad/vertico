@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 1.2 (2023-03-11)
 
 - =vertico-buffer=: Inherit =cursor-type= in minibuffer window, instead of always
   using the =box= cursor type. This change is particularly useful for Evil users,
