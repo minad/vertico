@@ -254,8 +254,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                      (plist-get completion-extra-properties :annotation-function)))
         (cl-loop for cand in cands collect
                  (let ((suffix (or (funcall ann cand) "")))
-                   ;; The default completion UI adds the `completions-annotations' face
-                   ;; if no other faces are present.
+                   ;; The default completion UI adds the `completions-annotations'
+                   ;; face if no other faces are present.
                    (unless (text-property-not-all 0 (length suffix) 'face nil suffix)
                      (setq suffix (propertize suffix 'face 'completions-annotations)))
                    (list cand "" suffix)))
@@ -539,9 +539,9 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (cond
      ((>= vertico--index 0)
       (let ((cand (substring (nth vertico--index vertico--candidates))))
-        ;; XXX Drop the completions-common-part face which is added by `completion--twq-all'.
-        ;; This is a hack in Emacs and should better be fixed in Emacs itself, the corresponding
-        ;; code is already marked with a FIXME. Should this be reported as a bug?
+        ;; XXX Drop the completions-common-part face which is added by the
+        ;; `completion--twq-all' hack.  This should better be fixed in Emacs
+        ;; itself, the corresponding code is already marked with a FIXME.
         (vertico--remove-face 0 (length cand) 'completions-common-part cand)
         (concat vertico--base
                 (if hl (car (funcall vertico--highlight (list cand))) cand))))
