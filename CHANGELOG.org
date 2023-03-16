@@ -2,6 +2,12 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- Use pixel-wise computation to determine if =truncate-lines= should be set. If
+  point is too far too the right of the window, line truncation is disabled such
+  that the full prompt is visible.
+
 * Version 1.2 (2023-03-11)
 
 - =vertico-buffer=: Inherit =cursor-type= in minibuffer window, instead of always
