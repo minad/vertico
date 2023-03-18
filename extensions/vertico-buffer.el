@@ -47,8 +47,9 @@
           (const :tag "Reuse some window"
                  (display-buffer-reuse-window))
           (const :tag "Below target buffer"
-                 (display-buffer-below-selected
-                  (window-height . ,(+ 3 vertico-count))))
+                 (display-buffer-in-direction
+                  (window-height . ,(+ 3 vertico-count))
+                  (direction . below)))
           (const :tag "Bottom of frame"
                  (display-buffer-at-bottom
                   (window-height . ,(+ 3 vertico-count))))
