@@ -46,8 +46,23 @@
   :type `(choice
           (const :tag "Reuse some window"
                  (display-buffer-reuse-window))
-          (const :tag "Below target buffer"
-                 (display-buffer-below-selected
+          (const :tag "Least recently used window"
+                 (,'display-buffer-use-least-recent-window))
+          (const :tag "Left of current window"
+                 (display-buffer-in-direction
+                  (direction . left)
+                  (window-width . 0.3)))
+          (const :tag "Right of current window"
+                 (display-buffer-in-direction
+                  (direction . right)
+                  (window-height . 0.3)))
+          (const :tag "Above current window"
+                 (display-buffer-in-direction
+                  (direction . above)
+                  (window-height . ,(+ 3 vertico-count))))
+          (const :tag "Below current window"
+                 (display-buffer-in-direction
+                  (direction . below)
                   (window-height . ,(+ 3 vertico-count))))
           (const :tag "Bottom of frame"
                  (display-buffer-at-bottom
