@@ -456,9 +456,7 @@ There are other interactive completion UIs, which follow a similar philosophy:
   approach is that ~*Completions*~ buffer displays all matching candidates. This
   has the advantage that you can interact freely with the candidates and jump
   around with Isearch or Avy. On the other hand it necessarily causes a
-  slowdown. Mct supports completion in region via its ~mct-region-mode~. Note that
-  Mct development has been [[https://protesilaos.com/codelog/2022-04-14-emacs-discontinue-mct/][discontinued]] due to recent developments of the
-  default completion UI in Emacs 29.
+  slowdown.
 - [[https://github.com/radian-software/selectrum][Selectrum]]: Selectrum is the predecessor of Vertico has been deprecated in
   favor of Vertico. Read the [[https://github.com/minad/vertico/wiki/Migrating-from-Selectrum-to-Vertico][migration guide]] when migrating from Selectrum.
   Vertico was designed specifically to address the technical shortcomings of
