@@ -457,9 +457,9 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
               (setq pos nexti))))))
     (if chunks (apply #'concat (nreverse chunks)) str)))
 
-(defun vertico--window-width (&optional pixel)
-  "Return minimum width of minibuffer windows, optionally in PIXEL."
-  (cl-loop for win in (get-buffer-window-list) minimize (window-width win pixel)))
+(defun vertico--window-width ()
+  "Return minimum width of windows, which display the minibuffer."
+  (cl-loop for win in (get-buffer-window-list) minimize (window-width win)))
 
 (defun vertico--truncate-multiline (cand max-width)
   "Truncate multiline CAND to MAX-WIDTH."
@@ -614,16 +614,16 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (cl-defgeneric vertico--resize-window (height)
   "Resize active minibuffer window to HEIGHT."
-  (setq-local truncate-lines
-              (< (car (window-text-pixel-size nil (point-min) (point) t 1))
-                 (* 0.8 (vertico--window-width 'pixelwise)))
+  (setq-local truncate-lines (< (point) (* 0.8 (vertico--window-width)))
               resize-mini-windows 'grow-only
               max-mini-window-height 1.0)
   (unless (frame-root-window-p (active-minibuffer-window))
-    (unless vertico-resize (setq height (max height vertico-count)))
-    (let ((dp (- (max (cdr (window-text-pixel-size))
-                      (* (default-line-height) (1+ height)))
-                 (window-pixel-height))))
+    (unless vertico-resize
+      (setq height (max height vertico-count)))
+    (let* ((window-resize-pixelwise t)
+           (dp (- (max (cdr (window-text-pixel-size))
+                       (* (default-line-height) (1+ height)))
+                  (window-pixel-height))))
       (when (or (and (> dp 0) (/= height 0))
                 (and (< dp 0) (eq vertico-resize t)))
         (window-resize nil dp nil nil 'pixelwise)))))

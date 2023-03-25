@@ -90,11 +90,10 @@
   (when-let (mbwin (active-minibuffer-window))
     (when (eq (window-buffer mbwin) (current-buffer))
       (unless (eq win mbwin)
+        (setq-local truncate-lines (< (window-point win)
+                                      (* 0.8 (window-width win))))
         (set-window-point win (point))
-        (set-window-hscroll win 0)
-        (setq-local truncate-lines
-                    (< (car (window-text-pixel-size win (point-min) (point) t 1))
-                       (* 0.8 (window-width win 'pixelwise)))))
+        (set-window-hscroll win 0))
       (when vertico-buffer-hide-prompt
         (window-resize mbwin (- (window-pixel-height mbwin)) nil nil 'pixelwise)
         (set-window-vscroll mbwin 100))

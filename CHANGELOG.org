@@ -4,9 +4,6 @@
 
 * Development
 
-- Use pixel-wise computation to determine if =truncate-lines= should be set. If
-  point is too far too the right of the window, line truncation is disabled such
-  that the full prompt is visible.
 - =vertico-buffer-display=: Add more choices for the display action to the
   customizable variable.
 
