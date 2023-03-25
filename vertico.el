@@ -618,12 +618,10 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
               resize-mini-windows 'grow-only
               max-mini-window-height 1.0)
   (unless (frame-root-window-p (active-minibuffer-window))
-    (unless vertico-resize
-      (setq height (max height vertico-count)))
-    (let* ((window-resize-pixelwise t)
-           (dp (- (max (cdr (window-text-pixel-size))
-                       (* (default-line-height) (1+ height)))
-                  (window-pixel-height))))
+    (unless vertico-resize (setq height (max height vertico-count)))
+    (let ((dp (- (max (cdr (window-text-pixel-size))
+                      (* (default-line-height) (1+ height)))
+                 (window-pixel-height))))
       (when (or (and (> dp 0) (/= height 0))
                 (and (< dp 0) (eq vertico-resize t)))
         (window-resize nil dp nil nil 'pixelwise)))))
