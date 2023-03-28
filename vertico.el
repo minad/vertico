@@ -194,13 +194,17 @@ The value should lie between 0 and vertico-count/2."
              (base-size (length base))
              (hist (and (not (eq minibuffer-history-variable t)) ;; Disabled for `t'.
                         (symbol-value minibuffer-history-variable)))
-             (hash (make-hash-table :test #'equal :size (length hist))))
+             (hash (make-hash-table :test #'equal :size (length hist)))
+             (file-hist (eq minibuffer-history-variable 'file-name-history))
+             (curr-file (when-let ((win (and file-hist (minibuffer-selected-window)))
+                                   (file (buffer-file-name (window-buffer win))))
+                          (abbreviate-file-name file))))
         (cl-loop for elem in hist for index from 0 do
-                 (when (or (= base-size 0)
-                           (and (>= (length elem) base-size)
-                                (eq t (compare-strings base 0 base-size elem 0 base-size))))
-                   (let ((file-sep (and (eq minibuffer-history-variable 'file-name-history)
-                                        (string-search "/" elem base-size))))
+                 (when (and (not (equal curr-file elem)) ;; Deprioritize current file
+                            (or (= base-size 0)
+                                (and (>= (length elem) base-size)
+                                     (eq t (compare-strings base 0 base-size elem 0 base-size)))))
+                   (let ((file-sep (and file-hist (string-search "/" elem base-size))))
                      ;; Drop base string from history elements & special file handling.
                      (when (or (> base-size 0) file-sep)
                        (setq elem (substring elem base-size (and file-sep (1+ file-sep)))))
