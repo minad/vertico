@@ -540,7 +540,8 @@ built-in file completion table. In your user configuration you can prioritize
            (let ((map (make-sparse-keymap (current-local-map))))
              (define-key map [tab] #'minibuffer-complete)
              (use-local-map map))
-           (setq-local completion-styles (cons 'basic completion-styles))))
+           (setq-local completion-styles (cons 'basic completion-styles)
+                       vertico-preselect 'prompt)))
       (apply args)))
 #+end_src
 
