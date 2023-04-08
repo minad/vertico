@@ -530,11 +530,18 @@ built-in file completion table. In your user configuration you can prioritize
   ;; Alternative 1: Use the basic completion style
   (setq org-refile-use-outline-path 'file
         org-outline-path-complete-in-steps t)
-  (advice-add #'org-olpath-completing-read :around
-              (lambda (&rest args)
-                (minibuffer-with-setup-hook
-                    (lambda () (setq-local completion-styles '(basic)))
-                  (apply args))))
+
+  (advice-add #'org-olpath-completing-read :around #'org-enforce-basic-completion)
+
+  (defun org-enforce-basic-completion (&rest args)
+    (minibuffer-with-setup-hook
+        (:append
+         (lambda ()
+           (let ((map (make-sparse-keymap (current-local-map))))
+             (define-key map [tab] #'minibuffer-complete)
+             (use-local-map map))
+           (setq-local completion-styles '(basic))))
+      (apply args)))
 #+end_src
 
 Alternatively you may want to disable the outline path completion in steps. The
@@ -548,15 +555,23 @@ However the list of possible completions becomes much more cluttered.
         org-outline-path-complete-in-steps nil)
 #+end_src
 
-** ~org-agenda-filter~
+** ~org-agenda-filter~ and ~org-tags-view~
 
-Similar to ~org-refile~, the ~org-agenda-filter~ completion function
-(~org-agenda-filter-completion-function~) does not make use of completion
-boundaries. Unfortunately =TAB= completion (~minibuffer-complete~) does not work for
-this reason. This affects Vertico and also the Emacs default completion system.
-For example if you enter ~+tag<0 TAB~ the input is replaced with ~0:10~ which is not
-correct. With preserved completion boundaries, the expected result would be
-~+tag<0:10~.
+Similar to ~org-refile~, the commands ~org-agenda-filter~ and ~org-tags-view~ do not
+make use of completion boundaries. The internal completion tables are
+~org-agenda-filter-completion-function~ and ~org-tags-completion-function~.
+Unfortunately =TAB= completion (~minibuffer-complete~) does not work for this reason
+with arbitrary completion styles like ~substring~, ~flex~ or ~orderless~. This affects
+Vertico and also the Emacs default completion system. For example if you enter
+~+tag<0 TAB~ the input is replaced with ~0:10~ which is not correct. With preserved
+completion boundaries, the expected result would be ~+tag<0:10~. Completion
+boundaries are used for example by file completion, where each part of the path
+can be completed separately. Ideally this issue would be fixed in Org.
+
+#+begin_src emacs-lisp
+  (advice-add #'org-make-tags-matcher :around #'org-enforce-basic-completion)
+  (advice-add #'org-agenda-filter :around #'org-enforce-basic-completion)
+#+end_src
 
 ** ~tmm-menubar~
 
