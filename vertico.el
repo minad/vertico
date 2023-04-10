@@ -8,6 +8,7 @@
 ;; Version: 1.2
 ;; Package-Requires: ((emacs "27.1") (compat "29.1.4.0"))
 ;; Homepage: https://github.com/minad/vertico
+;; Keywords: convenience, files, matching
 
 ;; This file is part of GNU Emacs.
 
