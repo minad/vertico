@@ -663,9 +663,9 @@ the completion style overrides for the file completion category.
         completion-category-overrides '((file (styles basic partial-completion))))
 #+end_src
 
-For users who are familiar with the =completion-style= machinery and who want to
-dig a bit deeper. You may also define a custom completion style which sets in
-only for remote files. This way =orderless= will stay the preferred style in most
+This disadvantage of this solution is that you loose the ability to match substrings
+within the filename. For a complete workaround define a custom completion style which
+kicks in only for remote files. This way =orderless= will stay the preferred style in most
 cases.
 
 #+begin_src emacs-lisp
@@ -679,5 +679,5 @@ cases.
    'completion-styles-alist
    '(basic-remote basic-remote-try-completion basic-remote-all-completions nil))
   (setq completion-styles '(orderless basic)
-        completion-category-overrides '((file (styles basic-remote partial-completion))))
+        completion-category-overrides '((file (styles basic-remote orderless))))
 #+end_src
