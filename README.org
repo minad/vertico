@@ -663,10 +663,11 @@ the completion style overrides for the file completion category.
         completion-category-overrides '((file (styles basic partial-completion))))
 #+end_src
 
-For users who are familiar with the =completion-style= machinery and who want to
-dig a bit deeper. You may also define a custom completion style which sets in
-only for remote files. This way =orderless= will stay the preferred style in most
-cases.
+If you are familiar with the =completion-style= machinery and want to dig a bit
+deeper, you may also define a custom completion style which sets in only for
+remote files. The custom completion style ensures that you can always match
+substrings within non-remote file names, since =orderless= will stay the preferred
+style for non-remote files.
 
 #+begin_src emacs-lisp
   (defun basic-remote-try-completion (string table pred point)
