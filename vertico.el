@@ -592,7 +592,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
         (when (= index vertico--index)
           (setq curr-line (length lines)))
         (push (cons index cand) lines)
-        (setq index (1+ index))))
+        (cl-incf index)))
     ;; Drop excess lines
     (setq lines (nreverse lines))
     (cl-loop for count from (length lines) above vertico-count do
