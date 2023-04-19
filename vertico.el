@@ -196,7 +196,8 @@ The value should lie between 0 and vertico-count/2."
              (hist (and (not (eq minibuffer-history-variable t)) ;; Disabled for `t'.
                         (symbol-value minibuffer-history-variable)))
              (hash (make-hash-table :test #'equal :size (length hist)))
-             (file-p (and (> base-len 0) (eq minibuffer-history-variable 'file-name-history)))
+             (file-p (and (> base-len 0) ;; Step-wise completion, unlike `project-find-file'
+                          (eq minibuffer-history-variable 'file-name-history)))
              (curr-file (when-let ((win (and file-p (minibuffer-selected-window)))
                                    (file (buffer-file-name (window-buffer win))))
                           (abbreviate-file-name file))))
