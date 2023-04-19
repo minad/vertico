@@ -7,6 +7,7 @@
 - =vertico-buffer-display=: Add more choices for the display action to the
   customizable variable.
 - =vertico--history-hash=: Deprioritize current file when sorting by history.
+- Fix sorting by history position for =project-find-file=.
 
 * Version 1.2 (2023-03-11)
 
