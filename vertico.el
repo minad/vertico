@@ -454,7 +454,11 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
       (let ((nextd (next-single-property-change pos 'display str end))
             (display (get-text-property pos 'display str)))
         (if (stringp display)
-            (progn (push display chunks) (setq pos nextd))
+            (progn
+              (if-let ((face (get-text-property pos 'face str)))
+                  (push (propertize display 'face face) chunks)
+                (push display chunks))
+              (setq pos nextd))
           (while (< pos nextd)
             (let ((nexti (next-single-property-change pos 'invisible str nextd)))
               (unless (get-text-property pos 'invisible str)
