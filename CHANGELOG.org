@@ -4,6 +4,7 @@
 
 * Development
 
+- =vertico-grid-annotate=: New customization variable to enable annotations.
 - =vertico-buffer-display=: Add more choices for the display action to the
   customizable variable.
 - =vertico--history-hash=: Deprioritize current file when sorting by history.

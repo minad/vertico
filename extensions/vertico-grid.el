@@ -36,7 +36,9 @@
 ;;; Code:
 
 (require 'vertico)
-(eval-when-compile (require 'cl-lib))
+(eval-when-compile
+  (require 'cl-lib)
+  (require 'subr-x))
 
 (defcustom vertico-grid-min-columns 2
   "Minimal number of grid columns."
@@ -45,6 +47,11 @@
 
 (defcustom vertico-grid-max-columns 8
   "Maximal number of grid columns."
+  :type 'natnum
+  :group 'vertico)
+
+(defcustom vertico-grid-annotate 0
+  "Reserved characters for the annotations."
   :type 'natnum
   :group 'vertico)
 
@@ -116,7 +123,7 @@ When scrolling beyond this limit, candidates may be truncated."
 
 (cl-defmethod vertico--arrange-candidates (&context (vertico-grid-mode (eql t)))
   (when (<= vertico--index 0)
-    (let ((cand vertico--candidates) (w 1) (n 0))
+    (let ((cand vertico--candidates) (n 0) (w (1+ vertico-grid-annotate)))
       (while (and cand (< n vertico-grid-lookahead))
         (setq w (max w (length (car cand))) n (1+ n))
         (pop cand))
@@ -129,21 +136,25 @@ When scrolling beyond this limit, candidates may be truncated."
          (start (* count (floor (max 0 vertico--index) count)))
          (width (- (/ (vertico--window-width) vertico-grid--columns) sep))
          (cands
-          (seq-map-indexed (lambda (cand index)
-                             (cl-incf index start)
-                             (when (string-search "\n" cand)
-                               (setq cand (vertico--truncate-multiline cand width)))
-                             (truncate-string-to-width
-                              (string-trim
-                               (replace-regexp-in-string
-                                "[ \t]+"
-                                (lambda (x) (apply #'propertize " " (text-properties-at 0 x)))
-                                (vertico--format-candidate cand "" "" index start)))
-                              width))
-                           (funcall vertico--highlight
-                                    (seq-subseq vertico--candidates start
-                                                (min (+ start count)
-                                                     vertico--total)))))
+          (thread-last
+            (seq-subseq vertico--candidates start
+                        (min (+ start count) vertico--total))
+            (funcall vertico--highlight)
+            (funcall (if (> vertico-grid-annotate 0) #'vertico--affixate #'identity))
+            (seq-map-indexed
+             (lambda (cand index)
+               (let (prefix suffix)
+                 (when (consp cand)
+                   (setq prefix (cadr cand) suffix (caddr cand) cand (car cand)))
+                 (when (string-search "\n" cand)
+                   (setq cand (vertico--truncate-multiline cand width)))
+                 (truncate-string-to-width
+                  (string-trim
+                   (replace-regexp-in-string
+                    "[ \t]+"
+                    (lambda (x) (apply #'propertize " " (text-properties-at 0 x)))
+                    (vertico--format-candidate cand prefix suffix (+ index start) start)))
+                  width))))))
          (width (make-vector vertico-grid--columns 0)))
     (dotimes (col vertico-grid--columns)
       (dotimes (row vertico-count)
