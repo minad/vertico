@@ -60,6 +60,11 @@
   :type 'plist
   :group 'vertico)
 
+(defcustom vertico-flat-annotate nil
+  "Annotate candidates."
+  :type 'boolean
+  :group 'vertico)
+
 (defvar-keymap vertico-flat-map
   :doc "Additional keymap activated in flat mode."
   "<remap> <left-char>" #'vertico-previous
@@ -104,21 +109,23 @@
          (result) (wrapped))
     (while (and candidates (not (eq wrapped (car candidates)))
                 (> width 0) (> count 0))
-      (let ((cand (car candidates)))
-        (setq cand (car (funcall vertico--highlight (list cand))))
+      (let ((cand (pop candidates)) (prefix "") (suffix ""))
+        (setq cand (funcall vertico--highlight (list cand)))
+        (pcase (and vertico-flat-annotate (vertico--affixate cand))
+          (`((,c ,p ,s)) (setq cand c prefix p suffix s))
+          (_ (setq cand (car cand))))
         (when (string-search "\n" cand)
           (setq cand (vertico--truncate-multiline cand width)))
         (setq cand (string-trim
                     (replace-regexp-in-string
                      "[ \t]+"
                      (lambda (x) (apply #'propertize " " (text-properties-at 0 x)))
-                     (vertico--format-candidate cand "" "" index vertico--index))))
+                     (vertico--format-candidate cand prefix suffix index vertico--index))))
         (setq index (1+ index)
               count (1- count)
               width (- width (string-width cand) (length (plist-get vertico-flat-format :separator))))
         (when (or (not result) (> width 0))
           (push cand result))
-        (pop candidates)
         (when (and vertico-cycle (not candidates))
           (setq candidates vertico--candidates index 0
                 wrapped (nth vertico--index vertico--candidates)))))
