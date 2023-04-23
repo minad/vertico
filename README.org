@@ -197,9 +197,11 @@ are used instead of ~orderless~:
 
 ** Completion-at-point and completion-in-region
 
-The =completion-at-point= command is usually bound to =M-TAB= or =TAB=. In case you
-want to use Vertico for completion-at-point/completion-in-region, you can use
-the function ~consult-completion-in-region~ provided by the Consult package.
+The tab completion command =completion-at-point= command is usually bound to =M-TAB=
+or =TAB=. Tab completion is also used in the minibuffer by =M-:= (~eval-expression~).
+In case you want to use Vertico to show the completion candidates of
+=completion-at-point= and =completion-in-region=, you can use the function
+~consult-completion-in-region~ provided by the Consult package.
 
 #+begin_src emacs-lisp
   ;; Use `consult-completion-in-region' if Vertico is enabled.
@@ -212,12 +214,10 @@ the function ~consult-completion-in-region~ provided by the Consult package.
                  args)))
 #+end_src
 
-The =completion-in-region-function= setting also affects TAB completion in the
-minibuffer when =M-:= (~eval-expression~) is used.
-
 You may also want to look into my [[https://github.com/minad/corfu][Corfu]] package, which provides a minimal
-completion system for =completion-in-region= in a child frame popup. Corfu is also
-a narrowly focused package and developed in the same spirit as Vertico.
+completion system for =completion-in-region= in a child frame popup. Corfu is a
+narrowly focused package and developed in the same spirit as Vertico. You can
+even use Corfu in the minibuffer.
 
 * Extensions
 :properties:
