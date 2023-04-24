@@ -144,6 +144,23 @@ The keys in LIST can be symbols or regexps."
   "M-R" #'vertico-multiform-reverse
   "M-U" #'vertico-multiform-unobtrusive)
 
+(easy-menu-define vertico-multiform-menu nil
+  "Menu used when Vertico is active."
+  '("Vertico"
+    ["Vertical" vertico-multiform-vertical
+     :style radio :selected t]
+    ["Grid" vertico-multiform-grid
+     :style radio :selected vertico-grid-mode]
+    ["Flat" vertico-multiform-flat
+     :style radio :selected vertico-flat-mode]
+    ["Reverse" vertico-multiform-reverse
+     :style radio :selected vertico-reverse-mode]
+    ["Unobtrusive" vertico-multiform-unobtrusive
+     :style radio :selected vertico-unobtrusive-mode]))
+(define-key minibuffer-local-map
+            [menu-bar minibuf vertico]
+            `(menu-item "Vertico" ,vertico-multiform-menu))
+
 ;;;###autoload
 (define-minor-mode vertico-multiform-mode
   "Configure Vertico in various forms per command."
