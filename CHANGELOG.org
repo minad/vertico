@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 1.3 (2023-04-25)
 
 - =vertico-grid-annotate= and =vertico-flat-annotate=: New customization variables
   to enable annotations in grid and flat display mode.
