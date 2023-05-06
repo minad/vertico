@@ -639,13 +639,13 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (cl-defgeneric vertico--setup ()
   "Setup completion UI."
-  (setq vertico--input t
-        vertico--candidates-ov (make-overlay (point-max) (point-max) nil t t)
-        vertico--count-ov (make-overlay (point-min) (point-min) nil t t))
-  ;; Set priority for compatibility with `minibuffer-depth-indicate-mode'
-  (overlay-put vertico--count-ov 'priority 1)
-  (setq-local completion-auto-help nil
-              completion-show-inline-help nil)
+  (setq-local scroll-margin 0
+              vertico--input t
+              completion-auto-help nil
+              completion-show-inline-help nil
+              vertico--candidates-ov (make-overlay (point-max) (point-max) nil t t)
+              vertico--count-ov (make-overlay (point-min) (point-min) nil t t))
+  (overlay-put vertico--count-ov 'priority 1) ;; For `minibuffer-depth-indicate-mode'
   (use-local-map vertico-map)
   (add-hook 'pre-command-hook #'vertico--prepare nil 'local)
   (add-hook 'post-command-hook #'vertico--exhibit nil 'local))
