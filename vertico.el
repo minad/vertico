@@ -274,8 +274,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     list))
 
 ;; bug#47711: Deferred highlighting for `completion-all-completions'
-;; XXX There is one complication: `completion--twq-all' already adds `completions-common-part'.
-;; See below `vertico--candidate'.
+;; XXX There is one complication: `completion--twq-all' already adds
+;; `completions-common-part'.  See below `vertico--candidate'.
 (defun vertico--all-completions (&rest args)
   "Compute all completions for ARGS with deferred highlighting."
   (cl-letf* ((orig-pcm (symbol-function #'completion-pcm--hilit-commonality))
@@ -327,7 +327,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                (pred minibuffer-completion-predicate)
                (before (substring content 0 pt))
                (after (substring content pt))
-               ;; bug#47678: `completion-boundaries` fails for `partial-completion`
+               ;; bug#47678: `completion-boundaries' fails for `partial-completion'
                ;; if the cursor is moved between the slashes of "~//".
                ;; See also marginalia.el which has the same issue.
                (bounds (or (condition-case nil
