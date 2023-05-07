@@ -231,15 +231,11 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
      (let* ((buckets (make-vector ,bsize nil))
             ,@(and (eq (car by) 'history) '((hhash (vertico--history-hash)) (hcands))))
        (dolist (% candidates)
-         ,(if (eq (car by) 'history)
-              ;; Find recent candidates or fill buckets
-              `(if-let (idx (gethash % hhash))
-                   (push (cons idx %) hcands)
-                 (let ((idx (min ,(1- bsize) ,bindex)))
-                   (aset buckets idx (cons % (aref buckets idx)))))
-            ;; Fill buckets
-            `(let ((idx (min ,(1- bsize) ,bindex)))
-               (aset buckets idx (cons % (aref buckets idx))))))
+         ;; Find recent candidate in history or fill bucket
+         (,@(if (not (eq (car by) 'history)) `(progn)
+              `(if-let (idx (gethash % hhash)) (push (cons idx %) hcands)))
+          (let ((idx (min ,(1- bsize) ,bindex)))
+            (aset buckets idx (cons % (aref buckets idx))))))
        (nconc ,@(and (eq (car by) 'history) '((vertico--sort-decorated hcands)))
               (mapcan (lambda (bucket) (sort bucket #',bpred))
                       (nbutlast (append buckets nil)))
