@@ -556,14 +556,13 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (defun vertico--match-p (input)
   "Return t if INPUT is a valid match."
-  (or (memq minibuffer--require-match '(nil confirm-after-completion))
-      (equal "" input) ;; Null completion, returns default value
-      (and (functionp minibuffer--require-match) ;; Emacs 29 require-match function
-           (funcall minibuffer--require-match input))
-      (test-completion input minibuffer-completion-table minibuffer-completion-predicate)
-      (if (eq minibuffer--require-match 'confirm)
-          (eq (ignore-errors (read-char "Confirm")) 13)
-        (and (minibuffer-message "Match required") nil))))
+  (let ((rm minibuffer--require-match))
+    (or (memq rm '(nil confirm-after-completion))
+        (equal "" input) ;; Null completion, returns default value
+        (and (functionp rm) (funcall rm input)) ;; Emacs 29 supports functions
+        (test-completion input minibuffer-completion-table minibuffer-completion-predicate)
+        (if (eq rm 'confirm) (eq (ignore-errors (read-char "Confirm")) 13)
+          (minibuffer-message "Match required") nil))))
 
 (cl-defgeneric vertico--format-candidate (cand prefix suffix index _start)
   "Format CAND given PREFIX, SUFFIX and INDEX."
