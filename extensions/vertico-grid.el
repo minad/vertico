@@ -123,9 +123,9 @@ When scrolling beyond this limit, candidates may be truncated."
 
 (cl-defmethod vertico--arrange-candidates (&context (vertico-grid-mode (eql t)))
   (when (<= vertico--index 0)
-    (let ((cand vertico--candidates) (n 0) (w (1+ vertico-grid-annotate)))
+    (let ((cand vertico--candidates) (n 0) (w 1))
       (while (and cand (< n vertico-grid-lookahead))
-        (setq w (max w (length (car cand))) n (1+ n))
+        (setq w (max w (+ vertico-grid-annotate (length (car cand)))) n (1+ n))
         (pop cand))
       (setq vertico-grid--columns
             (max vertico-grid-min-columns
