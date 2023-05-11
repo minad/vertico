@@ -117,8 +117,7 @@ If called interactively from an existing Vertico session,
 last selected candidate for the current command."
   (interactive
    (list (or (if vertico-repeat--command
-                 (seq-find (lambda (x) (eq (car x) vertico-repeat--command))
-                           vertico-repeat-history)
+                 (assq vertico-repeat--command vertico-repeat-history)
                (car vertico-repeat-history))
              (user-error "No repeatable Vertico session"))))
   (if (and vertico-repeat--command (eq vertico-repeat--command (car session)))
