@@ -95,12 +95,13 @@ category settings have lower precedence than
   "Lookup symbolic KEY in LIST.
 The keys in LIST can be symbols or regexps."
   (and (symbolp key)
-       (seq-find (lambda (x)
-                   (cond
-                    ((eq (car x) t))
-                    ((symbolp (car x)) (eq key (car x)))
-                    ((string-match-p (car x) (symbol-name key)))))
-                 list)))
+       (let (case-fold-search)
+         (seq-find (pcase-lambda (`(,x . ,_))
+                     (cond
+                      ((eq x t))
+                      ((symbolp x) (eq key x))
+                      ((string-match-p x (symbol-name key)))))
+                   list))))
 
 (defun vertico-multiform--setup ()
   "Enable modes at minibuffer setup."
