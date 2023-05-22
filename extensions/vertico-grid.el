@@ -150,7 +150,8 @@ When scrolling beyond this limit, candidates may be truncated."
                     (lambda (x) (apply #'propertize " " (text-properties-at 0 x)))
                     (vertico--format-candidate cand prefix suffix (+ index start) start)))
                   width))))))
-         (width (make-vector vertico-grid--columns 0)))
+         (width (make-vector vertico-grid--columns 0))
+         lines)
     (dotimes (col vertico-grid--columns)
       (dotimes (row vertico-count)
         (aset width col (max
@@ -158,7 +159,7 @@ When scrolling beyond this limit, candidates may be truncated."
                          (string-width (or (nth (+ row (* col vertico-count)) cands) ""))))))
     (dotimes (col (1- vertico-grid--columns))
       (cl-incf (aref width (1+ col)) (+ (aref width col) sep)))
-    (cl-loop for row from 0 to (1- (min vertico-count vertico--total)) collect
+    (cl-loop for row from 0 to (1- (min vertico-count vertico--total)) do
              (let ((line (list "\n")))
                (cl-loop for col from (1- vertico-grid--columns) downto 0 do
                         (when-let (cand (nth (+ row (* col vertico-count)) cands))
@@ -167,7 +168,11 @@ When scrolling beyond this limit, candidates may be truncated."
                             (push vertico-grid-separator line)
                             (push (propertize " " 'display
                                               `(space :align-to (+ left ,(aref width (1- col))))) line))))
-             (string-join line)))))
+               (push (string-join line) lines)))
+    (if (>= vertico--index 0)
+        (push (string-join (car (vertico--affixate (list (nth vertico--index vertico--candidates))))) lines)
+      (push "" lines))
+    (nreverse lines)))
 
 ;; Emacs 28: Do not show Vertico commands in M-X
 (dolist (sym '(vertico-grid-left vertico-grid-right
