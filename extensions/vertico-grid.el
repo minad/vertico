@@ -61,11 +61,6 @@
   :type 'string
   :group 'vertico)
 
-(defcustom vertico-grid-rows 6
-  "Number of grid rows."
-  :type 'natnum
-  :group 'vertico)
-
 (defcustom vertico-grid-lookahead 100
   "Number of candidates to lookahead for column number computation.
 When scrolling beyond this limit, candidates may be truncated."
