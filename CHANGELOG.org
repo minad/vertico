@@ -2,6 +2,11 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- =vertico-directory-enter=: Exit with input if prefix argument is given. Mirrors
+  the behavior of =vertico-exit=.
+
 * Version 1.4 (2023-07-02)
 
 - =vertico-grid-annotate=: Fix width computation.
