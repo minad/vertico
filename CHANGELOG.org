@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 1.4 (2023-07-02)
 
 - =vertico-grid-annotate=: Fix width computation.
 - =vertico--display-string=: Fix display issue with =consult-line= and =org-modern=.
