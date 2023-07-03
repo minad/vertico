@@ -6,6 +6,7 @@
 
 - =vertico-directory-enter=: Exit with input if prefix argument is given. Mirrors
   the behavior of =vertico-exit=.
+- =vertico-mouse-map=: New keymap.
 
 * Version 1.4 (2023-07-02)
 

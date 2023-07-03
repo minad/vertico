@@ -37,23 +37,26 @@
   "Face used for mouse highlighting."
   :group 'vertico-faces)
 
-(defun vertico-mouse--candidate-click (index key)
-  "Return command handling click on candidate with INDEX.
-The command will behave like KEY."
-  (when-let ((cmd (keymap-lookup vertico-map key)))
-    (lambda ()
-      (interactive)
-      ;; Ensure that the command is always executed in the minibuffer.
-      ;; Mouse clicks can also happen if another window is selected.
-      (with-selected-window (active-minibuffer-window)
-        (let ((vertico--index index))
-          (funcall cmd))))))
+(defvar-keymap vertico-mouse-map
+  :doc "Additional keymap activated in mouse mode."
+  "<mouse-1>" (vertico-mouse--click "RET")
+  "<mouse-3>" (vertico-mouse--click "TAB"))
 
-(defun vertico-mouse--candidate-map (index)
-  "Return keymap for candidate with INDEX."
-  (define-keymap
-    "<mouse-1>" (vertico-mouse--candidate-click index "RET")
-    "<mouse-3>" (vertico-mouse--candidate-click index "TAB")))
+(defun vertico-mouse--index (event)
+  "Return candidate index at EVENT."
+  (when-let ((object (posn-object (event-end event)))
+             ((consp object)))
+    (get-text-property (cdr object) 'vertico-mouse--index (car object))))
+
+(defun vertico-mouse--click (key)
+  "Create command handling mouse click, behave like KEY press."
+  (lambda (event)
+    (interactive "e")
+    ;; Mouse clicks can even happen if another window is selected.
+    (with-selected-window (active-minibuffer-window)
+      (when-let ((vertico--index (vertico-mouse--index event))
+                 (cmd (keymap-local-lookup key)))
+        (funcall cmd)))))
 
 (defun vertico-mouse--scroll-up (n)
   "Scroll up by N lines."
@@ -66,19 +69,18 @@ The command will behave like KEY."
 ;;;###autoload
 (define-minor-mode vertico-mouse-mode
   "Mouse support for Vertico."
-  :global t :group 'vertico)
+  :global t :group 'vertico
+  (if vertico-mouse-mode
+      (add-to-list 'minor-mode-map-alist `(vertico--input . ,vertico-mouse-map))
+    (setq minor-mode-map-alist (delete `(vertico--input . ,vertico-mouse-map) minor-mode-map-alist))))
 
 (cl-defmethod vertico--format-candidate
   :around (cand prefix suffix index start &context (vertico-mouse-mode (eql t)))
-  (setq cand (cl-call-next-method cand prefix suffix index start))
-  (when (equal suffix "")
-    (setq cand (concat (substring cand 0 -1)
-                       (propertize " " 'display '(space :align-to right))
-                       "\n"))
-    (when (= index vertico--index)
-      (add-face-text-property 0 (length cand) 'vertico-current 'append cand)))
+  (setq cand (cl-call-next-method cand prefix
+                                  (concat suffix #(" " 0 1 (display (space :align-to right))))
+                                  index start))
   (add-text-properties 0 (1- (length cand))
-                       `(mouse-face vertico-mouse keymap ,(vertico-mouse--candidate-map index))
+                       `(mouse-face vertico-mouse vertico-mouse--index ,index)
                        cand)
   cand)
 
