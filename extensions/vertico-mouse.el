@@ -37,11 +37,6 @@
   "Face used for mouse highlighting."
   :group 'vertico-faces)
 
-(defvar-keymap vertico-mouse-map
-  :doc "Additional keymap activated in mouse mode."
-  "<mouse-1>" (vertico-mouse--click "RET")
-  "<mouse-3>" (vertico-mouse--click "TAB"))
-
 (defun vertico-mouse--index (event)
   "Return candidate index at EVENT."
   (when-let ((object (posn-object (event-end event)))
@@ -58,6 +53,12 @@
                  (cmd (keymap-local-lookup key)))
         (funcall cmd)))))
 
+(defvar-keymap vertico-mouse-map
+  :doc "Additional keymap activated in mouse mode."
+  "<mouse-1>" (vertico-mouse--click "RET")
+  "<mouse-3>" (vertico-mouse--click "TAB"))
+(fset 'vertico-mouse-map vertico-mouse-map)
+
 (defun vertico-mouse--scroll-up (n)
   "Scroll up by N lines."
   (vertico--goto (max 0 (+ vertico--index n))))
@@ -69,10 +70,7 @@
 ;;;###autoload
 (define-minor-mode vertico-mouse-mode
   "Mouse support for Vertico."
-  :global t :group 'vertico
-  (if vertico-mouse-mode
-      (add-to-list 'minor-mode-map-alist `(vertico--input . ,vertico-mouse-map))
-    (setq minor-mode-map-alist (delete `(vertico--input . ,vertico-mouse-map) minor-mode-map-alist))))
+  :global t :group 'vertico)
 
 (cl-defmethod vertico--format-candidate
   :around (cand prefix suffix index start &context (vertico-mouse-mode (eql t)))
@@ -80,7 +78,8 @@
                                   (concat suffix #(" " 0 1 (display (space :align-to right))))
                                   index start))
   (add-text-properties 0 (1- (length cand))
-                       `(mouse-face vertico-mouse vertico-mouse--index ,index)
+                       `(mouse-face vertico-mouse keymap vertico-mouse-map
+                         vertico-mouse--index ,index)
                        cand)
   cand)
 
