@@ -78,8 +78,8 @@
                                   (concat suffix #(" " 0 1 (display (space :align-to right))))
                                   index start))
   (add-text-properties 0 (1- (length cand))
-                       `(mouse-face vertico-mouse keymap vertico-mouse-map
-                         vertico-mouse--index ,index)
+                       `(vertico-mouse--index ,index
+                         mouse-face vertico-mouse keymap vertico-mouse-map)
                        cand)
   cand)
 
