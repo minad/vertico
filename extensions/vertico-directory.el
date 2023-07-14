@@ -57,7 +57,7 @@ Exit with current input if prefix ARG is given."
                      (string-suffix-p ":" cand)))))
       (progn
         ;; Handle ./ and ../ manually instead of via `expand-file-name' and
-        ;; `abbreviate-file-name', such that we don't accidentially perform
+        ;; `abbreviate-file-name', such that we don't accidentally perform
         ;; unwanted substitutions in the existing completion.
         (setq cand (replace-regexp-in-string "/\\./" "/" cand))
         (unless (string-suffix-p "/../../" cand)
