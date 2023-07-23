@@ -150,7 +150,7 @@ completion in the [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Co
 
 The bindings of the ~minibuffer-local-completion-map~ are not available in Vertico
 by default. This means that TAB works differently from what you may expect from
-the default Emacs completion system.
+shells like Bash or the default Emacs completion system.
 
 If you prefer to have the default completion commands a key press away you can
 add new bindings or even replace the Vertico bindings. Then the default
