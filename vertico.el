@@ -621,6 +621,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   (setq-local truncate-lines (< (point) (* 0.8 (vertico--window-width)))
               resize-mini-windows 'grow-only
               max-mini-window-height 1.0)
+  (unless truncate-lines (set-window-hscroll nil 0))
   (unless (frame-root-window-p (active-minibuffer-window))
     (unless vertico-resize (setq height (max height vertico-count)))
     (let ((dp (- (max (cdr (window-text-pixel-size))
