@@ -7,6 +7,8 @@
 - =vertico-directory-enter=: Exit with input if prefix argument is given. Mirrors
   the behavior of =vertico-exit=.
 - =vertico-mouse-map=: New keymap.
+- Optimize truncation of multi-line candidates (=vertico--truncate-multiline=).
+  This affects commands like =yank-from-kill-ring=.
 
 * Version 1.4 (2023-07-02)
 
