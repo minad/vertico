@@ -469,10 +469,10 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 (defun vertico--truncate-multiline (cand max-width)
   "Truncate multiline CAND to MAX-WIDTH."
   (truncate-string-to-width
-   (thread-last cand
+   (thread-last (substring cand 0 (min (length cand) (* 2 max-width)))
      (replace-regexp-in-string "[\t ]+" " ")
-     (replace-regexp-in-string "[\t\n ]*\n[\t\n ]*" (car vertico-multiline))
-     (replace-regexp-in-string "\\`[\t\n ]+\\|[\t\n ]+\\'" ""))
+     (replace-regexp-in-string " *\n[\n ]*" (car vertico-multiline))
+     (replace-regexp-in-string "\\` +\\| +\\'" ""))
    max-width 0 nil (cdr vertico-multiline)))
 
 (defun vertico--compute-scroll ()
