@@ -120,8 +120,8 @@
                     (replace-regexp-in-string
                      "[ \t]+"
                      (lambda (x) (apply #'propertize " " (text-properties-at 0 x)))
-                     (vertico--format-candidate cand prefix suffix index vertico--index))))
-        (setq index (1+ index)
+                     (vertico--format-candidate cand prefix suffix index vertico--index)))
+              index (1+ index)
               count (1- count)
               width (- width (string-width cand) (length (plist-get vertico-flat-format :separator))))
         (when (or (not result) (> width 0))
