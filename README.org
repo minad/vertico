@@ -137,9 +137,10 @@ order to ensure that completion commands which rely on dynamic completion
 tables, e.g., ~completion-table-dynamic~ or ~completion-table-in-turn~, work
 correctly. See the [[https://github.com/minad/consult/wiki#minads-orderless-configuration][Consult wiki]] for my advanced Orderless configuration with
 style dispatchers. Additionally enable =partial-completion= for file path
-expansion. =partial-completion= is important for file wildcard support. Multiple
-files can be opened at once with =find-file= if you enter a wildcard. You may also
-give the =initials= completion style a try.
+expansion. =partial-completion= is important for file wildcard support in
+=find-file=. In order to open multiple files with a wildcard at once, you have to
+submit the prompt with =M-RET=. Alternative first move to the prompt and then
+press =RET=.
 
 See also the [[https://github.com/minad/vertico/wiki][Vertico Wiki]] for additional configuration tips. For more general
 documentation read the chapter about completion in the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Completion.html][Emacs manual]]. If you want
@@ -173,11 +174,11 @@ a prefix. In order to support completing prefixes you may want to combine
 (setq completion-styles '(substring orderless basic))
 #+end_src
 
-Alternatively you can experiment with the built-in completion-styles, e.g.,
-adding =partial-completion= or =flex=. The =partial-completion= style is important to
-add if you want to open multiple files at once with ~find-file~ using wildcards.
-In order to open multiple files at once, you have to move to the prompt and then
-press =RET=.
+Alternatively you can use the built-in completion-styles, e.g.,
+=partial-completion=, =flex= or =initials=. The =partial-completion= style is important
+if you want to open multiple files at once with ~find-file~ using wildcards. In
+order to open multiple files with a wildcard at once, you have to submit the
+prompt with =M-RET=. Alternative first move to the prompt and then press =RET=.
 
 #+begin_src emacs-lisp
 (setq completion-styles '(basic substring partial-completion flex))
