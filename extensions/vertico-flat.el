@@ -78,9 +78,9 @@
   (when-let (win (active-minibuffer-window))
     (unless (frame-root-window-p win)
       (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise)))
-  (if vertico-flat-mode
-      (add-to-list 'minor-mode-map-alist `(vertico--input . ,vertico-flat-map))
-    (setq minor-mode-map-alist (delete `(vertico--input . ,vertico-flat-map) minor-mode-map-alist))))
+  (setq minor-mode-map-alist (rassq-delete-all vertico-flat-map minor-mode-map-alist))
+  (when vertico-flat-mode
+    (push `(vertico--input . ,vertico-flat-map) minor-mode-map-alist)))
 
 (cl-defmethod vertico--display-candidates (candidates &context (vertico-flat-mode (eql t)))
   (setq-local truncate-lines nil

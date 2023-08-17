@@ -60,9 +60,9 @@
   (dolist (buf (buffer-list))
     (when-let (ov (buffer-local-value 'vertico--candidates-ov buf))
       (overlay-put ov 'before-string nil)))
-  (if vertico-reverse-mode
-      (add-to-list 'minor-mode-map-alist `(vertico--input . ,vertico-reverse-map))
-    (setq minor-mode-map-alist (delete `(vertico--input . ,vertico-reverse-map) minor-mode-map-alist))))
+  (setq minor-mode-map-alist (rassq-delete-all vertico-reverse-map minor-mode-map-alist))
+  (when vertico-reverse-mode
+    (push `(vertico--input . ,vertico-reverse-map) minor-mode-map-alist)))
 
 (cl-defmethod vertico--display-candidates (lines &context (vertico-reverse-mode (eql t)))
   (move-overlay vertico--candidates-ov (point-min) (point-min))
