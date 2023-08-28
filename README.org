@@ -41,8 +41,7 @@ without white space and comments.
 
 Vertico defines its own local keymap in the minibuffer which is derived from
 ~minibuffer-local-map~. The keymap keeps most of the ~fundamental-mode~ keybindings
-intact and remaps and binds only a handful of commands. Note in particular the
-binding of =TAB= to ~vertico-insert~ and the bindings of ~vertico-exit/exit-input~.
+intact and remaps and binds only a handful of commands.
 
 - ~beginning-of-buffer~, ~minibuffer-beginning-of-buffer~ -> ~vertico-first~
 - ~end-of-buffer~ -> ~vertico-last~
@@ -56,6 +55,13 @@ binding of =TAB= to ~vertico-insert~ and the bindings of ~vertico-exit/exit-inpu
 - ~kill-ring-save~ -> ~vertico-save~
 - =M-RET= -> ~vertico-exit-input~
 - =TAB= -> ~vertico-insert~
+
+Note in particular the binding of =TAB= to ~vertico-insert~, which inserts the
+currently selected candidate, and the binding of =RET= and =M-RET= to ~vertico-exit~
+and ~vertico-exit-input~ respectively. ~vertico-exit~ exits with the currently
+selected candidate, while ~vertico-exit-input~ exits with the minibuffer input
+instead. You should exist with the current input for example when you want to
+create a new buffer or a new file with ~find-file~ or ~switch-to-buffer~.
 
 * Configuration
 
