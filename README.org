@@ -60,7 +60,7 @@ Note in particular the binding of =TAB= to ~vertico-insert~, which inserts the
 currently selected candidate, and the binding of =RET= and =M-RET= to ~vertico-exit~
 and ~vertico-exit-input~ respectively. ~vertico-exit~ exits with the currently
 selected candidate, while ~vertico-exit-input~ exits with the minibuffer input
-instead. You should exist with the current input for example when you want to
+instead. You should exit with the current input for example when you want to
 create a new buffer or a new file with ~find-file~ or ~switch-to-buffer~.
 
 * Configuration
