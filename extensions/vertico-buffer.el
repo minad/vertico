@@ -112,7 +112,7 @@
 (cl-defmethod vertico--resize-window (_height &context (vertico-buffer-mode (eql t))))
 
 (cl-defmethod vertico--setup :after (&context (vertico-buffer-mode (eql t)))
-  (add-hook 'pre-redisplay-functions 'vertico-buffer--redisplay nil 'local)
+  (add-hook 'pre-redisplay-functions #'vertico-buffer--redisplay nil 'local)
   (let* ((action vertico-buffer-display-action) tmp win old-buf
          (_ (unwind-protect
                 (progn
