@@ -31,7 +31,9 @@
 ;; session.  If `vertico-suspend' is called from within the currently
 ;; active Vertico completion minibuffer, the completion session is
 ;; suspended.  Otherwise the last session is restored.  It is possible
-;; to suspend multiple nested Vertico sessions.
+;; to suspend multiple nested Vertico sessions.  Note that
+;; `vertico-suspend' requires you to enable recursive minibuffers, see
+;; the variable `enable-recursive-minibuffers'.
 ;;
 ;; (keymap-global-set "M-S" #'vertico-suspend)
 ;;
@@ -40,9 +42,6 @@
 ;; technique, storing a completion session history.
 ;;
 ;; The extension has the following known problems:
-;;
-;; * `vertico-suspend' has not been tested against all the other
-;;   Vertico extensions.
 ;;
 ;; * `vertico-suspend' restores the window configuration when resuming
 ;;   and when `vertico-buffer' is used.  This can be seen as a
