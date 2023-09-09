@@ -111,9 +111,9 @@ or the latest completion session is restored."
 
 (defun vertico-suspend--message (&rest app)
   "Show message in suspended minibuffer, otherwise apply APP."
-  (let ((win (active-minibuffer-window)))
-    (unless (buffer-local-value 'vertico-suspend--ov (window-buffer win))
-      (apply app))))
+  (when-let ((win (active-minibuffer-window))
+             ((not (buffer-local-value 'vertico-suspend--ov (window-buffer win)))))
+    (apply app)))
 
 (advice-add #'set-minibuffer-message :around #'vertico-suspend--message)
 
