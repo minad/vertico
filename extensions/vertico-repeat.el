@@ -31,13 +31,19 @@
 ;; `vertico-repeat-select' commands.  If the repeat commands are called
 ;; from an existing Vertico minibuffer session, only sessions
 ;; corresponding to the current minibuffer command are offered via
-;; completion.  It is necessary to register a minibuffer setup hook,
-;; which saves the Vertico state for repetition.  In order to save the
-;; history across Emacs sessions, enable `savehist-mode' and add
+;; completion.
+;;
+;; It is necessary to register a minibuffer setup hook, which saves
+;; the Vertico state for repetition.  In order to save the history
+;; across Emacs sessions, enable `savehist-mode' and add
 ;; `vertico-repeat-history' to `savehist-additional-variables'.
 ;;
 ;; (keymap-global-set "M-R" #'vertico-repeat)
 ;; (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
+;;
+;; See also the `vertico-suspend' extension which uses a different
+;; technique, relying on recursive minibuffers to suspend the current
+;; completion session temporarily while preserving the entire state.
 
 ;;; Code:
 

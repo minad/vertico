@@ -4,6 +4,7 @@
 
 * Development
 
+- =vertico-suspend=: New experimental extension.
 - =vertico-directory-enter=: Exit with input if prefix argument is given. Mirrors
   the behavior of =vertico-exit=.
 - =vertico-mouse-map=: New keymap.
