@@ -37,24 +37,19 @@
 ;;
 ;; (keymap-global-set "M-S" #'vertico-suspend)
 ;;
-;; The extension is currently experimental and may get removed again.
-;; See also the `vertico-repeat' extension which uses a different
-;; technique, storing a completion session history.
+;; See also the related extension `vertico-repeat', which uses a
+;; different technique, storing a completion session history.
 ;;
-;; The extension has the following known problems:
+;; The extension has the following known issues:
 ;;
 ;; * `vertico-suspend' restores the window configuration when resuming
 ;;   and when `vertico-buffer' is used.  This can be seen as a
-;;   disturbance.  I think the behavior is not unexpected since
-;;   minibuffer exiting also changes the window configuration by
-;;   default.
+;;   disturbance, however minibuffer exiting also changes the window
+;;   configuration by default.
 ;;
 ;; * `echo-keystrokes' does not work in recursive minibuffers.  This
 ;;   issue cannot be fixed without modifying the C source of Emacs,
 ;;   since Emacs disables echo in recursive minibuffers.
-;;
-;; * The function `set-minibuffer-message' is advised.  Maybe a more
-;;   elegant solution can be found to handle echo area messages?
 
 ;;; Code:
 
@@ -110,7 +105,7 @@ or the latest completion session is restored."
     (user-error "No Vertico session to suspend or resume")))
 
 (defun vertico-suspend--message (&rest app)
-  "Show message in suspended minibuffer, otherwise apply APP."
+  "Apply APP in non-suspended minibuffers, otherwise bail out."
   (when-let ((win (active-minibuffer-window))
              ((not (buffer-local-value 'vertico-suspend--ov (window-buffer win)))))
     (apply app)))

@@ -41,9 +41,10 @@
 ;; (keymap-global-set "M-R" #'vertico-repeat)
 ;; (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
 ;;
-;; See also the `vertico-suspend' extension which uses a different
-;; technique, relying on recursive minibuffers to suspend the current
-;; completion session temporarily while preserving the entire state.
+;; See also the related extension `vertico-suspend', which uses a
+;; different technique, relying on recursive minibuffers to suspend
+;; the current completion session temporarily while preserving the
+;; entire state.
 
 ;;; Code:
 

@@ -4,7 +4,8 @@
 
 * Development
 
-- =vertico-suspend=: New experimental extension.
+- =vertico-suspend=: New extension to suspend and resume the current Vertico
+  completion session.
 - =vertico-directory-enter=: Exit with input if prefix argument is given. Mirrors
   the behavior of =vertico-exit=.
 - =vertico-mouse-map=: New keymap.
