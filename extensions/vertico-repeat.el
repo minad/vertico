@@ -152,28 +152,19 @@ previous sessions for the current command."
               (replace-regexp-in-string
                "\\s-+" " "
                (string-trim (cadr session)))
-              (if (caddr session)
-                  (replace-regexp-in-string
-                   "\\s-+" " "
-                   (string-trim (caddr session)))
-                "")
               session))
             (user-error "No repeatable Vertico session"))))
          (max-cmd (cl-loop for (cmd . _) in trimmed
                            maximize (string-width cmd)))
-         (max-input (cl-loop for (_cmd input . _) in trimmed
-                             maximize (string-width input)))
          (formatted (cl-loop
-                     for (cmd input cand session) in trimmed collect
+                     for (cmd input session) in trimmed collect
                      (cons
                       (concat
                        (and (not current-cmd)
                             (propertize cmd 'face 'font-lock-function-name-face))
                        (and (not current-cmd)
                             (make-string (- max-cmd (string-width cmd) -4) ?\s))
-                       input
-                       (make-string (- max-input (string-width input) -4) ?\s)
-                       (and cand (propertize cand 'face 'font-lock-comment-face)))
+                       input)
                       session)))
          (enable-recursive-minibuffers t)
          (selected (or (cdr (assoc (completing-read
