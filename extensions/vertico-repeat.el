@@ -67,6 +67,8 @@
   :type '(repeat function)
   :group 'vertico)
 
+(declare-function vertico-multiform-vertical "ext:vertico-multiform")
+(defvar vertico-multiform--display-modes)
 (defvar vertico-repeat-history nil)
 (defvar-local vertico-repeat--command nil)
 (defvar-local vertico-repeat--input nil)
@@ -90,7 +92,11 @@
                    ,@(and vertico--lock-candidate
                           (>= vertico--index 0)
                           (list (substring-no-properties
-                                 (nth vertico--index vertico--candidates))))))
+                                 (nth vertico--index vertico--candidates))))
+                   ,@(and (bound-and-true-p vertico-multiform-mode)
+                          (ensure-list
+                           (seq-find (lambda (x) (and (boundp x) (symbol-value x)))
+                                     vertico-multiform--display-modes)))))
         (transform vertico-repeat-transformers))
     (while (and transform (setq session (funcall (pop transform) session))))
     (when session
@@ -100,11 +106,15 @@
   "Restore Vertico SESSION for `vertico-repeat'."
   (delete-minibuffer-contents)
   (insert (cadr session))
-  (when (caddr session)
+  (when-let ((cand (seq-find #'stringp (cddr session))))
     (vertico--update)
-    (when-let (idx (seq-position vertico--candidates (caddr session)))
+    (when-let ((idx (seq-position vertico--candidates cand)))
       (setq vertico--index idx
             vertico--lock-candidate t)))
+  (when-let ((mode (seq-find #'symbolp (cddr session)))
+             ((bound-and-true-p vertico-multiform-mode))
+             ((not (and (boundp mode) (symbol-value mode)))))
+    (vertico-multiform-vertical mode))
   (vertico--exhibit))
 
 ;;;###autoload
