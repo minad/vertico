@@ -64,7 +64,7 @@
   :type 'string
   :group 'vertico)
 
-(defcustom vertico-quick2 "jkl"
+(defcustom vertico-quick2 "jkluionm"
   "Two level quick keys."
   :type 'string
   :group 'vertico)
@@ -74,13 +74,12 @@
 INDEX is the current candidate index.
 START is the index of the first displayed candidate.
 TWO is non-nil if two keys should be displayed."
-  (let* ((fst (length vertico-quick1))
-         (snd (length vertico-quick2))
-         (idx (- index start))
-         (len (+ fst snd)))
+  (let ((fst (length vertico-quick1))
+        (snd (length vertico-quick2))
+        (idx (- index start)))
     (if (>= idx fst)
-        (let ((first (elt vertico-quick2 (mod (/ (- idx fst) len) snd)))
-              (second (elt (concat vertico-quick1 vertico-quick2) (mod (- idx fst) len))))
+        (let ((first (elt vertico-quick2 (mod (/ (- idx fst) fst) snd)))
+              (second (elt vertico-quick1 (mod (- idx fst) fst))))
           (cond
            ((eq first two)
             (list
