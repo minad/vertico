@@ -14,6 +14,7 @@
   via =vertico-multiform-mode=.
 - Optimize truncation of multi-line candidates (=vertico--truncate-multiline=).
   This affects commands like =yank-from-kill-ring=.
+- =vertico-quick=: Use a slightly different scheme to support more candidates.
 
 * Version 1.4 (2023-07-02)
 
