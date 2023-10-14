@@ -164,9 +164,9 @@ by default. This means that TAB works differently from what you may expect from
 shells like Bash or the default Emacs completion system.
 
 If you prefer to have the default completion commands a key press away you can
-add new bindings or even replace the Vertico bindings. Then the default
-completion commands behave as usual. For example you can use =M-TAB= to cycle
-between candidates if you have set ~completion-cycle-threshold~.
+add new bindings or even replace the Vertico bindings. For example you can use
+=M-TAB= to expand (TAB complete) the prefix of candidates or cycle between
+candidates if ~completion-cycle-threshold~ is non-nil.
 
 #+begin_src emacs-lisp
 (keymap-set vertico-map "?" #'minibuffer-completion-help)
@@ -174,11 +174,11 @@ between candidates if you have set ~completion-cycle-threshold~.
 (keymap-set vertico-map "M-TAB" #'minibuffer-complete)
 #+end_src
 
-The ~orderless~ completion style does not support completion of a common prefix
-substring, as you may be familiar with from shells or the basic default
-completion system. The reason is that the Orderless input string is usually not
-a prefix. In order to support completing prefixes you may want to combine
-~orderless~ with ~substring~ in your =completion-styles= configuration.
+The ~orderless~ completion style does not support expansion of a common candidate
+prefix, as supported by shells or the basic default completion system. The
+reason is that the Orderless input string is usually not a prefix. In order to
+support completing prefixes, combine ~orderless~ with ~substring~ in your
+=completion-styles= configuration.
 
 #+begin_src emacs-lisp
 (setq completion-styles '(substring orderless basic))
