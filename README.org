@@ -160,18 +160,23 @@ completion in the [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Co
 ** Completion styles and TAB completion
 
 The bindings of the ~minibuffer-local-completion-map~ are not available in Vertico
-by default. This means that TAB works differently from what you may expect from
-shells like Bash or the default Emacs completion system.
+by default. This means that =TAB= works differently from what you may expect from
+shells like Bash or the default Emacs completion system. In Vertico =TAB= inserts
+the currently selected candidate.
 
-If you prefer to have the default completion commands a key press away you can
-add new bindings or even replace the Vertico bindings. For example you can use
-=M-TAB= to expand (TAB complete) the prefix of candidates or cycle between
-candidates if ~completion-cycle-threshold~ is non-nil.
+If you prefer to have the default completion commands available you can add new
+bindings or even replace the Vertico bindings. For example you can use =M-TAB= to
+expand the prefix of candidates (TAB complete) or cycle between candidates if
+~completion-cycle-threshold~ is non-nil.
 
 #+begin_src emacs-lisp
+;; Option 1: Additional bindings
 (keymap-set vertico-map "?" #'minibuffer-completion-help)
 (keymap-set vertico-map "M-RET" #'minibuffer-force-complete-and-exit)
 (keymap-set vertico-map "M-TAB" #'minibuffer-complete)
+
+;; Option 2: Replace `vertico-insert' to enable TAB prefix expansion.
+;; (keymap-set vertico-map "TAB" #'minibuffer-complete)
 #+end_src
 
 The ~orderless~ completion style does not support expansion of a common candidate
