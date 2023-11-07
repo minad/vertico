@@ -131,25 +131,24 @@ When scrolling beyond this limit, candidates may be truncated."
          (start (* count (floor (max 0 vertico--index) count)))
          (width (- (/ (vertico--window-width) vertico-grid--columns) sep))
          (cands
-          (thread-last
-            (seq-subseq vertico--candidates start
-                        (min (+ start count) vertico--total))
-            (mapcar vertico--highlight)
-            (funcall (if (> vertico-grid-annotate 0) #'vertico--affixate #'identity))
-            (seq-map-indexed
-             (lambda (cand index)
-               (let (prefix suffix)
-                 (when (consp cand)
-                   (setq prefix (cadr cand) suffix (caddr cand) cand (car cand)))
-                 (when (string-search "\n" cand)
-                   (setq cand (vertico--truncate-multiline cand width)))
-                 (truncate-string-to-width
-                  (string-trim
-                   (replace-regexp-in-string
-                    "[ \t]+"
-                    (lambda (x) (apply #'propertize " " (text-properties-at 0 x)))
-                    (vertico--format-candidate cand prefix suffix (+ index start) start)))
-                  width))))))
+          (seq-map-indexed
+           (lambda (cand index)
+             (let (prefix suffix)
+               (when (consp cand)
+                 (setq prefix (cadr cand) suffix (caddr cand) cand (car cand)))
+               (when (string-search "\n" cand)
+                 (setq cand (vertico--truncate-multiline cand width)))
+               (truncate-string-to-width
+                (string-trim
+                 (replace-regexp-in-string
+                  "[ \t]+"
+                  (lambda (x) (apply #'propertize " " (text-properties-at 0 x)))
+                  (vertico--format-candidate cand prefix suffix (+ index start) start)))
+                width)))
+           (funcall (if (> vertico-grid-annotate 0) #'vertico--affixate #'identity)
+                    (cl-loop for i from 0 below count
+                             for c in (nthcdr start vertico--candidates)
+                             collect (funcall vertico--highlight (substring c))))))
          (width (make-vector vertico-grid--columns 0)))
     (dotimes (col vertico-grid--columns)
       (dotimes (row vertico-count)

@@ -271,38 +271,36 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (defun vertico--filter-completions (&rest args)
   "Compute all completions for ARGS with deferred highlighting."
-  (cl-letf* ((orig-pcm (symbol-function #'completion-pcm--hilit-commonality))
-             (orig-flex (symbol-function #'completion-flex-all-completions))
-             ((symbol-function #'completion-flex-all-completions)
-              (lambda (&rest args)
-                ;; Unfortunately for flex we have to undo the deferred highlighting, since flex uses
-                ;; the completion-score for sorting, which is applied during highlighting.
-                (cl-letf (((symbol-function #'completion-pcm--hilit-commonality) orig-pcm))
-                  (apply orig-flex args))))
-             ;; Defer the following highlighting functions
-             (hl #'identity)
+  (defvar completion-lazy-hilit)
+  (defvar completion-lazy-hilit-fn)
+  (cl-letf* ((completion-lazy-hilit t)
+             (completion-lazy-hilit-fn nil)
              ((symbol-function #'completion-hilit-commonality)
               (lambda (cands prefix &optional base)
-                (setq hl (lambda (x) (car (completion-hilit-commonality (list x) prefix base))))
-                (and cands (nconc cands base))))
-             ((symbol-function #'completion-pcm--hilit-commonality)
-              (lambda (pattern cands)
-                (setq hl (lambda (x)
-                           ;; `completion-pcm--hilit-commonality' sometimes throws an internal error
-                           ;; for example when entering "/sudo:://u".
-                           (condition-case nil
-                               (car (completion-pcm--hilit-commonality pattern (list x)))
-                             (t x))))
-                cands)))
-    ;; Only advise orderless after it has been loaded to avoid load order issues
-    (if (and (fboundp 'orderless-highlight-matches) (fboundp 'orderless-pattern-compiler))
-        (cl-letf (((symbol-function 'orderless-highlight-matches)
-                   (lambda (pattern cands)
-                     (let ((rxs (orderless-pattern-compiler pattern)))
-                       (setq hl (lambda (x) (car (orderless-highlight-matches rxs (list x))))))
-                     cands)))
-          (cons (apply #'completion-all-completions args) hl))
-      (cons (apply #'completion-all-completions args) hl))))
+                (setq completion-lazy-hilit-fn
+                      (lambda (x) (car (completion-hilit-commonality (list x) prefix base))))
+                (and cands (nconc cands base)))))
+    (if (eval-when-compile (>= emacs-major-version 30))
+        (cons (apply #'completion-all-completions args) completion-lazy-hilit-fn)
+      (cl-letf* ((orig-pcm (symbol-function #'completion-pcm--hilit-commonality))
+                 (orig-flex (symbol-function #'completion-flex-all-completions))
+                 ((symbol-function #'completion-flex-all-completions)
+                  (lambda (&rest args)
+                    ;; Unfortunately for flex we have to undo the deferred highlighting, since flex uses
+                    ;; the completion-score for sorting, which is applied during highlighting.
+                    (cl-letf (((symbol-function #'completion-pcm--hilit-commonality) orig-pcm))
+                      (apply orig-flex args))))
+                 ((symbol-function #'completion-pcm--hilit-commonality)
+                  (lambda (pattern cands)
+                    (setq completion-lazy-hilit-fn
+                          (lambda (x)
+                            ;; `completion-pcm--hilit-commonality' sometimes throws an internal error
+                            ;; for example when entering "/sudo:://u".
+                            (condition-case nil
+                                (car (completion-pcm--hilit-commonality pattern (list x)))
+                              (t x))))
+                    cands)))
+        (cons (apply #'completion-all-completions args) completion-lazy-hilit-fn)))))
 
 (defun vertico--metadata-get (prop)
   "Return PROP from completion metadata."
@@ -356,7 +354,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
       (vertico--metadata . ,vertico--metadata)
       (vertico--candidates . ,all)
       (vertico--total . ,(length all))
-      (vertico--highlight . ,hl)
+      (vertico--highlight . ,(or hl #'identity))
       (vertico--allow-prompt . ,(or def-missing (eq vertico-preselect 'prompt)
                                     (memq minibuffer--require-match
                                           '(nil confirm confirm-after-completion))))
@@ -575,10 +573,10 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (let* (title (index vertico--scroll)
            (group-fun (and vertico-group-format (vertico--metadata-get 'group-function)))
            (candidates
-            (thread-last (seq-subseq vertico--candidates index
-                                     (min (+ index vertico-count) vertico--total))
-              (mapcar vertico--highlight)
-              (vertico--affixate))))
+            (vertico--affixate
+             (cl-loop for i from 0 below vertico-count
+                      for c in (nthcdr index vertico--candidates)
+                      collect (funcall vertico--highlight (substring c))))))
       (pcase-dolist ((and cand `(,str . ,_)) candidates)
         (when-let (new-title (and group-fun (funcall group-fun str nil)))
           (unless (equal title new-title)
