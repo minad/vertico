@@ -134,7 +134,7 @@ When scrolling beyond this limit, candidates may be truncated."
           (thread-last
             (seq-subseq vertico--candidates start
                         (min (+ start count) vertico--total))
-            (funcall vertico--highlight)
+            (mapcar vertico--highlight)
             (funcall (if (> vertico-grid-annotate 0) #'vertico--affixate #'identity))
             (seq-map-indexed
              (lambda (cand index)

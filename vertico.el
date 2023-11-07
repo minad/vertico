@@ -269,10 +269,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
       (nconc (list (car found)) (delq (setcar found nil) list))
     list))
 
-;; bug#47711: Deferred highlighting for `completion-all-completions'
-;; XXX There is one complication: `completion--twq-all' already adds
-;; `completions-common-part'.  See below `vertico--candidate'.
-(defun vertico--all-completions (&rest args)
+(defun vertico--filter-completions (&rest args)
   "Compute all completions for ARGS with deferred highlighting."
   (cl-letf* ((orig-pcm (symbol-function #'completion-pcm--hilit-commonality))
              (orig-flex (symbol-function #'completion-flex-all-completions))
@@ -286,7 +283,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
              (hl #'identity)
              ((symbol-function #'completion-hilit-commonality)
               (lambda (cands prefix &optional base)
-                (setq hl (lambda (x) (nconc (completion-hilit-commonality x prefix base) nil)))
+                (setq hl (lambda (x) (car (completion-hilit-commonality (list x) prefix base))))
                 (and cands (nconc cands base))))
              ((symbol-function #'completion-pcm--hilit-commonality)
               (lambda (pattern cands)
@@ -294,15 +291,15 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                            ;; `completion-pcm--hilit-commonality' sometimes throws an internal error
                            ;; for example when entering "/sudo:://u".
                            (condition-case nil
-                               (completion-pcm--hilit-commonality pattern x)
+                               (car (completion-pcm--hilit-commonality pattern (list x)))
                              (t x))))
                 cands)))
     ;; Only advise orderless after it has been loaded to avoid load order issues
     (if (and (fboundp 'orderless-highlight-matches) (fboundp 'orderless-pattern-compiler))
         (cl-letf (((symbol-function 'orderless-highlight-matches)
                    (lambda (pattern cands)
-                     (let ((regexps (orderless-pattern-compiler pattern)))
-                       (setq hl (lambda (x) (orderless-highlight-matches regexps x))))
+                     (let ((rxs (orderless-pattern-compiler pattern)))
+                       (setq hl (lambda (x) (car (orderless-highlight-matches rxs (list x))))))
                      cands)))
           (cons (apply #'completion-all-completions args) hl))
       (cons (apply #'completion-all-completions args) hl))))
@@ -332,7 +329,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                (field (substring content (car bounds) (+ pt (cdr bounds))))
                ;; `minibuffer-completing-file-name' has been obsoleted by the completion category
                (completing-file (eq 'file (vertico--metadata-get 'category)))
-               (`(,all . ,hl) (vertico--all-completions content table pred pt vertico--metadata))
+               (`(,all . ,hl) (vertico--filter-completions content table pred pt vertico--metadata))
                (base (or (when-let (z (last all)) (prog1 (cdr z) (setcdr z nil))) 0))
                (vertico--base (substring content 0 base))
                (def (or (car-safe minibuffer-default) minibuffer-default))
@@ -488,8 +485,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Format group TITLE given the current CAND."
   (when (string-prefix-p title cand)
     ;; Highlight title if title is a prefix of the candidate
-    (setq title (substring (car (funcall vertico--highlight
-                                         (list (propertize cand 'face 'vertico-group-title))))
+    (setq title (substring (funcall vertico--highlight
+                                    (propertize cand 'face 'vertico-group-title))
                            0 (length title)))
     (vertico--remove-face 0 (length title) 'completions-first-difference title))
   (format (concat vertico-group-format "\n") title))
@@ -549,8 +546,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
         ;; `completion--twq-all' hack.  This should better be fixed in Emacs
         ;; itself, the corresponding code is already marked with a FIXME.
         (vertico--remove-face 0 (length cand) 'completions-common-part cand)
-        (concat vertico--base
-                (if hl (car (funcall vertico--highlight (list cand))) cand))))
+        (concat vertico--base (if hl (funcall vertico--highlight cand) cand))))
      ((and (equal content "") (or (car-safe minibuffer-default) minibuffer-default)))
      (t content))))
 
@@ -581,7 +577,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
            (candidates
             (thread-last (seq-subseq vertico--candidates index
                                      (min (+ index vertico-count) vertico--total))
-              (funcall vertico--highlight)
+              (mapcar vertico--highlight)
               (vertico--affixate))))
       (pcase-dolist ((and cand `(,str . ,_)) candidates)
         (when-let (new-title (and group-fun (funcall group-fun str nil)))
