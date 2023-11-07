@@ -33,7 +33,7 @@ without white space and comments.
 - Non-existing candidates can be submitted with =M-RET= or by moving the point to the prompt.
 - Configurable sorting by history position, length and alphabetically.
 - Long candidates with newlines are formatted to take up less space.
-- Deferred completion style highlighting for performance.
+- Lazy completion candidate highlighting for performance.
 - Annotations are displayed next to the candidates (~annotation-~ and ~affixation-function~).
 - Support for candidate grouping and group cycling commands (~group-function~).
 
