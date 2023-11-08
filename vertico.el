@@ -574,8 +574,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
            (group-fun (and vertico-group-format (vertico--metadata-get 'group-function)))
            (candidates
             (vertico--affixate
-             (cl-loop for i from 0 below vertico-count
-                      for c in (nthcdr index vertico--candidates)
+             (cl-loop repeat vertico-count for c in (nthcdr index vertico--candidates)
                       collect (funcall vertico--hilit (substring c))))))
       (pcase-dolist ((and cand `(,str . ,_)) candidates)
         (when-let (new-title (and group-fun (funcall group-fun str nil)))
