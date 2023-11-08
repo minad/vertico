@@ -140,7 +140,7 @@ The value should lie between 0 and vertico-count/2."
   "M-RET" #'vertico-exit-input
   "TAB" #'vertico-insert)
 
-(defvar-local vertico--highlight #'identity
+(defvar-local vertico--hilit #'identity
   "Lazy candidate highlighting function.")
 
 (defvar-local vertico--history-hash nil
@@ -354,7 +354,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
       (vertico--metadata . ,vertico--metadata)
       (vertico--candidates . ,all)
       (vertico--total . ,(length all))
-      (vertico--highlight . ,(or hl #'identity))
+      (vertico--hilit . ,(or hl #'identity))
       (vertico--allow-prompt . ,(or def-missing (eq vertico-preselect 'prompt)
                                     (memq minibuffer--require-match
                                           '(nil confirm confirm-after-completion))))
@@ -483,7 +483,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Format group TITLE given the current CAND."
   (when (string-prefix-p title cand)
     ;; Highlight title if title is a prefix of the candidate
-    (setq title (substring (funcall vertico--highlight
+    (setq title (substring (funcall vertico--hilit
                                     (propertize cand 'face 'vertico-group-title))
                            0 (length title)))
     (vertico--remove-face 0 (length title) 'completions-first-difference title))
@@ -544,7 +544,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
         ;; `completion--twq-all' hack.  This should better be fixed in Emacs
         ;; itself, the corresponding code is already marked with a FIXME.
         (vertico--remove-face 0 (length cand) 'completions-common-part cand)
-        (concat vertico--base (if hl (funcall vertico--highlight cand) cand))))
+        (concat vertico--base (if hl (funcall vertico--hilit cand) cand))))
      ((and (equal content "") (or (car-safe minibuffer-default) minibuffer-default)))
      (t content))))
 
@@ -576,7 +576,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
             (vertico--affixate
              (cl-loop for i from 0 below vertico-count
                       for c in (nthcdr index vertico--candidates)
-                      collect (funcall vertico--highlight (substring c))))))
+                      collect (funcall vertico--hilit (substring c))))))
       (pcase-dolist ((and cand `(,str . ,_)) candidates)
         (when-let (new-title (and group-fun (funcall group-fun str nil)))
           (unless (equal title new-title)

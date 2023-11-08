@@ -110,7 +110,7 @@
     (while (and candidates (not (eq wrapped (car candidates)))
                 (> width 0) (> count 0))
       (let ((cand (pop candidates)) (prefix "") (suffix ""))
-        (setq cand (funcall vertico--highlight (substring cand)))
+        (setq cand (funcall vertico--hilit (substring cand)))
         (pcase (and vertico-flat-annotate (vertico--affixate (list cand)))
           (`((,c ,p ,s)) (setq cand c prefix p suffix s)))
         (when (string-search "\n" cand)

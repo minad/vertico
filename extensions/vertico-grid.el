@@ -148,7 +148,7 @@ When scrolling beyond this limit, candidates may be truncated."
            (funcall (if (> vertico-grid-annotate 0) #'vertico--affixate #'identity)
                     (cl-loop for i from 0 below count
                              for c in (nthcdr start vertico--candidates)
-                             collect (funcall vertico--highlight (substring c))))))
+                             collect (funcall vertico--hilit (substring c))))))
          (width (make-vector vertico-grid--columns 0)))
     (dotimes (col vertico-grid--columns)
       (dotimes (row vertico-count)
