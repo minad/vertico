@@ -320,10 +320,10 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                (after (substring content pt))
                ;; bug#47678: `completion-boundaries' fails for `partial-completion'
                ;; if the cursor is moved between the slashes of "~//".
-               ;; See also marginalia.el which has the same issue.
-               (bounds (or (condition-case nil
-                               (completion-boundaries before table pred after)
-                             (t (cons 0 (length after))))))
+               ;; See also corfu.el which has the same issue.
+               (bounds (condition-case nil
+                           (completion-boundaries before table pred after)
+                         (t (cons 0 (length after)))))
                (field (substring content (car bounds) (+ pt (cdr bounds))))
                ;; `minibuffer-completing-file-name' has been obsoleted by the completion category
                (completing-file (eq 'file (vertico--metadata-get 'category)))
