@@ -27,9 +27,9 @@
 ;;; Commentary:
 
 ;; This package is a Vertico extension, which provides Ido-like
-;; directory navigation commands. The commands can be bound in the
-;; `vertico-map'. Furthermore a cleanup function for shadowed file paths
-;; is provided.
+;; directory navigation commands.  The commands can be bound in the
+;; `vertico-map'.  Furthermore a cleanup function for shadowed file
+;; paths is provided.
 ;;
 ;; (keymap-set vertico-map "RET" #'vertico-directory-enter)
 ;; (keymap-set vertico-map "DEL" #'vertico-directory-delete-char)
@@ -72,7 +72,8 @@ Exit with current input if prefix ARG is given."
   (interactive "p")
   (when (and (> (point) (minibuffer-prompt-end))
              (eq 'file (vertico--metadata-get 'category)))
-    (let ((path (buffer-substring (minibuffer-prompt-end) (point))) found)
+    (let ((path (buffer-substring-no-properties (minibuffer-prompt-end) (point)))
+          found)
       (when (string-match-p "\\`~[^/]*/\\'" path)
         (delete-minibuffer-contents)
         (insert (expand-file-name path)))

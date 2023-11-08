@@ -106,11 +106,11 @@ The keys in LIST can be symbols or regexps."
 (defun vertico-multiform--setup ()
   "Enable modes at minibuffer setup."
   (let ((cat (completion-metadata-get
-              (completion-metadata
-               (buffer-substring (minibuffer-prompt-end)
-                                 (max (minibuffer-prompt-end) (point)))
-               minibuffer-completion-table
-               minibuffer-completion-predicate)
+              (completion-metadata (buffer-substring-no-properties
+                                    (minibuffer-prompt-end)
+                                    (max (minibuffer-prompt-end) (point)))
+                                   minibuffer-completion-table
+                                   minibuffer-completion-predicate)
               'category))
         (exit (make-symbol "vertico-multiform--exit"))
         (depth (recursion-depth))
