@@ -542,7 +542,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
       (let ((cand (substring (nth vertico--index vertico--candidates))))
         ;; XXX Drop the completions-common-part face which is added by the
         ;; `completion--twq-all' hack.  This should better be fixed in Emacs
-        ;; itself, the corresponding code is already marked with a FIXME.
+        ;; itself, the corresponding code is already marked as fixme.
         (vertico--remove-face 0 (length cand) 'completions-common-part cand)
         (concat vertico--base (if hl (funcall vertico--hilit cand) cand))))
      ((and (equal content "") (or (car-safe minibuffer-default) minibuffer-default)))
