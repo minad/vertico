@@ -6,7 +6,7 @@
 ;; Maintainer: Daniel Mendler <mail@daniel-mendler.de>
 ;; Created: 2021
 ;; Version: 1.4
-;; Package-Requires: ((emacs "27.1") (compat "29.1.4.0"))
+;; Package-Requires: ((emacs "27.1") (compat "29.1.4.3"))
 ;; Homepage: https://github.com/minad/vertico
 ;; Keywords: convenience, files, matching, completion
 
@@ -233,7 +233,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
        (dolist (% candidates)
          ;; Find recent candidate in history or fill bucket
          (,@(if (not (eq (car by) 'history)) `(progn)
-              `(if-let (idx (gethash % hhash)) (push (cons idx %) hcands)))
+              `(if-let ((idx (gethash % hhash))) (push (cons idx %) hcands)))
           (let ((idx (min ,(1- bsize) ,bindex)))
             (aset buckets idx (cons % (aref buckets idx))))))
        (nconc ,@(and (eq (car by) 'history) '((vertico--sort-decorated hcands)))
@@ -249,11 +249,11 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (defun vertico--affixate (cands)
   "Annotate CANDS with annotation function."
-  (if-let (aff (or (vertico--metadata-get 'affixation-function)
-                   (plist-get completion-extra-properties :affixation-function)))
+  (if-let ((aff (or (vertico--metadata-get 'affixation-function)
+                    (plist-get completion-extra-properties :affixation-function))))
       (funcall aff cands)
-    (if-let (ann (or (vertico--metadata-get 'annotation-function)
-                     (plist-get completion-extra-properties :annotation-function)))
+    (if-let ((ann (or (vertico--metadata-get 'annotation-function)
+                      (plist-get completion-extra-properties :annotation-function))))
         (cl-loop for cand in cands collect
                  (let ((suffix (or (funcall ann cand) "")))
                    ;; The default completion UI adds the `completions-annotations'
@@ -265,7 +265,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (defun vertico--move-to-front (elem list)
   "Move ELEM to front of LIST."
-  (if-let (found (member elem list))
+  (if-let ((found (member elem list)))
       (nconc (list (car found)) (delq (setcar found nil) list))
     list))
 
@@ -328,7 +328,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                ;; `minibuffer-completing-file-name' has been obsoleted by the completion category
                (completing-file (eq 'file (vertico--metadata-get 'category)))
                (`(,all . ,hl) (vertico--filter-completions content table pred pt vertico--metadata))
-               (base (or (when-let (z (last all)) (prog1 (cdr z) (setcdr z nil))) 0))
+               (base (or (when-let ((z (last all))) (prog1 (cdr z) (setcdr z nil))) 0))
                (vertico--base (substring content 0 base))
                (def (or (car-safe minibuffer-default) minibuffer-default))
                (groups) (def-missing) (lock))
@@ -344,8 +344,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (when (and completing-file (not (string-suffix-p "/" field)))
       (setq all (vertico--move-to-front (concat field "/") all)))
     (setq all (vertico--move-to-front field all))
-    (when-let (group-fun (and all (vertico--metadata-get 'group-function)))
-      (setq groups (vertico--group-by group-fun all) all (car groups)))
+    (when-let ((fun (and all (vertico--metadata-get 'group-function))))
+      (setq groups (vertico--group-by fun all) all (car groups)))
     (setq def-missing (and def (equal content "") (not (member def all)))
           lock (and vertico--lock-candidate ;; Locked position of old candidate.
                     (if (< vertico--index 0) -1
@@ -376,19 +376,17 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Group ELEMS by FUN."
   (let ((ht (make-hash-table :test #'equal)) titles groups)
     ;; Build hash table of groups
-    (while elems
-      (let* ((title (funcall fun (car elems) nil))
-             (group (gethash title ht)))
-        (if group
-            (setcdr group (setcdr (cdr group) elems)) ;; Append to tail of group
-          (puthash title (cons elems elems) ht) ;; New group element (head . tail)
-          (push title titles))
-        (pop elems)))
+    (cl-loop for elem on elems
+             for title = (funcall fun (car elem) nil) do
+             (if-let ((group (gethash title ht)))
+                 (setcdr group (setcdr (cdr group) elem)) ;; Append to tail of group
+               (puthash title (cons elem elem) ht) ;; New group element (head . tail)
+               (push title titles)))
     (setq titles (nreverse titles))
     ;; Cycle groups if `vertico--lock-groups' is set
-    (when-let (group (and vertico--lock-groups
-                          (seq-find (lambda (group) (gethash group ht))
-                                    vertico--all-groups)))
+    (when-let ((vertico--lock-groups)
+               (group (seq-find (lambda (group) (gethash group ht))
+                                vertico--all-groups)))
       (setq titles (vertico--cycle titles (seq-position titles group))))
     ;; Build group list
     (dolist (title titles)
@@ -515,7 +513,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Remove FACE between BEG and END from OBJ."
   (while (< beg end)
     (let ((next (next-single-property-change beg 'face obj end)))
-      (when-let (val (get-text-property beg 'face obj))
+      (when-let ((val (get-text-property beg 'face obj)))
         (put-text-property beg next 'face (remq face (ensure-list val)) obj))
       (setq beg next))))
 
@@ -577,7 +575,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
              (cl-loop repeat vertico-count for c in (nthcdr index vertico--candidates)
                       collect (funcall vertico--hilit (substring c))))))
       (pcase-dolist ((and cand `(,str . ,_)) candidates)
-        (when-let (new-title (and group-fun (funcall group-fun str nil)))
+        (when-let ((new-title (and group-fun (funcall group-fun str nil))))
           (unless (equal title new-title)
             (setq title new-title)
             (push (vertico--format-group-title title str) lines))

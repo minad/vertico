@@ -87,7 +87,7 @@
 
 (defun vertico-buffer--redisplay (win)
   "Redisplay window WIN."
-  (when-let (mbwin (active-minibuffer-window))
+  (when-let ((mbwin (active-minibuffer-window)))
     (when (eq (window-buffer mbwin) (current-buffer))
       (unless (eq win mbwin)
         (setq-local truncate-lines (< (window-point win)
