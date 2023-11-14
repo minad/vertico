@@ -554,9 +554,9 @@ built-in file completion table. In your user configuration you can prioritize
   (minibuffer-with-setup-hook
       (:append
        (lambda ()
-         (let ((map (make-sparse-keymap (current-local-map))))
+         (let ((map (make-sparse-keymap)))
            (define-key map [tab] #'minibuffer-complete)
-           (use-local-map map))
+           (use-local-map (make-composed-keymap (list map) (current-local-map))))
          (setq-local completion-styles (cons 'basic completion-styles)
                      vertico-preselect 'prompt)))
     (apply args)))
