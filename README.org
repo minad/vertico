@@ -664,16 +664,12 @@ exiting with the empty string is possible by pressing =RET= only.
 
 ** Tramp hostname and username completion
 
-*NOTE:* On upcoming Emacs 30 and Tramp 2.6.0.2 the workarounds described in this
-section are not necessary anymore, since the relevant completion tables have
-been improved.
-
-In combination with Orderless or other non-prefix completion styles like
-=substring= or =flex=, host names and user names are not made available for
-completion after entering =/ssh:=. In order to avoid this problem, the =basic=
-completion style should be specified for the file completion category, such that
-=basic= is tried before =orderless=. This can be achieved by putting =basic= first in
-the completion style overrides for the file completion category.
+In combination with Orderless, protocols, host names and user names are not
+filtered on Emacs 29 or even made available for completion after entering =/ssh:=
+on Emacs 28 and older. In order to avoid this problem, the =basic= completion
+style should be specified for the file completion category, such that =basic= is
+tried before =orderless=. This can be achieved by putting =basic= first in the
+completion style overrides for the file completion category.
 
 #+begin_src emacs-lisp
 (setq completion-styles '(orderless basic)
@@ -681,11 +677,10 @@ the completion style overrides for the file completion category.
       completion-category-overrides '((file (styles basic partial-completion))))
 #+end_src
 
-If you are familiar with the =completion-style= machinery and want to dig a bit
-deeper, you may also define a custom completion style which sets in only for
-remote files. The custom completion style ensures that you can always match
-substrings within non-remote file names, since =orderless= will stay the preferred
-style for non-remote files.
+If you are familiar with the =completion-style= machinery, you may also define a
+custom completion style which activates only for remote files. The custom
+completion style ensures that you can always match substrings within non-remote
+file names, since =orderless= will stay the preferred style for non-remote files.
 
 #+begin_src emacs-lisp
 (defun basic-remote-try-completion (string table pred point)
