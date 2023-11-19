@@ -54,14 +54,16 @@ Exit with current input if prefix ARG is given."
            (cand (vertico--candidate))
            ((or (string-suffix-p "/" cand)
                 (and (vertico--remote-p cand)
-                     (string-suffix-p ":" cand)))))
+                     (string-suffix-p ":" cand))))
+           ;; Handle /./ and /../ manually instead of via `expand-file-name'
+           ;; and `abbreviate-file-name', such that we don't accidentally
+           ;; perform unwanted substitutions in the existing completion.
+           ((progn
+              (setq cand (string-replace "/./" "/" cand))
+              (unless (string-suffix-p "/../../" cand)
+                (setq cand (replace-regexp-in-string "/[^/|:]+/\\.\\./\\'" "/" cand)))
+              (not (equal (minibuffer-contents-no-properties) cand)))))
       (progn
-        ;; Handle ./ and ../ manually instead of via `expand-file-name' and
-        ;; `abbreviate-file-name', such that we don't accidentally perform
-        ;; unwanted substitutions in the existing completion.
-        (setq cand (replace-regexp-in-string "/\\./" "/" cand))
-        (unless (string-suffix-p "/../../" cand)
-          (setq cand (replace-regexp-in-string "/[^/|:]+/\\.\\./\\'" "/" cand)))
         (delete-minibuffer-contents)
         (insert cand))
     (vertico-exit arg)))
