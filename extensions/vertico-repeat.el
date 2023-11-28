@@ -41,6 +41,8 @@
 ;; (keymap-global-set "M-R" #'vertico-repeat)
 ;; (keymap-set vertico-map "M-P" #'vertico-repeat-previous)
 ;; (keymap-set vertico-map "M-N" #'vertico-repeat-next)
+;; (keymap-set vertico-map "S-<prior>" #'vertico-repeat-previous)
+;; (keymap-set vertico-map "S-<next>" #'vertico-repeat-next)
 ;; (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
 ;;
 ;; See also the related extension `vertico-suspend', which uses a
