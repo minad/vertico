@@ -12,6 +12,9 @@
 - =vertico-repeat-select=: Do not display selected candidate.
 - =vertico-repeat=: Store active display mode if the mode was temporarily toggled
   via =vertico-multiform-mode=.
+- =vertico-repeat-previous=, =vertico-repeat-next=: New commands to step over input
+  history during an active Vertico completion session.
+- =vertico-repeat-last=: Deprecated in favor of =vertico-repeat-previous=.
 - Optimize truncation of multi-line candidates (=vertico--truncate-multiline=).
   This affects commands like =yank-from-kill-ring=.
 - =vertico-quick=: Use a slightly different scheme to support more candidates.

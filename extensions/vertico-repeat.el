@@ -27,9 +27,9 @@
 ;;; Commentary:
 
 ;; This package is a Vertico extension, which enables repetition of
-;; Vertico sessions via the `vertico-repeat', `vertico-repeat-last' and
-;; `vertico-repeat-select' commands.  If the repeat commands are called
-;; from an existing Vertico minibuffer session, only sessions
+;; Vertico sessions via the `vertico-repeat', `vertico-repeat-previous'
+;; and `vertico-repeat-select' commands.  If the repeat commands are
+;; called from an existing Vertico minibuffer session, only sessions
 ;; corresponding to the current minibuffer command are offered via
 ;; completion.
 ;;
@@ -39,6 +39,8 @@
 ;; `vertico-repeat-history' to `savehist-additional-variables'.
 ;;
 ;; (keymap-global-set "M-R" #'vertico-repeat)
+;; (keymap-set vertico-map "M-P" #'vertico-repeat-previous)
+;; (keymap-set vertico-map "M-N" #'vertico-repeat-next)
 ;; (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
 ;;
 ;; See also the related extension `vertico-suspend', which uses a
@@ -72,6 +74,8 @@
 (defvar vertico-repeat-history nil)
 (defvar-local vertico-repeat--command nil)
 (defvar-local vertico-repeat--input nil)
+(defvar-local vertico-repeat--step nil)
+(defvar-local vertico-repeat--pos 0)
 
 (defun vertico-repeat--filter-commands (session)
   "Filter SESSION if command is listed in `vertico-repeat-filter'."
@@ -106,11 +110,12 @@
   "Restore Vertico SESSION for `vertico-repeat'."
   (delete-minibuffer-contents)
   (insert (cadr session))
-  (when-let ((cand (seq-find #'stringp (cddr session))))
-    (vertico--update)
-    (when-let ((idx (seq-position vertico--candidates cand)))
-      (setq vertico--index idx
-            vertico--lock-candidate t)))
+  (setq vertico--lock-candidate
+        (when-let ((cand (seq-find #'stringp (cddr session))))
+          (vertico--update)
+          (when-let ((idx (seq-position vertico--candidates cand)))
+            (setq vertico--index idx)
+            t)))
   ;; Restore display modes if not modifying the current session
   (when-let (((not (and vertico-repeat--command
                         (eq vertico-repeat--command (car session)))))
@@ -119,6 +124,16 @@
              ((not (and (boundp mode) (symbol-value mode)))))
     (vertico-multiform-vertical mode))
   (vertico--exhibit))
+
+(defun vertico-repeat--run (session)
+  "Run Vertico completion SESSION."
+  (unless session
+    (user-error "No repeatable session"))
+  (if (and vertico-repeat--command (eq vertico-repeat--command (car session)))
+      (vertico-repeat--restore session)
+    (minibuffer-with-setup-hook
+        (apply-partially #'vertico-repeat--restore session)
+      (command-execute (setq this-command (car session))))))
 
 ;;;###autoload
 (defun vertico-repeat-save ()
@@ -130,21 +145,34 @@ This function must be registered as `minibuffer-setup-hook'."
     (add-hook 'minibuffer-exit-hook #'vertico-repeat--save-exit nil 'local)))
 
 ;;;###autoload
-(defun vertico-repeat-last (&optional session)
-  "Repeat last Vertico completion SESSION.
-If called interactively from an existing Vertico session,
-`vertico-repeat-last' will restore the last input and
-last selected candidate for the current command."
-  (interactive
-   (list (or (if vertico-repeat--command
-                 (assq vertico-repeat--command vertico-repeat-history)
-               (car vertico-repeat-history))
-             (user-error "No repeatable Vertico session"))))
-  (if (and vertico-repeat--command (eq vertico-repeat--command (car session)))
-      (vertico-repeat--restore session)
-    (minibuffer-with-setup-hook
-        (apply-partially #'vertico-repeat--restore session)
-      (command-execute (setq this-command (car session))))))
+(defun vertico-repeat-next (n)
+  "Repeat Nth next Vertico completion session.
+This command must be called from an existing Vertico session
+after `vertico-repeat-previous'."
+  (interactive "p")
+  (vertico-repeat-previous (- n)))
+
+;;;###autoload
+(defun vertico-repeat-previous (n)
+  "Repeat Nth previous Vertico completion session.
+If called from an existing Vertico session, restore the input and
+selected candidate for the current command."
+  (interactive "p")
+  (vertico-repeat--run
+   (if (not vertico-repeat--command)
+       (and (> n 0) (nth (1- n) vertico-repeat-history))
+     (unless vertico-repeat--step
+       (setq vertico-repeat--step
+             `((,vertico-repeat--command ,vertico-repeat--input)
+               ,@(cl-loop for h in vertico-repeat-history
+                          if (eq (car h) vertico-repeat--command) collect h))))
+     (cl-incf n vertico-repeat--pos)
+     (when-let (((>= n 0)) (session (nth n vertico-repeat--step)))
+       (setq vertico-repeat--pos n)
+       session))))
+
+(define-obsolete-function-alias
+  'vertico-repeat-last 'vertico-repeat-previous "1.4")
 
 ;;;###autoload
 (defun vertico-repeat-select ()
@@ -152,55 +180,53 @@ last selected candidate for the current command."
 If called from an existing Vertico session, you can select among
 previous sessions for the current command."
   (interactive)
-  (let* ((current-cmd vertico-repeat--command)
-         (trimmed
-          (delete-dups
-           (or
-            (cl-loop
-             for session in vertico-repeat-history
-             if (or (not current-cmd) (eq (car session) current-cmd))
-             collect
-             (list
-              (symbol-name (car session))
-              (replace-regexp-in-string
-               "\\s-+" " "
-               (string-trim (cadr session)))
-              session))
-            (user-error "No repeatable Vertico session"))))
-         (max-cmd (cl-loop for (cmd . _) in trimmed
-                           maximize (string-width cmd)))
-         (formatted (cl-loop
-                     for (cmd input session) in trimmed collect
-                     (cons
-                      (concat
-                       (and (not current-cmd)
-                            (propertize cmd 'face 'font-lock-function-name-face))
-                       (and (not current-cmd)
-                            (make-string (- max-cmd (string-width cmd) -4) ?\s))
-                       input)
-                      session)))
-         (enable-recursive-minibuffers t)
-         (selected (or (cdr (assoc (completing-read
-                                    (if current-cmd
-                                        (format "History of %s: " current-cmd)
-                                      "Completion history: ")
-                                    (lambda (str pred action)
-                                      (if (eq action 'metadata)
-                                          '(metadata (display-sort-function . identity)
-                                                     (cycle-sort-function . identity))
-                                        (complete-with-action action formatted str pred)))
-                                    nil t nil t)
-                                   formatted))
-                       (user-error "No session selected"))))
-    (vertico-repeat-last selected)))
+  (vertico-repeat--run
+   (let* ((current-cmd vertico-repeat--command)
+          (trimmed
+           (delete-dups
+            (or
+             (cl-loop
+              for session in vertico-repeat-history
+              if (or (not current-cmd) (eq (car session) current-cmd))
+              collect
+              (list
+               (symbol-name (car session))
+               (replace-regexp-in-string
+                "\\s-+" " "
+                (string-trim (cadr session)))
+               session))
+             (user-error "No repeatable session"))))
+          (max-cmd (cl-loop for (cmd . _) in trimmed
+                            maximize (string-width cmd)))
+          (formatted (cl-loop
+                      for (cmd input session) in trimmed collect
+                      (cons
+                       (concat
+                        (and (not current-cmd)
+                             (propertize cmd 'face 'font-lock-function-name-face))
+                        (and (not current-cmd)
+                             (make-string (- max-cmd (string-width cmd) -4) ?\s))
+                        input)
+                       session)))
+          (enable-recursive-minibuffers t))
+     (cdr (assoc (completing-read
+                  (if current-cmd
+                      (format "History of %s: " current-cmd)
+                    "Completion history: ")
+                  (lambda (str pred action)
+                    (if (eq action 'metadata)
+                        '(metadata (display-sort-function . identity)
+                                   (cycle-sort-function . identity))
+                      (complete-with-action action formatted str pred)))
+                  nil t nil t)
+                 formatted)))))
 
 ;;;###autoload
 (defun vertico-repeat (&optional arg)
   "Repeat last Vertico session.
 If prefix ARG is non-nil, offer completion menu to select from session history."
   (interactive "P")
-  (call-interactively
-   (if arg #'vertico-repeat-select #'vertico-repeat-last)))
+  (if arg (vertico-repeat-select) (vertico-repeat-previous 1)))
 
 (provide 'vertico-repeat)
 ;;; vertico-repeat.el ends here
