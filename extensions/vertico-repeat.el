@@ -111,7 +111,10 @@
     (when-let ((idx (seq-position vertico--candidates cand)))
       (setq vertico--index idx
             vertico--lock-candidate t)))
-  (when-let ((mode (seq-find #'symbolp (cddr session)))
+  ;; Restore display modes if not modifying the current session
+  (when-let (((not (and vertico-repeat--command
+                        (eq vertico-repeat--command (car session)))))
+             (mode (seq-find #'symbolp (cddr session)))
              ((bound-and-true-p vertico-multiform-mode))
              ((not (and (boundp mode) (symbol-value mode)))))
     (vertico-multiform-vertical mode))
