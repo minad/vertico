@@ -89,18 +89,22 @@
   "Save current minibuffer input."
   (setq vertico-repeat--input (minibuffer-contents-no-properties)))
 
+(defun vertico-repeat--current ()
+  "Return the current session datum."
+  `(,vertico-repeat--command
+    ,vertico-repeat--input
+    ,@(and vertico--lock-candidate
+           (>= vertico--index 0)
+           (list (substring-no-properties
+                  (nth vertico--index vertico--candidates))))
+    ,@(and (bound-and-true-p vertico-multiform-mode)
+           (ensure-list
+            (seq-find (lambda (x) (and (boundp x) (symbol-value x)))
+                      vertico-multiform--display-modes)))))
+
 (defun vertico-repeat--save-exit ()
   "Save command session in `vertico-repeat-history'."
-  (let ((session `(,vertico-repeat--command
-                   ,vertico-repeat--input
-                   ,@(and vertico--lock-candidate
-                          (>= vertico--index 0)
-                          (list (substring-no-properties
-                                 (nth vertico--index vertico--candidates))))
-                   ,@(and (bound-and-true-p vertico-multiform-mode)
-                          (ensure-list
-                           (seq-find (lambda (x) (and (boundp x) (symbol-value x)))
-                                     vertico-multiform--display-modes)))))
+  (let ((session (vertico-repeat--current))
         (transform vertico-repeat-transformers))
     (while (and transform (setq session (funcall (pop transform) session))))
     (when session
@@ -161,11 +165,14 @@ selected candidate for the current command."
   (vertico-repeat--run
    (if (not vertico-repeat--command)
        (and (> n 0) (nth (1- n) vertico-repeat-history))
-     (unless vertico-repeat--step
+     (cond
+      ((not vertico-repeat--step)
        (setq vertico-repeat--step
-             `((,vertico-repeat--command ,vertico-repeat--input)
-               ,@(cl-loop for h in vertico-repeat-history
-                          if (eq (car h) vertico-repeat--command) collect h))))
+             (cons (vertico-repeat--current)
+                   (cl-loop for h in vertico-repeat-history
+                            if (eq (car h) vertico-repeat--command) collect h))))
+      ((= vertico-repeat--pos 0)
+       (setcar vertico-repeat--step (vertico-repeat--current))))
      (cl-incf n vertico-repeat--pos)
      (when-let (((>= n 0)) (session (nth n vertico-repeat--step)))
        (setq vertico-repeat--pos n)
