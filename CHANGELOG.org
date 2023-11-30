@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 1.5 (2023-12-01)
 
 - =vertico-suspend=: New extension to suspend and resume the current Vertico
   completion session.
