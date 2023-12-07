@@ -312,6 +312,15 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
       (vertico--metadata-get 'display-sort-function)
       vertico-sort-function))
 
+(defun vertico--delete-dups (list)
+  "Delete `equal-including-properties' consecutive duplicates from LIST."
+  (let ((tail list))
+    (while (cdr tail)
+      (if (equal-including-properties (car tail) (cadr tail))
+          (setcdr tail (cddr tail))
+        (pop tail))))
+  list)
+
 (defun vertico--recompute (pt content)
   "Recompute state given PT and CONTENT."
   (pcase-let* ((table minibuffer-completion-table)
@@ -337,10 +346,9 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     ;; and `file-directory-p'.
     (when completing-file (setq all (completion-pcm--filename-try-filter all)))
     ;; Sort using the `display-sort-function' or the Vertico sort functions
-    (setq all (delete-consecutive-dups (funcall (or (vertico--sort-function) #'identity) all)))
+    (setq all (vertico--delete-dups (funcall (or (vertico--sort-function) #'identity) all)))
     ;; Move special candidates: "field" appears at the top, before "field/", before default value
-    (when (stringp def)
-      (setq all (vertico--move-to-front def all)))
+    (when (stringp def) (setq all (vertico--move-to-front def all)))
     (when (and completing-file (not (string-suffix-p "/" field)))
       (setq all (vertico--move-to-front (concat field "/") all)))
     (setq all (vertico--move-to-front field all))
@@ -389,8 +397,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                                 vertico--all-groups)))
       (setq titles (vertico--cycle titles (seq-position titles group))))
     ;; Build group list
-    (dolist (title titles)
-      (push (gethash title ht) groups))
+    (dolist (title titles) (push (gethash title ht) groups))
     ;; Unlink last tail
     (setcdr (cdar groups) nil)
     (setq groups (nreverse groups))
@@ -400,8 +407,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
         (setcdr (cdar link) (caadr link))
         (pop link)))
     ;; Check if new groups are found
-    (dolist (group vertico--all-groups)
-      (remhash group ht))
+    (dolist (group vertico--all-groups) (remhash group ht))
     (list (caar groups) titles
           (if (hash-table-empty-p ht) vertico--all-groups titles))))
 
@@ -481,9 +487,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Format group TITLE given the current CAND."
   (when (string-prefix-p title cand)
     ;; Highlight title if title is a prefix of the candidate
-    (setq title (substring (funcall vertico--hilit
-                                    (propertize cand 'face 'vertico-group-title))
-                           0 (length title)))
+    (setq cand (propertize cand 'face 'vertico-group-title)
+          title (substring (funcall vertico--hilit cand) 0 (length title)))
     (vertico--remove-face 0 (length title) 'completions-first-difference title))
   (format (concat vertico-group-format "\n") title))
 
