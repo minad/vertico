@@ -416,15 +416,17 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
          (input (cons content pt)))
     (unless (or (and interruptible (input-pending-p)) (equal vertico--input input))
       ;; Redisplay to make input immediately visible before expensive candidate
-      ;; recomputation (#89).  No redisplay during init because of flicker.
+      ;; recomputation (gh:minad/vertico#89).  No redisplay during init because
+      ;; of flicker.
       (when (and interruptible (consp vertico--input))
         ;; Prevent recursive exhibit from timer (`consult-vertico--refresh').
         (cl-letf (((symbol-function #'vertico--exhibit) #'ignore)) (redisplay)))
       (pcase (let ((vertico--metadata (completion-metadata (substring content 0 pt)
                                                            minibuffer-completion-table
                                                            minibuffer-completion-predicate)))
-               ;; If Tramp is used, do not compute the candidates in an interruptible fashion,
-               ;; since this will break the Tramp password and user name prompts (See #23).
+               ;; If Tramp is used, do not compute the candidates in an
+               ;; interruptible fashion, since this will break the Tramp
+               ;; password and user name prompts (See gh:minad/vertico#23).
                (if (or (not interruptible)
                        (and (eq 'file (vertico--metadata-get 'category))
                             (or (vertico--remote-p content) (vertico--remote-p default-directory))))
