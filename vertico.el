@@ -481,9 +481,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Format group TITLE given the current CAND."
   (when (string-prefix-p title cand)
     ;; Highlight title if title is a prefix of the candidate
-    (setq title (substring (funcall vertico--hilit
-                                    (propertize cand 'face 'vertico-group-title))
-                           0 (length title)))
+    (setq cand (propertize cand 'face 'vertico-group-title)
+          title (substring (funcall vertico--hilit cand) 0 (length title)))
     (vertico--remove-face 0 (length title) 'completions-first-difference title))
   (format (concat vertico-group-format "\n") title))
 
