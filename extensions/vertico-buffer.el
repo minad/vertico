@@ -113,7 +113,6 @@
 
 (defun vertico-buffer--setup ()
   "Setup buffer display."
-  (add-hook 'pre-redisplay-functions #'vertico-buffer--redisplay nil 'local)
   (let* ((action vertico-buffer-display-action)
          (old-wins (mapcar (lambda (w) (cons w (window-buffer w))) (window-list)))
          win old-buf tmp-buf
@@ -162,6 +161,8 @@
           (lambda ()
             (remove-hook 'pre-redisplay-functions #'vertico-buffer--redisplay 'local)
             (remove-hook 'minibuffer-exit-hook vertico-buffer--restore)
+            (buffer-local-restore-state old-state)
+            (kill-local-variable 'vertico-buffer--restore)
             (overlay-put vertico--candidates-ov 'window nil)
             (when vertico--count-ov (overlay-put vertico--count-ov 'window nil))
             (cond
@@ -173,13 +174,12 @@
              ((window-live-p win)
               (delete-window win)))
             (when vertico-buffer-hide-prompt
-              (set-window-vscroll nil 0))
-            (buffer-local-restore-state old-state)
-            (kill-local-variable 'vertico-buffer--restore)))
+              (set-window-vscroll nil 0))))
     ;; We cannot use a buffer-local minibuffer-exit-hook here.  The hook will
     ;; not be called when abnormally exiting the minibuffer from another buffer
     ;; via `keyboard-escape-quit'.
-    (add-hook 'minibuffer-exit-hook vertico-buffer--restore)))
+    (add-hook 'minibuffer-exit-hook vertico-buffer--restore)
+    (add-hook 'pre-redisplay-functions #'vertico-buffer--redisplay nil 'local)))
 
 ;;;###autoload
 (define-minor-mode vertico-buffer-mode
