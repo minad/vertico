@@ -247,7 +247,7 @@ be enabled manually if desired. Furthermore it is possible to install all of the
 files separately, both ~vertico.el~ and the ~vertico-*.el~ extensions. Currently the
 following extensions come with the Vertico ELPA package:
 
-- [[https://github.com/minad/vertico/blob/main/extensions/vertico-buffer.el][vertico-buffer]]: =vertico-buffer-mode= to display Vertico in a separate buffer.
+- [[https://github.com/minad/vertico/blob/main/extensions/vertico-buffer.el][vertico-buffer]]: =vertico-buffer-mode= to display Vertico like a regular buffer.
 - [[https://github.com/minad/vertico/blob/main/extensions/vertico-directory.el][vertico-directory]]: Commands for Ido-like directory navigation.
 - [[https://github.com/minad/vertico/blob/main/extensions/vertico-flat.el][vertico-flat]]: =vertico-flat-mode= to enable a flat, horizontal display.
 - [[https://github.com/minad/vertico/blob/main/extensions/vertico-grid.el][vertico-grid]]: =vertico-grid-mode= to enable a grid display.

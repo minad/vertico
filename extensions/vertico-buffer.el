@@ -1,4 +1,4 @@
-;;; vertico-buffer.el --- Display Vertico in a buffer instead of the minibuffer -*- lexical-binding: t -*-
+;;; vertico-buffer.el --- Display Vertico like a regular buffer -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2021-2023 Free Software Foundation, Inc.
 
@@ -26,9 +26,14 @@
 
 ;;; Commentary:
 
-;; This package is a Vertico extension, which displays Vertico in a
-;; buffer instead of the minibuffer.  The buffer display can be enabled
-;; by the `vertico-buffer-mode'.
+;; This package is a Vertico extension, which displays Vertico like a
+;; regular buffer in a large window instead of the miniwindow.  The
+;; buffer display can be enabled by the `vertico-buffer-mode'.
+
+;; The mode can be enabled globally or via `vertico-multiform-mode'
+;; per command or completion category.  Alternatively the buffer
+;; display can be toggled temporarily with M-B if
+;; `vertico-multiform-mode' is enabled.
 
 ;;; Code:
 
@@ -178,7 +183,7 @@
 
 ;;;###autoload
 (define-minor-mode vertico-buffer-mode
-  "Display Vertico in a buffer instead of the minibuffer."
+  "Display Vertico like a regular buffer in a large window."
   :global t :group 'vertico
   ;; Shrink current minibuffer window
   (when-let ((win (active-minibuffer-window)))
