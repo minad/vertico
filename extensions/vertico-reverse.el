@@ -37,6 +37,7 @@
 ;;; Code:
 
 (require 'vertico)
+(eval-when-compile (require 'cl-lib))
 
 (defvar-keymap vertico-reverse-map
   :doc "Additional keymap activated in reverse mode."
@@ -60,7 +61,7 @@
   (dolist (buf (buffer-list))
     (when-let ((ov (buffer-local-value 'vertico--candidates-ov buf)))
       (overlay-put ov 'before-string nil)))
-  (setq minor-mode-map-alist (rassq-delete-all vertico-reverse-map minor-mode-map-alist))
+  (cl-callf2 rassq-delete-all vertico-reverse-map minor-mode-map-alist)
   (when vertico-reverse-mode
     (push `(vertico--input . ,vertico-reverse-map) minor-mode-map-alist)))
 

@@ -40,6 +40,7 @@
 ;;; Code:
 
 (require 'vertico)
+(eval-when-compile (require 'cl-lib))
 
 (defcustom vertico-flat-max-lines 1
   "Maximal number of lines to use."
@@ -78,7 +79,7 @@
   (when-let ((win (active-minibuffer-window)))
     (unless (frame-root-window-p win)
       (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise)))
-  (setq minor-mode-map-alist (rassq-delete-all vertico-flat-map minor-mode-map-alist))
+  (cl-callf2 rassq-delete-all vertico-flat-map minor-mode-map-alist)
   (when vertico-flat-mode
     (push `(vertico--input . ,vertico-flat-map) minor-mode-map-alist)))
 

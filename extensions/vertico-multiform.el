@@ -156,7 +156,7 @@ The keys in LIST can be symbols or regexps."
   (when vertico-multiform--stack
     (warn "vertico-multiform state is inconsistent")
     (setq vertico-multiform--stack nil))
-  (setq minor-mode-map-alist (rassq-delete-all vertico-multiform-map minor-mode-map-alist))
+  (cl-callf2 rassq-delete-all vertico-multiform-map minor-mode-map-alist)
   (when vertico-multiform-mode
     (push `(vertico--input . ,vertico-multiform-map) minor-mode-map-alist)))
 

@@ -39,31 +39,26 @@
 
 (require 'vertico-flat)
 
-(defvar vertico-unobtrusive--orig-count nil)
-(defvar vertico-unobtrusive--orig-count-format nil)
+(defvar vertico-unobtrusive--restore nil)
 
 ;;;###autoload
 (define-minor-mode vertico-unobtrusive-mode
   "Unobtrusive display for Vertico."
   :global t :group 'vertico
   (cond
-   (vertico-unobtrusive-mode
-    (unless vertico-unobtrusive--orig-count
-      (push '(vertico-current . default) (default-value 'face-remapping-alist))
-      (setq vertico-unobtrusive--orig-count vertico-count
-            vertico-unobtrusive--orig-count-format vertico-count-format
-            vertico-count 1
-            vertico-count-format nil
-            vertico-flat-format `(:separator nil :ellipsis nil ,@vertico-flat-format))))
-   (t
-    (when vertico-unobtrusive--orig-count
-      (setq-default face-remapping-alist
-                    (remove '(vertico-current . default)
-                            (default-value 'face-remapping-alist)))
-      (setq vertico-count vertico-unobtrusive--orig-count
-            vertico-count-format vertico-unobtrusive--orig-count-format
-            vertico-flat-format (nthcdr 4 vertico-flat-format)
-            vertico-unobtrusive--orig-count nil))))
+   ((and vertico-unobtrusive-mode (not vertico-unobtrusive--restore))
+    (push '(vertico-current . default) (default-value 'face-remapping-alist))
+    (setq vertico-unobtrusive--restore (cons vertico-count vertico-count-format)
+          vertico-count 1
+          vertico-count-format nil
+          vertico-flat-format `(:separator nil :ellipsis nil ,@vertico-flat-format)))
+   ((and (not vertico-unobtrusive-mode) vertico-unobtrusive--restore)
+    (cl-callf2 delete '(vertico-current . default)
+               (default-value 'face-remapping-alist))
+    (setq vertico-count (car vertico-unobtrusive--restore)
+          vertico-count-format (cdr vertico-unobtrusive--restore)
+          vertico-flat-format (nthcdr 4 vertico-flat-format)
+          vertico-unobtrusive--restore nil)))
   (vertico-flat-mode (if vertico-unobtrusive-mode 1 -1)))
 
 (cl-defmethod vertico--setup :before (&context (vertico-unobtrusive-mode (eql t)))

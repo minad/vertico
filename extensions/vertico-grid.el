@@ -112,7 +112,7 @@ When scrolling beyond this limit, candidates may be truncated."
   (when-let ((win (active-minibuffer-window)))
     (unless (frame-root-window-p win)
       (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise)))
-  (setq minor-mode-map-alist (rassq-delete-all vertico-grid-map minor-mode-map-alist))
+  (cl-callf2 rassq-delete-all vertico-grid-map minor-mode-map-alist)
   (when vertico-grid-mode
     (push `(vertico--input . ,vertico-grid-map) minor-mode-map-alist)))
 
