@@ -57,7 +57,6 @@
 
 (defvar vertico-buffer--restore)
 (declare-function vertico-buffer-mode "ext:vertico-buffer")
-
 (defvar-local vertico-suspend--ov nil)
 
 ;;;###autoload
@@ -70,11 +69,13 @@ or the latest completion session is restored."
   (interactive)
   (unless enable-recursive-minibuffers
     (user-error "Recursive minibuffers must be enabled"))
+  (advice-add #'set-minibuffer-message :around #'vertico-suspend--message)
   (if-let ((win (active-minibuffer-window))
            (buf (window-buffer win))
            ((buffer-local-value 'vertico--input buf)))
       (cond
        ((minibufferp)
+        (add-hook 'pre-redisplay-functions #'vertico-suspend--redisplay nil 'local)
         (setq vertico-suspend--ov (make-overlay (point-min) (point-max) nil t t))
         (overlay-put vertico-suspend--ov 'invisible t)
         (overlay-put vertico-suspend--ov 'priority 1000)
@@ -90,6 +91,7 @@ or the latest completion session is restored."
        (t
         (select-window win)
         (set-window-parameter win 'no-other-window nil)
+        (remove-hook 'pre-redisplay-functions #'vertico-suspend--redisplay 'local)
         (when vertico-suspend--ov
           (delete-overlay vertico-suspend--ov)
           (setq vertico-suspend--ov nil))
@@ -98,13 +100,19 @@ or the latest completion session is restored."
           (vertico-buffer-mode 1))))
     (user-error "No Vertico session to suspend or resume")))
 
+(defun vertico-suspend--redisplay (_)
+  "Ensure that suspended minibuffer is not selected."
+  (let ((win (get-buffer-window)))
+    (when (eq win (selected-window))
+      (unless (frame-root-window-p win)
+        (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise))
+      (select-window (minibuffer-selected-window) t))))
+
 (defun vertico-suspend--message (&rest app)
   "Apply APP in non-suspended minibuffers, otherwise bail out."
   (when-let ((win (active-minibuffer-window))
              ((not (buffer-local-value 'vertico-suspend--ov (window-buffer win)))))
     (apply app)))
-
-(advice-add #'set-minibuffer-message :around #'vertico-suspend--message)
 
 (provide 'vertico-suspend)
 ;;; vertico-suspend.el ends here
