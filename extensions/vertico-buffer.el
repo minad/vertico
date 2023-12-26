@@ -104,6 +104,13 @@
       (when vertico-buffer-hide-prompt
         (window-resize mbwin (- (window-pixel-height mbwin)) nil nil 'pixelwise)
         (set-window-vscroll mbwin 100))
+      (when transient-mark-mode
+        (with-silent-modifications
+          (vertico--remove-face (point-min) (point-max) 'region)
+          (when (use-region-p)
+            (add-face-text-property
+             (max (minibuffer-prompt-end) (region-beginning))
+             (region-end) 'region))))
       (let ((old cursor-in-non-selected-windows)
             (new (and (eq (selected-window) mbwin)
                       (if (memq cursor-type '(nil t)) 'box cursor-type))))
@@ -161,6 +168,9 @@
           (lambda ()
             (with-selected-window (active-minibuffer-window)
               (when vertico-buffer--restore
+                (when transient-mark-mode
+                  (with-silent-modifications
+                    (vertico--remove-face (point-min) (point-max) 'region)))
                 (remove-hook 'pre-redisplay-functions #'vertico-buffer--redisplay 'local)
                 (remove-hook 'minibuffer-exit-hook vertico-buffer--restore)
                 (fset vertico-buffer--restore nil)

@@ -4,8 +4,9 @@
 
 * Development
 
-- Add ~vertico-multiform-buffer~. Support toggling ~vertico-buffer-mode~ during an
-  active minibuffer session.
+- ~vertico-multiform-buffer~: New display toggle command.
+- ~vertico-buffer-mode~: Support toggling during an active minibuffer session.
+- ~vertico-buffer-mode~: Highlight active region.
 
 * Version 1.5 (2023-12-01)
 
