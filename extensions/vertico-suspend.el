@@ -55,7 +55,9 @@
 
 (require 'vertico)
 
-(defvar-local vertico-suspend--wc nil)
+(defvar vertico-buffer--restore)
+(declare-function vertico-buffer-mode "ext:vertico-buffer")
+
 (defvar-local vertico-suspend--ov nil)
 
 ;;;###autoload
@@ -79,15 +81,9 @@ or the latest completion session is restored."
         (overlay-put vertico--candidates-ov 'before-string nil)
         (overlay-put vertico--candidates-ov 'after-string nil)
         (set-window-parameter win 'no-other-window t)
-        ;; vertico-buffer handling
-        (when (memq 'vertico-buffer--redisplay pre-redisplay-functions)
-          (remove-hook 'pre-redisplay-functions 'vertico-buffer--redisplay 'local)
-          (setq-local cursor-in-non-selected-windows nil
-                      vertico-suspend--wc (current-window-configuration))
-          (dolist (w (get-buffer-window-list buf))
-            (unless (eq w win)
-              (delete-window w)))
-          (set-window-vscroll nil 0))
+        (when (bound-and-true-p vertico-buffer-mode)
+          (vertico-buffer-mode -1)
+          (setq vertico-buffer--restore #'ignore))
         (unless (frame-root-window-p win)
           (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise))
         (other-window 1))
@@ -97,11 +93,9 @@ or the latest completion session is restored."
         (when vertico-suspend--ov
           (delete-overlay vertico-suspend--ov)
           (setq vertico-suspend--ov nil))
-        ;; vertico-buffer handling
-        (when vertico-suspend--wc
-          (add-hook 'pre-redisplay-functions 'vertico-buffer--redisplay nil 'local)
-          (set-window-configuration vertico-suspend--wc nil t)
-          (setq vertico-suspend--wc nil))))
+        (when (bound-and-true-p vertico-buffer--restore)
+          (setq vertico-buffer--restore nil)
+          (vertico-buffer-mode 1))))
     (user-error "No Vertico session to suspend or resume")))
 
 (defun vertico-suspend--message (&rest app)
