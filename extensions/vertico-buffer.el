@@ -156,25 +156,28 @@
     (overlay-put vertico--candidates-ov 'window win)
     (when (and vertico-buffer-hide-prompt vertico--count-ov)
       (overlay-put vertico--count-ov 'window win))
-    (setq-local vertico-buffer--restore (make-symbol "vertico-buffer--destroy"))
+    (setq-local vertico-buffer--restore (make-symbol "vertico-buffer--restore"))
     (fset vertico-buffer--restore
           (lambda ()
-            (remove-hook 'pre-redisplay-functions #'vertico-buffer--redisplay 'local)
-            (remove-hook 'minibuffer-exit-hook vertico-buffer--restore)
-            (buffer-local-restore-state old-state)
-            (kill-local-variable 'vertico-buffer--restore)
-            (overlay-put vertico--candidates-ov 'window nil)
-            (when vertico--count-ov (overlay-put vertico--count-ov 'window nil))
-            (cond
-             ((and (window-live-p win) (buffer-live-p old-buf))
-              (set-window-parameter win 'no-other-window old-no-other)
-              (set-window-parameter win 'no-delete-other-windows old-no-delete)
-              (set-window-dedicated-p win nil)
-              (set-window-buffer win old-buf))
-             ((window-live-p win)
-              (delete-window win)))
-            (when vertico-buffer-hide-prompt
-              (set-window-vscroll nil 0))))
+            (with-selected-window (active-minibuffer-window)
+              (when vertico-buffer--restore
+                (remove-hook 'pre-redisplay-functions #'vertico-buffer--redisplay 'local)
+                (remove-hook 'minibuffer-exit-hook vertico-buffer--restore)
+                (fset vertico-buffer--restore nil)
+                (kill-local-variable 'vertico-buffer--restore)
+                (buffer-local-restore-state old-state)
+                (overlay-put vertico--candidates-ov 'window nil)
+                (when vertico--count-ov (overlay-put vertico--count-ov 'window nil))
+                (cond
+                 ((and (window-live-p win) (buffer-live-p old-buf))
+                  (set-window-parameter win 'no-other-window old-no-other)
+                  (set-window-parameter win 'no-delete-other-windows old-no-delete)
+                  (set-window-dedicated-p win nil)
+                  (set-window-buffer win old-buf))
+                 ((window-live-p win)
+                  (delete-window win)))
+                (when vertico-buffer-hide-prompt
+                  (set-window-vscroll nil 0))))))
     ;; We cannot use a buffer-local minibuffer-exit-hook here.  The hook will
     ;; not be called when abnormally exiting the minibuffer from another buffer
     ;; via `keyboard-escape-quit'.
