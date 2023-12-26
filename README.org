@@ -321,11 +321,12 @@ Temporary toggling between the different display modes is possible. The
 following commands are bound by default in the =vertico-multiform-map=. You can of
 course change these bindings if you like.
 
-- =M-V= -> ~vertico-multiform-vertical~
-- =M-G= -> ~vertico-multiform-grid~
+- =M-B= -> ~vertico-multiform-buffer~
 - =M-F= -> ~vertico-multiform-flat~
+- =M-G= -> ~vertico-multiform-grid~
 - =M-R= -> ~vertico-multiform-reverse~
 - =M-U= -> ~vertico-multiform-unobtrusive~
+- =M-V= -> ~vertico-multiform-vertical~
 
 For special configuration you can use your own functions or even lambdas to
 configure the completion behavior per command or per completion category.

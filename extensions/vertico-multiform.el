@@ -49,11 +49,12 @@
 ;; Temporary toggling between the different display modes is possible.
 ;; The following keys are bound in the `vertico-multiform-map'.
 ;;
-;;   M-V -> `vertico-multiform-vertical'
-;;   M-G -> `vertico-multiform-grid'
+;;   M-B -> `vertico-multiform-buffer'
 ;;   M-F -> `vertico-multiform-flat'
+;;   M-G -> `vertico-multiform-grid'
 ;;   M-R -> `vertico-multiform-reverse'
 ;;   M-U -> `vertico-multiform-unobtrusive'
+;;   M-V -> `vertico-multiform-vertical'
 ;;
 ;;; Code:
 
@@ -139,11 +140,12 @@ The keys in LIST can be symbols or regexps."
 
 (defvar-keymap vertico-multiform-map
   :doc "Additional keymap activated in multiform mode."
-  "M-V" #'vertico-multiform-vertical
-  "M-G" #'vertico-multiform-grid
+  "M-B" #'vertico-multiform-buffer
   "M-F" #'vertico-multiform-flat
+  "M-G" #'vertico-multiform-grid
   "M-R" #'vertico-multiform-reverse
-  "M-U" #'vertico-multiform-unobtrusive)
+  "M-U" #'vertico-multiform-unobtrusive
+  "M-V" #'vertico-multiform-vertical)
 
 ;;;###autoload
 (define-minor-mode vertico-multiform-mode
@@ -188,8 +190,8 @@ ARG can be nil, t, -1, 1 or toggle."
         (push not-mode (car vertico-multiform--stack))))))
 
 (defvar vertico-multiform--display-modes
-  '(vertico-unobtrusive-mode vertico-flat-mode
-    vertico-grid-mode vertico-reverse-mode))
+  '(vertico-unobtrusive-mode vertico-flat-mode vertico-grid-mode
+    vertico-reverse-mode vertico-buffer-mode))
 (defvar-local vertico-multiform--display-last nil)
 
 (defun vertico-multiform-vertical (&optional mode)
@@ -214,6 +216,7 @@ MODE defaults to the vertical display."
      (interactive)
      (vertico-multiform-vertical ',(intern (format "vertico-%s-mode" name)))))
 
+(vertico-multiform--define-display-toggle buffer)
 (vertico-multiform--define-display-toggle grid)
 (vertico-multiform--define-display-toggle flat)
 (vertico-multiform--define-display-toggle reverse)

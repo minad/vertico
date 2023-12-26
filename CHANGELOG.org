@@ -2,6 +2,11 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- Add ~vertico-multiform-buffer~. Support toggling ~vertico-buffer-mode~ during an
+  active minibuffer session.
+
 * Version 1.5 (2023-12-01)
 
 - =vertico-suspend=: New extension to suspend and resume the current Vertico
