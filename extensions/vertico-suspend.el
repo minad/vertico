@@ -95,7 +95,7 @@ or the latest completion session is restored."
         (when vertico-suspend--ov
           (delete-overlay vertico-suspend--ov)
           (setq vertico-suspend--ov nil))
-        (when (bound-and-true-p vertico-buffer--restore)
+        (when (eq #'ignore (bound-and-true-p vertico-buffer--restore))
           (setq vertico-buffer--restore nil)
           (vertico-buffer-mode 1))))
     (user-error "No Vertico session to suspend or resume")))
