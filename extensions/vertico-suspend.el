@@ -40,16 +40,10 @@
 ;; See also the related extension `vertico-repeat', which uses a
 ;; different technique, storing a completion session history.
 ;;
-;; The extension has the following known issues:
-;;
-;; * `vertico-suspend' restores the window configuration when resuming
-;;   and when `vertico-buffer' is used.  This can be seen as a
-;;   disturbance, however minibuffer exiting also changes the window
-;;   configuration by default.
-;;
-;; * `echo-keystrokes' does not work in recursive minibuffers.  This
-;;   issue cannot be fixed without modifying the C source of Emacs,
-;;   since Emacs disables echo in recursive minibuffers.
+;; There exists a small issue with `vertico-suspend': The setting
+;; `echo-keystrokes' does not work.  Unfortunately this cannot be
+;; fixed without modifying the C source of Emacs, since Emacs forcibly
+;; disables echo in recursive minibuffers.
 
 ;;; Code:
 
