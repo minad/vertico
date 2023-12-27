@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 1.6 (2023-12-27)
 
 - ~vertico-multiform-buffer~: New display toggle command.
 - ~vertico-buffer-mode~: Support toggling during an active minibuffer session.
