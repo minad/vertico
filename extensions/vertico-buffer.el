@@ -103,7 +103,7 @@
         (set-window-hscroll win 0))
       (when vertico-buffer-hide-prompt
         (window-resize mbwin (- (window-pixel-height mbwin)) nil nil 'pixelwise)
-        (set-window-vscroll mbwin 100))
+        (set-window-vscroll mbwin 3))
       (when transient-mark-mode
         (with-silent-modifications
           (vertico--remove-face (point-min) (point-max) 'region)
