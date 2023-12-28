@@ -26,24 +26,24 @@
 
 ;;; Commentary:
 
-;; This package is a Vertico extension, which provides the
-;; `vertico-suspend' command to suspend the current Vertico completion
-;; session.  If `vertico-suspend' is called from within the currently
-;; active Vertico completion minibuffer, the completion session is
-;; suspended.  Otherwise the last session is restored.  It is possible
-;; to suspend multiple nested Vertico sessions.  Note that
-;; `vertico-suspend' requires you to enable recursive minibuffers, see
-;; the variable `enable-recursive-minibuffers'.
+;; This package is a Vertico extension providing the `vertico-suspend'
+;; command to suspend the current Vertico completion session.  If
+;; `vertico-suspend' is called from within the currently active
+;; Vertico minibuffer, the completion session is suspended.  Otherwise
+;; the last session is restored.  It is possible to suspend multiple
+;; nested Vertico sessions.  Note that `vertico-suspend' requires that
+;; recursive minibuffers are enabled by setting the customizable
+;; variable `enable-recursive-minibuffers' to t.
 ;;
 ;; (keymap-global-set "M-S" #'vertico-suspend)
 ;;
 ;; See also the related extension `vertico-repeat', which uses a
 ;; different technique, storing a completion session history.
 ;;
-;; There exists a small issue with `vertico-suspend': The setting
+;; There exists a small issue with `vertico-suspend'. The setting
 ;; `echo-keystrokes' does not work.  Unfortunately this cannot be
 ;; fixed without modifying the C source of Emacs, since Emacs forcibly
-;; disables echo in recursive minibuffers.
+;; disables echo if a minibuffer is active.
 
 ;;; Code:
 
