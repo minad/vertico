@@ -40,7 +40,7 @@
 ;; See also the related extension `vertico-repeat', which uses a
 ;; different technique, storing a completion session history.
 ;;
-;; There exists a small issue with `vertico-suspend'. The setting
+;; There exists a small issue with `vertico-suspend'.  The setting
 ;; `echo-keystrokes' does not work.  Unfortunately this cannot be
 ;; fixed without modifying the C source of Emacs, since Emacs forcibly
 ;; disables echo if a minibuffer is active.
