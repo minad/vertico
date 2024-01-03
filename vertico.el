@@ -255,17 +255,17 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (if-let ((ann (or (vertico--metadata-get 'annotation-function)
                       (plist-get completion-extra-properties :annotation-function))))
         (cl-loop for cand in cands collect
-                 (let ((suffix (or (funcall ann cand) "")))
+                 (let ((suff (or (funcall ann cand) "")))
                    ;; The default completion UI adds the `completions-annotations'
                    ;; face if no other faces are present.
-                   (unless (text-property-not-all 0 (length suffix) 'face nil suffix)
-                     (setq suffix (propertize suffix 'face 'completions-annotations)))
-                   (list cand "" suffix)))
+                   (unless (text-property-not-all 0 (length suff) 'face nil suff)
+                     (setq suff (propertize suff 'face 'completions-annotations)))
+                   (list cand "" suff)))
       (cl-loop for cand in cands collect (list cand "" "")))))
 
 (defun vertico--move-to-front (elem list)
   "Move ELEM to front of LIST."
-  (if-let ((found (member elem list)))
+  (if-let ((found (member elem list))) ;; No duplicates, compare with Corfu.
       (nconc (list (car found)) (delq (setcar found nil) list))
     list))
 
