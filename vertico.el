@@ -303,8 +303,13 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
         (cons (apply #'completion-all-completions args) completion-lazy-hilit-fn)))))
 
 (defun vertico--metadata-get (prop)
-  "Return PROP from completion metadata."
-  (completion-metadata-get vertico--metadata prop))
+  "Get PROP from completion metadata, respect `completion-category-overrides'."
+  (if-let (((not (eq prop 'category)))
+           (cat (completion-metadata-get vertico--metadata 'category))
+           (over (completion--category-override cat prop))
+           ((functionp (cdr over))))
+      (cdr over)
+    (completion-metadata-get vertico--metadata prop)))
 
 (defun vertico--sort-function ()
   "Return the sorting function."
