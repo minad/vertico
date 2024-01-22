@@ -2,6 +2,12 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- =vertico-buffer-mode=: Simplify mode line format.
+- =vertico-buffer-mode=: Reduce vscroll value when =vertico-buffer-hide-prompt= is
+  non-nil to avoid redisplay performance issues.
+
 * Version 1.6 (2023-12-27)
 
 - ~vertico-multiform-buffer~: New display toggle command.
