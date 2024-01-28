@@ -94,29 +94,29 @@
 
 (defun vertico-buffer--redisplay (win)
   "Redisplay window WIN."
-  (when-let ((mbwin (active-minibuffer-window)))
-    (when (eq (window-buffer mbwin) (current-buffer))
-      (unless (eq win mbwin)
-        (setq-local truncate-lines (< (window-point win)
-                                      (* 0.8 (window-width win))))
-        (set-window-point win (point))
-        (set-window-hscroll win 0))
-      (when vertico-buffer-hide-prompt
-        (window-resize mbwin (- (window-pixel-height mbwin)) nil nil 'pixelwise)
-        (set-window-vscroll mbwin 3))
-      (when transient-mark-mode
-        (with-silent-modifications
-          (vertico--remove-face (point-min) (point-max) 'region)
-          (when (use-region-p)
-            (add-face-text-property
-             (max (minibuffer-prompt-end) (region-beginning))
-             (region-end) 'region))))
-      (let ((old cursor-in-non-selected-windows)
-            (new (and (eq (selected-window) mbwin)
-                      (if (memq cursor-type '(nil t)) 'box cursor-type))))
-        (unless (eq new old)
-          (setq-local cursor-in-non-selected-windows new)
-          (force-mode-line-update t))))))
+  (when-let ((mbwin (active-minibuffer-window))
+             ((eq (window-buffer mbwin) (current-buffer))))
+    (unless (eq win mbwin)
+      (setq-local truncate-lines (< (window-point win)
+                                    (* 0.8 (window-width win))))
+      (set-window-point win (point))
+      (set-window-hscroll win 0))
+    (when vertico-buffer-hide-prompt
+      (window-resize mbwin (- (window-pixel-height mbwin)) nil nil 'pixelwise)
+      (set-window-vscroll mbwin 3))
+    (when transient-mark-mode
+      (with-silent-modifications
+        (vertico--remove-face (point-min) (point-max) 'region)
+        (when (use-region-p)
+          (add-face-text-property
+           (max (minibuffer-prompt-end) (region-beginning))
+           (region-end) 'region))))
+    (let ((old cursor-in-non-selected-windows)
+          (new (and (eq (selected-window) mbwin)
+                    (if (memq cursor-type '(nil t)) 'box cursor-type))))
+      (unless (eq new old)
+        (setq-local cursor-in-non-selected-windows new)
+        (force-mode-line-update t)))))
 
 (defun vertico-buffer--setup ()
   "Setup buffer display."
