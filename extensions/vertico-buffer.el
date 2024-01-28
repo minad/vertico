@@ -94,29 +94,25 @@
 
 (defun vertico-buffer--redisplay (win)
   "Redisplay window WIN."
-  (when-let ((mbwin (active-minibuffer-window)))
-    (when (eq (window-buffer mbwin) (current-buffer))
-      (unless (eq win mbwin)
-        (setq-local truncate-lines (< (window-point win)
-                                      (* 0.8 (window-width win))))
-        (set-window-point win (point))
-        (set-window-hscroll win 0))
-      (when vertico-buffer-hide-prompt
-        (window-resize mbwin (- (window-pixel-height mbwin)) nil nil 'pixelwise)
-        (set-window-vscroll mbwin 3))
-      (when transient-mark-mode
-        (with-silent-modifications
-          (vertico--remove-face (point-min) (point-max) 'region)
-          (when (use-region-p)
-            (add-face-text-property
-             (max (minibuffer-prompt-end) (region-beginning))
-             (region-end) 'region))))
-      (let ((old cursor-in-non-selected-windows)
-            (new (and (eq (selected-window) mbwin)
-                      (if (memq cursor-type '(nil t)) 'box cursor-type))))
-        (unless (eq new old)
-          (setq-local cursor-in-non-selected-windows new)
-          (force-mode-line-update t))))))
+  (when-let ((mbwin (active-minibuffer-window))
+             ((eq (window-buffer mbwin) (current-buffer))))
+    (unless (eq win mbwin)
+      (setq-local truncate-lines (< (window-point win)
+                                    (* 0.8 (window-width win))))
+      (set-window-point win (point))
+      (set-window-hscroll win 0)
+      (when (and (not (eq (selected-window) win)) (eq (selected-window) mbwin))
+        (select-window win 'norecord)))
+    (when vertico-buffer-hide-prompt
+      (window-resize mbwin (- (window-pixel-height mbwin)) nil nil 'pixelwise)
+      (set-window-vscroll mbwin 3))
+    (when transient-mark-mode
+      (with-silent-modifications
+        (vertico--remove-face (point-min) (point-max) 'region)
+        (when (use-region-p)
+          (add-face-text-property
+           (max (minibuffer-prompt-end) (region-beginning))
+           (region-end) 'region))))))
 
 (defun vertico-buffer--setup ()
   "Setup buffer display."
@@ -137,10 +133,8 @@
                         old-buf (alist-get win old-wins))
                   (set-window-buffer win (current-buffer)))
               (kill-buffer tmp-buf)))
-         (old-no-other (window-parameter win 'no-other-window))
          (old-no-delete (window-parameter win 'no-delete-other-windows))
          (old-state (buffer-local-set-state
-                     cursor-in-non-selected-windows cursor-in-non-selected-windows
                      show-trailing-whitespace nil
                      truncate-lines t
                      face-remapping-alist (copy-tree `((mode-line-inactive mode-line)
@@ -153,7 +147,6 @@
                                       (if (< depth 2) "" (format " [%s]" depth)))))
                      vertico-count (- (/ (window-pixel-height win)
                                          (default-line-height)) 2))))
-    (set-window-parameter win 'no-other-window t)
     (set-window-parameter win 'no-delete-other-windows t)
     (set-window-dedicated-p win t)
     (overlay-put vertico--candidates-ov 'window win)
@@ -176,7 +169,6 @@
                 (when vertico--count-ov (overlay-put vertico--count-ov 'window nil))
                 (cond
                  ((and (window-live-p win) (buffer-live-p old-buf))
-                  (set-window-parameter win 'no-other-window old-no-other)
                   (set-window-parameter win 'no-delete-other-windows old-no-delete)
                   (set-window-dedicated-p win nil)
                   (set-window-buffer win old-buf))
