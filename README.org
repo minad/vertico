@@ -46,20 +46,20 @@ Vertico defines its own local keymap in the minibuffer which is derived from
 ~minibuffer-local-map~. The keymap keeps most of the ~fundamental-mode~ keybindings
 intact and remaps and binds only a handful of commands.
 
-| ~Fundamental-mode~                                      | Vertico                  |
-|---------------------------------------------------------|--------------------------|
+| Fundamental                                         | Vertico                |
+|-----------------------------------------------------+------------------------|
 | ~beginning-of-buffer~, ~minibuffer-beginning-of-buffer~ | ~vertico-first~          |
-| ~end-of-buffer~                                         | ~vertico-last~           |
-| ~scroll-down-command~                                   | ~vertico-scroll-down~    |
-| ~scroll-up-command~                                     | ~vertico-scroll-up~      |
+| ~end-of-buffer~                                       | ~vertico-last~           |
+| ~scroll-down-command~                                 | ~vertico-scroll-down~    |
+| ~scroll-up-command~                                   | ~vertico-scroll-up~      |
 | ~next-line~, ~next-line-or-history-element~             | ~vertico-next~           |
 | ~previous-line~, ~previous-line-or-history-element~     | ~vertico-previous~       |
-| ~forward-paragraph~                                     | ~vertico-next-group~     |
-| ~backward-paragraph~                                    | ~vertico-previous-group~ |
-| ~exit-minibuffer~                                       | ~vertico-exit~           |
-| ~kill-ring-save~                                        | ~vertico-save~           |
-| =M-RET=                                                 | ~vertico-exit-input~     |
-| =TAB=                                                   | ~vertico-insert~         |
+| ~forward-paragraph~                                   | ~vertico-next-group~     |
+| ~backward-paragraph~                                  | ~vertico-previous-group~ |
+| ~exit-minibuffer~                                     | ~vertico-exit~           |
+| ~kill-ring-save~                                      | ~vertico-save~           |
+| =M-RET=                                               | ~vertico-exit-input~     |
+| =TAB=                                                 | ~vertico-insert~         |
 
 Note in particular the binding of =TAB= to ~vertico-insert~, which inserts the
 currently selected candidate, and the binding of =RET= and =M-RET= to ~vertico-exit~
