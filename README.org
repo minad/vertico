@@ -40,6 +40,12 @@ without white space and comments.
 
 [[https://github.com/minad/vertico/blob/screenshots/vertico-mx.png?raw=true]]
 
+* Installation
+
+Vertico is available from [[https://elpa.gnu.org/packages/vertico.html][GNU ELPA]]. You can install it directly via =M-x
+package-install RET vertico RET=. After installation, activate the global minor
+mode with =M-x vertico-mode RET=.
+
 * Key bindings
 
 Vertico defines its own local keymap in the minibuffer which is derived from
@@ -72,11 +78,8 @@ then press =RET=.
 
 * Configuration
 
-Vertico is available from [[https://elpa.gnu.org/packages/vertico.html][GNU ELPA]]. You can install it directly via
-~package-install~. After installation, you can activate the global minor mode with
-=M-x vertico-mode=. In order to configure Vertico and other packages in your
-init.el, you may want to take advantage of ~use-package~. Here is an example
-configuration:
+In order to configure Vertico and other packages in your init.el, you may want
+to take advantage of ~use-package~. Here is an example configuration:
 
 #+begin_src emacs-lisp
 ;; Enable vertico
