@@ -42,9 +42,8 @@ without white space and comments.
 
 * Installation
 
-Vertico is available from [[https://elpa.gnu.org/packages/vertico.html][GNU ELPA]]. You can install it directly via =M-x
-package-install RET vertico RET=. After installation, activate the global minor
-mode with =M-x vertico-mode RET=.
+Vertico is available from [[https://elpa.gnu.org/packages/vertico.html][GNU ELPA]]. You can install it directly via =M-x package-install RET vertico RET=.
+After installation, activate the global minor mode with =M-x vertico-mode RET=.
 
 * Key bindings
 
