@@ -47,8 +47,8 @@
 
 (defvar vertico-indexed--commands
   '(vertico-insert vertico-exit vertico-directory-enter))
-(defvar-local vertico-indexed--min 0)
-(defvar-local vertico-indexed--max 0)
+(defvar-local vertico-indexed--min -1)
+(defvar-local vertico-indexed--max -1)
 
 ;;;###autoload
 (define-minor-mode vertico-indexed-mode
@@ -56,16 +56,18 @@
   :global t :group 'vertico)
 
 (cl-defmethod vertico--prepare :before (&context (vertico-indexed-mode (eql t)))
-  (when (and prefix-arg (memq this-command vertico-indexed--commands))
-    (let ((index (+ vertico-indexed--min
-                    (- (prefix-numeric-value prefix-arg)
-                       vertico-indexed-start))))
-      (if (and (>= index vertico-indexed--min)
-               (<= index vertico-indexed--max)
-               (/= vertico--total 0))
-          (setq vertico--index index prefix-arg nil)
-        (minibuffer-message "Out of range")
-        (setq this-command #'ignore)))))
+  (when-let (((memq this-command vertico-indexed--commands))
+             (arg (if prefix-arg
+                      (prefix-numeric-value prefix-arg)
+                    (when-let (((event-modifiers last-input-event))
+                               (ev (event-basic-type last-input-event))
+                               ((and (characterp ev) (<= ?0 ev ?9))))
+                      (- ev ?0))))
+             (index (+ vertico-indexed--min (- arg vertico-indexed-start))))
+    (if (and (>= index vertico-indexed--min) (<= index vertico-indexed--max))
+        (setq vertico--index index prefix-arg nil)
+      (message "Out of range")
+      (setq this-command #'ignore))))
 
 (cl-defmethod vertico--format-candidate :around
   (cand prefix suffix index start &context (vertico-indexed-mode (eql t)))
