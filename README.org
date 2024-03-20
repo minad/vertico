@@ -68,12 +68,14 @@ intact and remaps and binds only a handful of commands.
 
 Note in particular the binding of =TAB= to ~vertico-insert~, which inserts the
 currently selected candidate, and the binding of =RET= and =M-RET= to ~vertico-exit~
-and ~vertico-exit-input~ respectively. ~vertico-exit~ exits with the currently
-selected candidate, while ~vertico-exit-input~ exits with the minibuffer input
-instead. You should exit with the current input for example when you want to
-create a new buffer or a new file with ~find-file~ or ~switch-to-buffer~. As an
-alternative to pressing =M-RET=, move the selection first to the input prompt by
-pressing the =up= arrow key and then press =RET=.
+and ~vertico-exit-input~ respectively.
+
+~vertico-exit~ exits with the currently selected candidate, while
+~vertico-exit-input~ exits with the minibuffer input instead. Exiting with the
+current input is needed when you want to create a new buffer or a new file with
+~find-file~ or ~switch-to-buffer~. As an alternative to pressing =M-RET=, move the
+selection up to the input prompt by pressing the =up= arrow key and then press
+=RET=.
 
 * Configuration
 
