@@ -497,7 +497,7 @@ There are other interactive completion UIs, which follow a similar philosophy:
 If you want to learn more about Vertico and minibuffer completion, check out the
 following resources:
 
-- [[https://github.com/doomemacs/doomemacs/tree/master/modules/completion/vertico][Doom Emacs Vertico Module]]: Vertico is Doom's default completion system.
+- [[https://github.com/doomemacs/doomemacs/tree/master/modules/completion/vertico][Doom Emacs Vertico Module]]: Vertico and Corfu are used for completion.
 - [[https://github.com/SystemCrafters/crafted-emacs/blob/master/modules/crafted-completion.el][Crafted Emacs Completion Module]]: Vertico and Corfu are used for completion.
 - [[https://git.sr.ht/~protesilaos/dotfiles/tree/master/item/emacs/.emacs.d/][Prot's Emacs configuration]]: Vertico and Corfu are used for completion.
 - [[https://www.youtube.com/watch?v=fnE0lXoe7Y0][Emacs Completion Explained]] (2022-07-19) by Andrew Tropin.
@@ -506,6 +506,8 @@ following resources:
 - [[https://youtu.be/5ffb2at2d7w][Using Emacs Episode 80 - Vertico, Marginalia, Consult and Embark]] (2021-10-26) by Mike Zamansky.
 - [[https://www.youtube.com/watch?v=UtqE-lR2HCA][System Crafters Live! - Replacing Ivy and Counsel with Vertico and Consult]] (2021-05-21) by David Wilson.
 - [[https://www.youtube.com/watch?v=J0OaRy85MOo][Streamline Your Emacs Completions with Vertico]] (2021-05-17) by David Wilson.
+- [[https://www.youtube.com/watch?v=SOxlQ7ogplA&t=1952s][Modern Emacs: all those new tools that make Emacs better and faster]]
+  (2024-03-06) by Marie-Hélène Burle.
 
 * Contributions
 
