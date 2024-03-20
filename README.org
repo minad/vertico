@@ -497,10 +497,10 @@ There are other interactive completion UIs, which follow a similar philosophy:
 If you want to learn more about Vertico and minibuffer completion, check out the
 following resources:
 
-- Configurations:
-  + [[https://github.com/doomemacs/doomemacs/tree/master/modules/completion/vertico][Doom Emacs Vertico Module]]: Vertico and Corfu are used for completion.
-  + [[https://github.com/SystemCrafters/crafted-emacs/blob/master/modules/crafted-completion.el][Crafted Emacs Completion Module]]: Vertico and Corfu are used for completion.
-  + [[https://git.sr.ht/~protesilaos/dotfiles/tree/master/item/emacs/.emacs.d/][Prot's Emacs configuration]]: Vertico and Corfu are used for completion.
+- Configurations which use Vertico and Corfu for completion:
+  + [[https://github.com/doomemacs/doomemacs/tree/master/modules/completion/vertico][Doom Emacs Vertico Module]]
+  + [[https://github.com/SystemCrafters/crafted-emacs/blob/master/modules/crafted-completion.el][Crafted Emacs Completion Module]]
+  + [[https://git.sr.ht/~protesilaos/dotfiles/tree/master/item/emacs/.emacs.d/][Prot's Emacs configuration]]
 - Videos:
   + [[https://www.youtube.com/watch?v=fnE0lXoe7Y0][Emacs Completion Explained]] (2022-07-19) by Andrew Tropin.
   + [[https://www.youtube.com/watch?v=w9hHMDyF9V4][Emacs Minibuffer Completions]] (2022-02-12) by Greg Yut.
