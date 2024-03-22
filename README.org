@@ -559,9 +559,9 @@ built-in file completion table. In your user configuration you can prioritize
 (setq org-refile-use-outline-path 'file
       org-outline-path-complete-in-steps t)
 
-(advice-add #'org-olpath-completing-read :around #'org-enforce-basic-completion)
+(advice-add #'org-olpath-completing-read :around #'vertico-enforce-basic-completion)
 
-(defun org-enforce-basic-completion (&rest args)
+(defun vertico-enforce-basic-completion (&rest args)
   (minibuffer-with-setup-hook
       (:append
        (lambda ()
@@ -598,8 +598,8 @@ boundaries are used for example by file completion, where each part of the path
 can be completed separately. Ideally this issue would be fixed in Org.
 
 #+begin_src emacs-lisp
-(advice-add #'org-make-tags-matcher :around #'org-enforce-basic-completion)
-(advice-add #'org-agenda-filter :around #'org-enforce-basic-completion)
+(advice-add #'org-make-tags-matcher :around #'vertico-enforce-basic-completion)
+(advice-add #'org-agenda-filter :around #'vertico-enforce-basic-completion)
 #+end_src
 
 ** ~tmm-menubar~
