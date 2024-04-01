@@ -106,7 +106,7 @@ The keys in LIST can be symbols or regexps."
 
 (defun vertico-multiform--setup ()
   "Enable modes at minibuffer setup."
-  (let ((cat (completion-metadata-get
+  (let ((cat (compat-call completion-metadata-get
               (completion-metadata (buffer-substring-no-properties
                                     (minibuffer-prompt-end)
                                     (max (minibuffer-prompt-end) (point)))
