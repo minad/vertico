@@ -2,6 +2,11 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- =vertico-preselect=: Add =never-prompt= configuration choice to
+  entirely disallow the selection of the prompt.
+
 * Version 1.7 (2024-01-23)
 
 - =vertico-buffer-mode=: Simplify mode line format.

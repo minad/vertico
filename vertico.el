@@ -67,8 +67,13 @@
   "Configure if the prompt or first candidate is preselected.
 - prompt: Always select the prompt.
 - first: Always select the first candidate.
-- directory: Like first, but select the prompt if it is a directory."
-  :type '(choice (const prompt) (const first) (const directory)))
+- directory: Like first, but select the prompt if it is a directory.
+- never-prompt: Disallow the selection of the prompt entirely."
+  :type '(choice
+          (const prompt)
+          (const first)
+          (const directory)
+          (const never-prompt)))
 
 (defcustom vertico-scroll-margin 2
   "Number of lines at the top and bottom when scrolling.
@@ -352,9 +357,10 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
       (vertico--candidates . ,all)
       (vertico--total . ,(length all))
       (vertico--hilit . ,(or hl #'identity))
-      (vertico--allow-prompt . ,(or def-missing (eq vertico-preselect 'prompt)
-                                    (memq minibuffer--require-match
-                                          '(nil confirm confirm-after-completion))))
+      (vertico--allow-prompt . ,(and (not (eq vertico-preselect 'never-prompt))
+                                     (or def-missing (eq vertico-preselect 'prompt)
+                                         (memq minibuffer--require-match
+                                               '(nil confirm confirm-after-completion)))))
       (vertico--lock-candidate . ,lock)
       (vertico--groups . ,(cadr groups))
       (vertico--all-groups . ,(or (caddr groups) vertico--all-groups))
