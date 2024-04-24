@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 1.8 (2024-04-24)
 
 - =vertico-preselect=: Add =no-prompt= configuration choice to entirely disallow the
   selection of the prompt.
