@@ -643,8 +643,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (cl-defgeneric vertico--advice (&rest app)
   "Advice for completion function, apply APP."
-  (if (or defining-kbd-macro executing-kbd-macro) (apply app)
-    (minibuffer-with-setup-hook #'vertico--setup (apply app))))
+  (minibuffer-with-setup-hook #'vertico--setup (apply app)))
 
 (defun vertico-first ()
   "Go to first candidate, or to the prompt when the first candidate is selected."

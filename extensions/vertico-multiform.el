@@ -155,12 +155,12 @@ The keys in LIST can be symbols or regexps."
     (push `(vertico--input . ,vertico-multiform-map) minor-mode-map-alist)))
 
 (cl-defmethod vertico--advice (&context (vertico-multiform-mode (eql t)) &rest app)
-  (if (or defining-kbd-macro executing-kbd-macro) (apply app)
-    (unwind-protect
-        (progn
-          (vertico-multiform--toggle -1)
-          (minibuffer-with-setup-hook #'vertico-multiform--setup (apply app)))
-      (vertico-multiform--toggle 1))))
+  (unwind-protect
+      (progn
+        (vertico-multiform--toggle -1)
+        (minibuffer-with-setup-hook #'vertico-multiform--setup
+          (apply app)))
+    (vertico-multiform--toggle 1)))
 
 (defun vertico-multiform--temporary-mode (mode arg)
   "Enable or disable MODE temporarily in minibuffer given ARG.
