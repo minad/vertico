@@ -181,7 +181,8 @@
                   (set-window-dedicated-p win nil)
                   (set-window-buffer win old-buf))
                  ((window-live-p win)
-                  (delete-window win)))
+                  ;; The window may be a sole window (gh:minad/vertico#496).
+                  (ignore-errors (delete-window win))))
                 (when vertico-buffer-hide-prompt
                   (set-window-vscroll nil 0))))))
     ;; We cannot use a buffer-local minibuffer-exit-hook here.  The hook will
