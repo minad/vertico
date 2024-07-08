@@ -271,7 +271,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 (defun vertico--filter-completions (&rest args)
   "Compute all completions for ARGS with lazy highlighting."
   (dlet ((completion-lazy-hilit t) (completion-lazy-hilit-fn nil))
-    (if (eval-when-compile (>= emacs-major-version 30))
+    (static-if (>= emacs-major-version 30)
         (cons (apply #'completion-all-completions args) completion-lazy-hilit-fn)
       (cl-letf* ((orig-pcm (symbol-function #'completion-pcm--hilit-commonality))
                  (orig-flex (symbol-function #'completion-flex-all-completions))
