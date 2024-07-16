@@ -116,10 +116,5 @@ Exit with current input if prefix ARG is given."
                      (eq ?/ (char-before (- (point) 2)))))
         (delete-region (overlay-start ov) (overlay-end ov))))))
 
-;; Emacs 28: Do not show Vertico commands in M-X
-(dolist (sym '(vertico-directory-up vertico-directory-enter
-               vertico-directory-delete-char vertico-directory-delete-word))
-  (put sym 'completion-predicate #'vertico--command-p))
-
 (provide 'vertico-directory)
 ;;; vertico-directory.el ends here

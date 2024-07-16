@@ -750,7 +750,11 @@ When the prefix argument is 0, the group order is reset."
 ;; Emacs 28: Do not show Vertico commands in M-X
 (dolist (sym '(vertico-next vertico-next-group vertico-previous vertico-previous-group
                vertico-scroll-down vertico-scroll-up vertico-exit vertico-insert
-               vertico-exit-input vertico-save vertico-first vertico-last))
+               vertico-exit-input vertico-save vertico-first vertico-last
+               vertico-repeat-previous ;; autoloads in vertico-repeat.el
+               vertico-quick-jump vertico-quick-exit vertico-quick-insert ;; autoloads in vertico-quick.el
+               vertico-directory-up vertico-directory-enter ;; autoloads in vertico-directory.el
+               vertico-directory-delete-char vertico-directory-delete-word))
   (put sym 'completion-predicate #'vertico--command-p))
 
 (provide 'vertico)
