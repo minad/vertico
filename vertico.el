@@ -549,8 +549,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   (let ((rm minibuffer--require-match))
     (or (memq rm '(nil confirm-after-completion))
         (equal "" input) ;; Null completion, returns default value
-        (and (functionp rm) (funcall rm input)) ;; Emacs 29 supports functions
-        (test-completion input minibuffer-completion-table minibuffer-completion-predicate)
+        (if (functionp rm) (funcall rm input) ;; Emacs 29 supports functions
+          (test-completion input minibuffer-completion-table minibuffer-completion-predicate))
         (if (eq rm 'confirm) (eq (ignore-errors (read-char "Confirm")) 13)
           (minibuffer-message "Match required") nil))))
 
