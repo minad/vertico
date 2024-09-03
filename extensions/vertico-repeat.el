@@ -180,9 +180,6 @@ selected candidate for the current command."
        (setq vertico-repeat--pos n)
        session))))
 
-(define-obsolete-function-alias
-  'vertico-repeat-last 'vertico-repeat-previous "1.4")
-
 ;;;###autoload
 (defun vertico-repeat-select ()
   "Select a Vertico session from the session history and repeat it.
