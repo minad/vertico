@@ -4,6 +4,7 @@
 
 * Development
 
+- Require Emacs 28.1.
 - Fix behavior when a function is passed as =REQUIRE-MATCH= argument to
   ~completing-read~.
 - Drop obsolete command alias ~vertico-repeat-last~.

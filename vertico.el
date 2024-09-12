@@ -6,7 +6,7 @@
 ;; Maintainer: Daniel Mendler <mail@daniel-mendler.de>
 ;; Created: 2021
 ;; Version: 1.9
-;; Package-Requires: ((emacs "27.1") (compat "30"))
+;; Package-Requires: ((emacs "28.1") (compat "30"))
 ;; Homepage: https://github.com/minad/vertico
 ;; Keywords: convenience, files, matching, completion
 
@@ -315,7 +315,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                (before (substring content 0 pt))
                (after (substring content pt))
                ;; bug#47678: `completion-boundaries' fails for `partial-completion'
-               ;; if the cursor is moved between the slashes of "~//".
+               ;; if the cursor is moved before the slashes of "~//".
                ;; See also corfu.el which has the same issue.
                (bounds (condition-case nil
                            (completion-boundaries before table pred after)
@@ -747,7 +747,7 @@ When the prefix argument is 0, the group order is reset."
   "Return non-nil if Vertico is active in BUFFER."
   (buffer-local-value 'vertico--input buffer))
 
-;; Emacs 28: Do not show Vertico commands in M-X
+;; Do not show Vertico commands in M-X
 (dolist (sym '(vertico-next vertico-next-group vertico-previous vertico-previous-group
                vertico-scroll-down vertico-scroll-up vertico-exit vertico-insert
                vertico-exit-input vertico-save vertico-first vertico-last

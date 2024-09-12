@@ -6,7 +6,7 @@
 ;; Maintainer: Daniel Mendler <mail@daniel-mendler.de>
 ;; Created: 2021
 ;; Version: 1.9
-;; Package-Requires: ((emacs "27.1") (compat "30") (vertico "1.9"))
+;; Package-Requires: ((emacs "28.1") (compat "30") (vertico "1.9"))
 ;; Homepage: https://github.com/minad/vertico
 
 ;; This file is part of GNU Emacs.
@@ -165,7 +165,7 @@ When scrolling beyond this limit, candidates may be truncated."
                                               `(space :align-to (+ left ,(aref width (1- col))))) line))))
              (string-join line)))))
 
-;; Emacs 28: Do not show Vertico commands in M-X
+;; Do not show Vertico commands in M-X
 (dolist (sym '(vertico-grid-left vertico-grid-right
                vertico-grid-scroll-up vertico-grid-scroll-down))
   (put sym 'completion-predicate #'vertico--command-p))

@@ -6,7 +6,7 @@
 ;; Maintainer: Daniel Mendler <mail@daniel-mendler.de>
 ;; Created: 2021
 ;; Version: 1.9
-;; Package-Requires: ((emacs "27.1") (compat "30") (vertico "1.9"))
+;; Package-Requires: ((emacs "28.1") (compat "30") (vertico "1.9"))
 ;; Homepage: https://github.com/minad/vertico
 
 ;; This file is part of GNU Emacs.

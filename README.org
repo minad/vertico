@@ -103,9 +103,9 @@ to take advantage of ~use-package~. Here is an example configuration:
   :custom
   ;; Support opening new minibuffers from inside existing minibuffers.
   (enable-recursive-minibuffers t)
-  ;; Emacs 28 and newer: Hide commands in M-x which do not work in the current
-  ;; mode.  Vertico commands are hidden in normal buffers. This setting is
-  ;; useful beyond Vertico.
+  ;; Hide commands in M-x which do not work in the current mode.  Vertico
+  ;; commands are hidden in normal buffers. This setting is useful beyond
+  ;; Vertico.
   (read-extended-command-predicate #'command-completion-default-include-p)
   :init
   ;; Add prompt indicator to `completing-read-multiple'.
@@ -472,7 +472,7 @@ There are other interactive completion UIs, which follow a similar philosophy:
   Selectrum. Selectrum is not fully compatible with every Emacs completion
   command and dynamic completion tables, since it uses its own filtering
   infrastructure, which deviates from the standard Emacs completion facilities.
-- Icomplete: Emacs 28 comes with a builtin =icomplete-vertical-mode=, which is a
+- Icomplete: Emacs comes with the builtin =icomplete-vertical-mode=, which is a
   more bare-bone than Vertico. Vertico offers additional flexibility thanks to
   its [[#extensions][extensions]].
 
