@@ -45,14 +45,14 @@
   :type 'boolean)
 
 (defcustom vertico-buffer-display-action
-  '(display-buffer-reuse-window)
+  '(display-buffer-use-least-recent-window)
   "Display action for the Vertico buffer."
   :group 'vertico
   :type `(choice
-          (const :tag "Reuse some window"
-                 (display-buffer-reuse-window))
           (const :tag "Least recently used window"
                  (display-buffer-use-least-recent-window))
+          (const :tag "Reuse some window"
+                 (display-buffer-reuse-window))
           (const :tag "Left of current window"
                  (display-buffer-in-direction
                   (direction . left)

@@ -8,6 +8,8 @@
 - Fix behavior when a function is passed as =REQUIRE-MATCH= argument to
   ~completing-read~.
 - Drop obsolete command alias ~vertico-repeat-last~.
+- ~vertico-buffer~: Use ~display-buffer-use-least-recent-window~ as default buffer
+  display action.
 
 * Version 1.9 (2024-07-26)
 
