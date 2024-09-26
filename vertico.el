@@ -7,7 +7,7 @@
 ;; Created: 2021
 ;; Version: 1.9
 ;; Package-Requires: ((emacs "28.1") (compat "30"))
-;; Homepage: https://github.com/minad/vertico
+;; URL: https://github.com/minad/vertico
 ;; Keywords: convenience, files, matching, completion
 
 ;; This file is part of GNU Emacs.
@@ -42,7 +42,7 @@
 (defgroup vertico nil
   "VERTical Interactive COmpletion."
   :link '(info-link :tag "Info Manual" "(vertico)")
-  :link '(url-link :tag "Homepage" "https://github.com/minad/vertico")
+  :link '(url-link :tag "Website" "https://github.com/minad/vertico")
   :link '(emacs-library-link :tag "Library Source" "vertico.el")
   :group 'convenience
   :group 'minibuffer
