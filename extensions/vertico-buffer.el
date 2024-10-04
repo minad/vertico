@@ -146,11 +146,12 @@
                      face-remapping-alist (copy-tree `((mode-line-inactive mode-line)
                                                        ,@face-remapping-alist))
                      mode-line-format
-                     (list (format  #(" %s%s " 1 3 (face mode-line-buffer-id))
-                                    (replace-regexp-in-string ":? *\\'" ""
-                                                              (minibuffer-prompt))
-                                    (let ((depth (recursion-depth)))
-                                      (if (< depth 2) "" (format " [%s]" depth)))))
+                     (when mode-line-format ;; Do not override if nil
+                       (list (format  #(" %s%s " 1 3 (face mode-line-buffer-id))
+                                      (replace-regexp-in-string ":? *\\'" ""
+                                                                (minibuffer-prompt))
+                                      (let ((depth (recursion-depth)))
+                                        (if (< depth 2) "" (format " [%s]" depth))))))
                      vertico-count (- (/ (window-pixel-height win)
                                          (default-line-height)) 2))))
     (set-window-parameter win 'no-other-window t)
