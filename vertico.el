@@ -43,6 +43,7 @@
   "VERTical Interactive COmpletion."
   :link '(info-link :tag "Info Manual" "(vertico)")
   :link '(url-link :tag "Website" "https://github.com/minad/vertico")
+  :link '(url-link :tag "Wiki" "https://github.com/minad/vertico/wiki")
   :link '(emacs-library-link :tag "Library Source" "vertico.el")
   :group 'convenience
   :group 'minibuffer
