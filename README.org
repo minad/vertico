@@ -589,9 +589,10 @@ can be completed separately. Ideally this issue would be fixed in Org.
 ** ~tmm-menubar~
 
 The text menu bar works well with Vertico but always shows a =*Completions*=
-buffer, which is unwanted if you use the Vertico UI. This completion buffer can
-be disabled with an advice. If you disabled the standard GUI menu bar and prefer
-the Vertico interface you may also overwrite the default F10 keybinding.
+buffer, which is unwanted if you use the Vertico UI. See [[https://debbugs.gnu.org/cgi/bugreport.cgi?bug=74616][bug#74616]] for the
+upstream bug report. Right now the completion buffer can be disabled with an
+advice. If you disabled the standard GUI menu bar and prefer the Vertico
+interface you may also overwrite the default F10 keybinding.
 
 #+begin_src emacs-lisp
 (keymap-global-set "<f10>" #'tmm-menubar)
