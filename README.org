@@ -659,9 +659,8 @@ exiting with the empty string is possible by pressing =RET= only.
 
 ** Tramp hostname and username completion
 
-*NOTE:* On upcoming Emacs 29.2 and Tramp 2.6.1.5 the workarounds described in this
-section are not necessary anymore, since the relevant completion tables have
-been improved.
+*NOTE:* On Emacs 29.2 and Tramp 2.7 the workarounds described in this section are
+not necessary anymore, since the relevant completion tables have been improved.
 
 In combination with Orderless or other non-prefix completion styles like
 =substring= or =flex=, host names and user names are not made available for
