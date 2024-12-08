@@ -166,8 +166,8 @@ When scrolling beyond this limit, candidates may be truncated."
              (string-join line)))))
 
 ;; Do not show Vertico commands in M-X
-(dolist (sym '(vertico-grid-left vertico-grid-right
-               vertico-grid-scroll-up vertico-grid-scroll-down))
+(dolist (sym '( vertico-grid-left vertico-grid-right
+                vertico-grid-scroll-up vertico-grid-scroll-down))
   (put sym 'completion-predicate #'vertico--command-p))
 
 (provide 'vertico-grid)
