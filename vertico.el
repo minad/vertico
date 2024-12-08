@@ -612,7 +612,12 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   (setq-local truncate-lines (< (point) (* 0.8 (vertico--window-width)))
               resize-mini-windows vertico-resize
               max-mini-window-height 1.0)
-  (unless truncate-lines (set-window-hscroll nil 0)))
+  (unless truncate-lines (set-window-hscroll nil 0))
+  (unless (or vertico-resize (frame-root-window-p (active-minibuffer-window)))
+    (let ((delta (- (max (cdr (window-text-pixel-size))
+                         (* (default-line-height) (1+ vertico-count)))
+                 (window-pixel-height))))
+      (when (/= 0 delta) (window-resize nil delta nil nil 'pixelwise)))))
 
 (cl-defgeneric vertico--prepare ()
   "Ensure that the state is prepared before running the next command."
