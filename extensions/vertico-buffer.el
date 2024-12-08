@@ -208,7 +208,7 @@
        ((and (not vertico-buffer-mode) vertico-buffer--restore)
         (funcall vertico-buffer--restore))))))
 
-(cl-defmethod vertico--resize-window (_height &context (vertico-buffer-mode (eql t))))
+(cl-defmethod vertico--resize (&context (vertico-buffer-mode (eql t))))
 
 (cl-defmethod vertico--setup :after (&context (vertico-buffer-mode (eql t)))
   (vertico-buffer--setup))

@@ -10,6 +10,7 @@
 - Drop obsolete command alias ~vertico-repeat-last~.
 - ~vertico-buffer~: Use ~display-buffer-use-least-recent-window~ as default buffer
   display action.
+- Simplify the mini window resizing implementation, see ~vertico--resize~.
 
 * Version 1.9 (2024-07-26)
 

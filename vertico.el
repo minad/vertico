@@ -522,7 +522,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
     (vertico--update 'interruptible)
     (vertico--prompt-selection)
     (vertico--display-count)
-    (vertico--display-candidates (vertico--arrange-candidates))))
+    (vertico--display-candidates (vertico--arrange-candidates))
+    (vertico--resize)))
 
 (defun vertico--goto (index)
   "Go to candidate with INDEX."
@@ -604,23 +605,14 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   "Update candidates overlay `vertico--candidates-ov' with LINES."
   (move-overlay vertico--candidates-ov (point-max) (point-max))
   (overlay-put vertico--candidates-ov 'after-string
-               (apply #'concat #(" " 0 1 (cursor t)) (and lines "\n") lines))
-  (vertico--resize-window (length lines)))
+               (apply #'concat #(" " 0 1 (cursor t)) (and lines "\n") lines)))
 
-(cl-defgeneric vertico--resize-window (height)
-  "Resize active minibuffer window to HEIGHT."
+(cl-defgeneric vertico--resize ()
+  "Resize active minibuffer window."
   (setq-local truncate-lines (< (point) (* 0.8 (vertico--window-width)))
-              resize-mini-windows 'grow-only
+              resize-mini-windows vertico-resize
               max-mini-window-height 1.0)
-  (unless truncate-lines (set-window-hscroll nil 0))
-  (unless (frame-root-window-p (active-minibuffer-window))
-    (unless vertico-resize (setq height (max height vertico-count)))
-    (let ((dp (- (max (cdr (window-text-pixel-size))
-                      (* (default-line-height) (1+ height)))
-                 (window-pixel-height))))
-      (when (or (and (> dp 0) (/= height 0))
-                (and (< dp 0) (eq vertico-resize t)))
-        (window-resize nil dp nil nil 'pixelwise)))))
+  (unless truncate-lines (set-window-hscroll nil 0)))
 
 (cl-defgeneric vertico--prepare ()
   "Ensure that the state is prepared before running the next command."
