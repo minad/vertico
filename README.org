@@ -588,11 +588,14 @@ can be completed separately. Ideally this issue would be fixed in Org.
 
 ** ~tmm-menubar~
 
+*NOTE*: I have implemented a fix for this problem which is part of Emacs 31. You
+can set ~completion-eager-display~ to ~nil~ in your configuration. See [[https://debbugs.gnu.org/cgi/bugreport.cgi?bug=74616][bug#74616]] for
+the upstream bug report.
+
 The text menu bar works well with Vertico but always shows a =*Completions*=
-buffer, which is unwanted if you use the Vertico UI. See [[https://debbugs.gnu.org/cgi/bugreport.cgi?bug=74616][bug#74616]] for the
-upstream bug report. Right now the completion buffer can be disabled with an
-advice. If you disabled the standard GUI menu bar and prefer the Vertico
-interface you may also overwrite the default F10 keybinding.
+buffer, which is unwanted if Vertico is used. Right now the completion buffer
+can be disabled with an advice. If you disabled the standard GUI menu bar and
+prefer the Vertico interface you may also overwrite the default F10 keybinding.
 
 #+begin_src emacs-lisp
 (keymap-global-set "<f10>" #'tmm-menubar)
@@ -601,9 +604,13 @@ interface you may also overwrite the default F10 keybinding.
 
 ** ~ffap-menu~
 
+*NOTE*: I have implemented a fix for this problem which is part of Emacs 31. You
+can set ~completion-eager-display~ to ~nil~ in your configuration. See [[https://debbugs.gnu.org/cgi/bugreport.cgi?bug=74616][bug#74616]] for
+the upstream bug report.
+
 The command ~ffap-menu~ shows the =*Completions*= buffer by default like
-~tmm-menubar~, which is unnecessary with Vertico. See [[https://debbugs.gnu.org/cgi/bugreport.cgi?bug=74617][bug#74617]] for the upstream
-bug report. This completion buffer can be disabled as follows.
+~tmm-menubar~, which is unwanted if Vertico is used. The completions buffer can be
+disabled as follows.
 
 #+begin_src emacs-lisp
 (advice-add #'ffap-menu-ask :around
