@@ -142,7 +142,7 @@ When scrolling beyond this limit, candidates may be truncated."
                    (truncate-string-to-width
                     (string-trim
                      (replace-regexp-in-string
-                      "[ \t]+"
+                      "[ \t]+$"
                       (lambda (x) (apply #'propertize " " (text-properties-at 0 x)))
                       (vertico--format-candidate cand prefix suffix (+ index start) start)))
                     width))))
