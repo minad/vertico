@@ -56,7 +56,8 @@
 (defvar-keymap vertico-mouse-map
   :doc "Additional keymap activated in mouse mode."
   "<mouse-1>" (vertico-mouse--click "RET")
-  "<mouse-3>" (vertico-mouse--click "TAB"))
+  "<mouse-3>" (vertico-mouse--click "TAB")
+  "<touchscreen-begin>" #'ignore)
 (fset 'vertico-mouse-map vertico-mouse-map)
 
 (defun vertico-mouse--scroll-up (n)
