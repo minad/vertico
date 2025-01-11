@@ -140,7 +140,8 @@ The value should lie between 0 and vertico-count/2."
   "<remap> <exit-minibuffer>" #'vertico-exit
   "<remap> <kill-ring-save>" #'vertico-save
   "M-RET" #'vertico-exit-input
-  "TAB" #'vertico-insert)
+  "TAB" #'vertico-insert
+  "<touchscreen-begin>" #'ignore)
 
 (defvar-local vertico--hilit #'identity
   "Lazy candidate highlighting function.")
@@ -626,6 +627,8 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (cl-defgeneric vertico--setup ()
   "Setup completion UI."
+  (when (boundp 'pixel-scroll-precision-mode)
+    (setq-local pixel-scroll-precision-mode nil))
   (setq-local scroll-margin 0
               vertico--input t
               completion-auto-help nil
