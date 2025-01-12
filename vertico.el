@@ -721,7 +721,8 @@ When the prefix argument is 0, the group order is reset."
   (interactive)
   (if (or (use-region-p) (not transient-mark-mode))
       (call-interactively #'kill-ring-save)
-    (kill-new (vertico--candidate))))
+    (kill-new (substring-no-properties
+               (vertico--display-string (vertico--candidate))))))
 
 (defun vertico-insert ()
   "Insert current candidate in minibuffer."
