@@ -219,6 +219,7 @@ previous sessions for the current command."
                   (if current-cmd
                       (format "History of %s: " current-cmd)
                     "Completion history: ")
+                  ;; TODO: Use `completion-table-with-metadata'
                   (lambda (str pred action)
                     (if (eq action 'metadata)
                         '(metadata (display-sort-function . identity)
