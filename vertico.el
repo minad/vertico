@@ -117,7 +117,7 @@ The value should lie between 0 and vertico-count/2."
 (defface vertico-group-title '((t :inherit shadow :slant italic))
   "Face used for the title text of the candidate group headlines.")
 
-(defface vertico-group-separator '((t :inherit shadow :strike-through t))
+(defface vertico-group-separator '((t :inherit vertico-group-title :strike-through t))
   "Face used for the separator lines of the candidate groups.")
 
 (defface vertico-current '((t :inherit highlight :extend t))
