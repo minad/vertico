@@ -323,7 +323,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
                            (completion-boundaries before table pred after)
                          (t (cons 0 (length after)))))
                (field (substring content (car bounds) (+ pt (cdr bounds))))
-               ;; `minibuffer-completing-file-name' has been obsoleted by the completion category
+               ;; bug#75910: category instead of `minibuffer-completing-file-name'
                (completing-file (eq 'file (vertico--metadata-get 'category)))
                (`(,all . ,hl) (vertico--filter-completions content table pred pt vertico--metadata))
                (base (or (when-let ((z (last all))) (prog1 (cdr z) (setcdr z nil))) 0))
