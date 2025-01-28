@@ -2,6 +2,12 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- Ignore touchscreen events.
+- Disable ~pixel-scroll-precision-mode~ locally.
+- Strip text properties when copying to the kill ring.
+
 * Version 1.10 (2024-12-22)
 
 - Require Emacs 28.1.
