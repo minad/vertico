@@ -91,17 +91,33 @@ Exit with current input if prefix ARG is given."
 (defun vertico-directory-delete-char (&optional n)
   "Delete N directories or chars before point."
   (interactive "p")
-  (unless (and (eq (char-before) ?/) (vertico-directory-up n))
-    (delete-char (- n))))
+  (cond ((and (use-region-p)
+	      delete-active-region
+	      (= n 1))
+	 ;; If a region is active, kill or delete it.
+	 (if (eq delete-active-region 'kill)
+	     (kill-region (region-beginning) (region-end) 'region)
+           (funcall region-extract-function 'delete-only)))
+        ((not (and (eq (char-before) ?/) (vertico-directory-up n)))
+         ;; If the previous character is not `/' delete the character
+          (delete-char (- n)))))
 
 ;;;###autoload
 (defun vertico-directory-delete-word (&optional n)
   "Delete N directories or words before point."
   (interactive "p")
-  (unless (and (eq (char-before) ?/) (vertico-directory-up n))
-    (let ((pt (point)))
-      (backward-word n)
-      (delete-region pt (point)))))
+  (cond ((and (use-region-p)
+	      delete-active-region
+	      (= n 1))
+	 ;; If a region is active, kill or delete it.
+	 (if (eq delete-active-region 'kill)
+	     (kill-region (region-beginning) (region-end) 'region)
+           (funcall region-extract-function 'delete-only)))
+        ((not (and (eq (char-before) ?/) (vertico-directory-up n)))
+         ;; If the previous character is not `/' delete the word
+         (let ((pt (point)))
+           (backward-word n)
+           (delete-region pt (point))))))
 
 ;;;###autoload
 (defun vertico-directory-tidy ()
