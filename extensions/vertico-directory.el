@@ -88,20 +88,19 @@ Exit with current input if prefix ARG is given."
               (setq found t))))))))
 
 ;;;###autoload
-(defun vertico-directory-delete-char (&optional n)
+(defun vertico-directory-delete-char (n)
   "Delete N directories or chars before point."
   (interactive "p")
-  (unless (and (eq (char-before) ?/) (vertico-directory-up n))
-    (delete-char (- n))))
+  (unless (and (not (and (use-region-p) delete-active-region (= n 1)))
+               (eq (char-before) ?/) (vertico-directory-up n))
+    (with-no-warnings (delete-backward-char n))))
 
 ;;;###autoload
-(defun vertico-directory-delete-word (&optional n)
+(defun vertico-directory-delete-word (n)
   "Delete N directories or words before point."
   (interactive "p")
   (unless (and (eq (char-before) ?/) (vertico-directory-up n))
-    (let ((pt (point)))
-      (backward-word n)
-      (delete-region pt (point)))))
+    (delete-region (prog1 (point) (backward-word n)) (point))))
 
 ;;;###autoload
 (defun vertico-directory-tidy ()
