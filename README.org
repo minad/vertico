@@ -108,7 +108,7 @@ to take advantage of ~use-package~. Here is an example configuration:
   ;; Vertico.
   (read-extended-command-predicate #'command-completion-default-include-p)
   :init
-  ;; Add prompt indicator to `completing-read-multiple'.
+  ;; Emacs bug#76028: Add prompt indicator to `completing-read-multiple'.
   ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
   (defun crm-indicator (args)
     (cons (format "[CRM%s] %s"
