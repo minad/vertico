@@ -622,7 +622,9 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 
 (cl-defgeneric vertico--prepare ()
   "Ensure that the state is prepared before running the next command."
-  (when (and (symbolp this-command) (string-prefix-p "vertico-" (symbol-name this-command)))
+  (when-let ((cmd (and (symbolp this-command) (symbol-name this-command)))
+             ((string-prefix-p "vertico-" cmd))
+             ((not (and vertico--metadata (string-prefix-p "vertico-directory-" cmd)))))
     (vertico--update)))
 
 (cl-defgeneric vertico--setup ()
