@@ -208,14 +208,7 @@ In case you want to use Vertico to show the completion candidates of
 ~consult-completion-in-region~ provided by the Consult package.
 
 #+begin_src emacs-lisp
-;; Use `consult-completion-in-region' if Vertico is enabled.
-;; Otherwise use the default `completion--in-region' function.
-(setq completion-in-region-function
-      (lambda (&rest args)
-        (apply (if vertico-mode
-                   #'consult-completion-in-region
-                 #'completion--in-region)
-               args)))
+(setq completion-in-region-function #'consult-completion-in-region)
 #+end_src
 
 You may also want to look into my [[https://github.com/minad/corfu][Corfu]] package, which provides a minimal
