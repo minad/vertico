@@ -83,7 +83,7 @@ In order to configure Vertico and other packages in your init.el, you may want
 to take advantage of ~use-package~. Here is an example configuration:
 
 #+begin_src emacs-lisp
-;; Enable vertico
+;; Enable Vertico.
 (use-package vertico
   :custom
   ;; (vertico-scroll-margin 0) ;; Different scroll margin
@@ -98,7 +98,7 @@ to take advantage of ~use-package~. Here is an example configuration:
   :init
   (savehist-mode))
 
-;; A few more useful configurations...
+;; Emacs minibuffer configurations.
 (use-package emacs
   :custom
   ;; Support opening new minibuffers from inside existing minibuffers.
@@ -109,17 +109,7 @@ to take advantage of ~use-package~. Here is an example configuration:
   (read-extended-command-predicate #'command-completion-default-include-p)
   ;; Do not allow the cursor in the minibuffer prompt
   (minibuffer-prompt-properties
-   '(read-only t cursor-intangible t face minibuffer-prompt))
-  :init
-  ;; Prompt indicator for `completing-read-multiple'.  Available out of the box
-  ;; on Emacs 31, see `crm-prompt'.
-  (when (< emacs-major-version 31)
-    (advice-add #'completing-read-multiple :filter-args
-                (lambda (args)
-                  (cons (format "[CRM%s] %s"
-                                (string-replace "[ \t]*" "" crm-separator)
-                                (car args))
-                        (cdr args))))))
+   '(read-only t cursor-intangible t face minibuffer-prompt)))
 #+end_src
 
 I recommend to give Orderless completion a try, which is more flexible and
@@ -215,6 +205,26 @@ You may also want to look into my [[https://github.com/minad/corfu][Corfu]] pack
 completion system for =completion-in-region= in a child frame popup. Corfu is a
 narrowly focused package and developed in the same spirit as Vertico. You can
 even use Corfu in the minibuffer.
+
+** Completing-read-multiple
+
+The function ~completing-read-multiple~ is similar to ~completing-read~ but returns
+a list of completed strings. The strings are separated by ~crm-separator~ in the
+minibuffer. However ~completing-read-multiple~ does not indicate to the user that
+multiple strings can be completed. I have contributed a patch to Emacs 31, which
+fixes this minor issue. See the variable ~crm-prompt~ and [[https://debbugs.gnu.org/cgi/bugreport.cgi?bug=76028][bug#76028]]. On older
+Emacs versions you can use the following:
+
+#+begin_src emacs-lisp
+;; Prompt indicator for `completing-read-multiple'.
+(when (< emacs-major-version 31)
+  (advice-add #'completing-read-multiple :filter-args
+              (lambda (args)
+                (cons (format "[CRM%s] %s"
+                              (string-replace "[ \t]*" "" crm-separator)
+                              (car args))
+                      (cdr args))))))
+#+end_src
 
 * Extensions
 :properties:
