@@ -30,10 +30,10 @@
 ;; regular buffer in a large window instead of the miniwindow.  The
 ;; buffer display can be enabled by the `vertico-buffer-mode'.
 
-;; The mode can be enabled globally or via `vertico-multiform-mode'
-;; per command or completion category.  Alternatively the buffer
-;; display can be toggled temporarily with M-B if
-;; `vertico-multiform-mode' is enabled.
+;; The mode `vertico-buffer-mode' can be enabled globally or via
+;; `vertico-multiform-mode' per command or completion category.
+;; Alternatively the buffer display can be toggled temporarily with
+;; M-B if `vertico-multiform-mode' is enabled.
 
 ;;; Code:
 

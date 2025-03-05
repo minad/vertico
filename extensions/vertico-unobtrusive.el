@@ -30,10 +30,10 @@
 ;; display.  The unobtrusive display only shows the topmost candidate
 ;; and nothing else, it is a simple derivative of `vertico-flat-mode'.
 ;;
-;; The mode can be enabled globally or via `vertico-multiform-mode'
-;; per command or completion category.  Alternatively the unobtrusive
-;; display can be toggled temporarily with M-U if
-;; `vertico-multiform-mode' is enabled.
+;; The mode `vertico-unobtrusive-mode' can be enabled globally or
+;; via `vertico-multiform-mode' per command or completion category.
+;; Alternatively the unobtrusive display can be toggled temporarily
+;; with M-U if `vertico-multiform-mode' is enabled.
 
 ;;; Code:
 
