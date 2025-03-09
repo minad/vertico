@@ -111,8 +111,7 @@ Exit with current input if prefix ARG is given."
                  (setq ov (symbol-value ov))
                  (overlay-buffer ov)
                  (= (point) (point-max))
-                 (or (>= (- (point) (overlay-end ov)) 2)
-                     (eq ?/ (char-before (- (point) 2)))))
+                 (> (point) (overlay-end ov)))
         (delete-region (overlay-start ov) (overlay-end ov))))))
 
 (provide 'vertico-directory)
