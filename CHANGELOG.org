@@ -2,6 +2,12 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- ~vertico-directory-tidy~: Cleanup shadowed path more aggressively.
+- ~vertico-directory-delete-char~: Respect region.
+- ~vertico-directory-*~: Improve responsiveness when using directory commands.
+
 * Version 1.11 (2025-01-28)
 
 - Ignore touchscreen events.
