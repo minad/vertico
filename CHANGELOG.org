@@ -2,6 +2,10 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- =vertico-flat-format=: Customizable =:spacer= string.
+
 * Version 2.0 (2025-03-11)
 
 - ~vertico-directory-tidy~: Cleanup shadowed path more aggressively.
