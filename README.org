@@ -308,16 +308,16 @@ problem.
           (consult-grep buffer)))
 #+end_src
 
-Temporary toggling between the different display modes is possible. The
-following commands are bound by default in the =vertico-multiform-map=. You can of
-course change these bindings if you like.
+The different display modes can be toggled temporarily. The
+=vertico-multiform-map= binds the following toggle commands to keys. Depending on
+preference, these bindings can be changed in the =vertico-multiform-map=.
 
-- =M-B= -> ~vertico-multiform-buffer~
-- =M-F= -> ~vertico-multiform-flat~
-- =M-G= -> ~vertico-multiform-grid~
-- =M-R= -> ~vertico-multiform-reverse~
-- =M-U= -> ~vertico-multiform-unobtrusive~
-- =M-V= -> ~vertico-multiform-vertical~
+| =M-B= | ~vertico-multiform-buffer~      |
+| =M-F= | ~vertico-multiform-flat~        |
+| =M-G= | ~vertico-multiform-grid~        |
+| =M-R= | ~vertico-multiform-reverse~     |
+| =M-U= | ~vertico-multiform-unobtrusive~ |
+| =M-V= | ~vertico-multiform-vertical~    |
 
 For special configuration you can use your own functions or even lambdas to
 configure the completion behavior per command or per completion category.
