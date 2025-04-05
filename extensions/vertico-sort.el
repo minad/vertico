@@ -90,18 +90,16 @@ occur only if `history-delete-duplicates' is disabled."
 The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
   `(defun ,(intern (mapconcat #'symbol-name `(vertico sort ,@by) "-")) (candidates)
      ,(concat "Sort candidates by " (mapconcat #'symbol-name by ", ") ".")
-     (let* ((buckets (make-vector ,bsize nil))
-            ,@(and (eq (car by) 'history) '((hhash (vertico-sort--history)) (hcands))))
+     (let ((buckets (make-vector ,bsize nil)) last
+           ,@(and (eq (car by) 'history) '((hhash (vertico-sort--history)) hcands)))
        (dolist (% candidates)
          ;; Find recent candidate in history or fill bucket
          (,@(if (not (eq (car by) 'history)) `(progn)
               `(if-let ((idx (gethash % hhash))) (push (cons idx %) hcands)))
-          (push % (aref buckets (min ,(1- bsize) ,bindex)))))
+          (let ((i ,bindex)) (if (< i ,bsize) (push % (aref buckets i)) (push % last)))))
        (nconc ,@(and (eq (car by) 'history) '((vertico-sort--decorated hcands)))
-              (mapcan (lambda (bucket) (sort bucket #',bpred))
-                      (nbutlast (append buckets nil)))
-              ;; Last bucket needs special treatment
-              (sort (aref buckets ,(1- bsize)) #',pred)))))
+              (mapcan (lambda (bucket) (sort bucket #',bpred)) buckets)
+              (sort last #',pred)))))
 
 ;;;###autoload (autoload 'vertico-sort-history-length-alpha "vertico-sort")
 ;;;###autoload (autoload 'vertico-sort-history-alpha "vertico-sort")
