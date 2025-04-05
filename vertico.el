@@ -237,17 +237,16 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
          ;; Find recent candidate in history or fill bucket
          (,@(if (not (eq (car by) 'history)) `(progn)
               `(if-let ((idx (gethash % hhash))) (push (cons idx %) hcands)))
-          (let ((idx (min ,(1- bsize) ,bindex)))
-            (aset buckets idx (cons % (aref buckets idx))))))
+          (push % (aref buckets (min ,(1- bsize) ,bindex)))))
        (nconc ,@(and (eq (car by) 'history) '((vertico--sort-decorated hcands)))
               (mapcan (lambda (bucket) (sort bucket #',bpred))
                       (nbutlast (append buckets nil)))
               ;; Last bucket needs special treatment
               (sort (aref buckets ,(1- bsize)) #',pred)))))
 
-(vertico--define-sort (history length alpha) 32 (length %) string< vertico--length-string<)
+(vertico--define-sort (history length alpha) 48 (length %) string< vertico--length-string<)
 (vertico--define-sort (history alpha) 32 (if (equal % "") 0 (/ (aref % 0) 4)) string< string<)
-(vertico--define-sort (length alpha) 32 (length %) string< vertico--length-string<)
+(vertico--define-sort (length alpha) 48 (length %) string< vertico--length-string<)
 (vertico--define-sort (alpha) 32 (if (equal % "") 0 (/ (aref % 0) 4)) string< string<)
 
 (defun vertico--affixate (cands)
