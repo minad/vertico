@@ -38,6 +38,16 @@
 (defvar-local vertico-sort--history nil
   "History hash table and corresponding base string.")
 
+(defcustom vertico-sort-history-duplicate 1.0
+  "Weight of duplicate elements, multiplied by the length of the history.
+Duplicate elements in the history are prioritized such that they appear
+earlier in the completion list.  The value should be between 0.0 and
+1.0. For 0, only the recency of history elements matters.  If the value
+is 1.0, frequency is more relevant than recency.  Note that duplicates
+occur only if `history-delete-duplicates' is disabled."
+  :type 'float
+  :group 'vertico)
+
 (defun vertico-sort--history ()
   "Recompute history hash table and return it."
   (or (and (equal (car vertico-sort--history) vertico--base) (cdr vertico-sort--history))
@@ -45,13 +55,15 @@
              (base-len (length base))
              (hist (and (not (eq minibuffer-history-variable t)) ;; Disabled for `t'.
                         (symbol-value minibuffer-history-variable)))
-             (hash (make-hash-table :test #'equal :size (length hist)))
+             (hist-len (length hist))
+             (ht (make-hash-table :test #'equal :size hist-len))
              (file-p (and (> base-len 0) ;; Step-wise completion, unlike `project-find-file'
                           (eq minibuffer-history-variable 'file-name-history)))
              (curr-file (when-let ((win (and file-p (minibuffer-selected-window)))
                                    (file (buffer-file-name (window-buffer win))))
-                          (abbreviate-file-name file))))
-        (cl-loop for elem in hist for index from 0 do
+                          (abbreviate-file-name file)))
+             (dup (round (* hist-len vertico-sort-history-duplicate))))
+        (cl-loop for elem in hist for idx from 0 do
                  (when (and (not (equal curr-file elem)) ;; Deprioritize current file
                             (or (= base-len 0)
                                 (and (>= (length elem) base-len)
@@ -60,8 +72,8 @@
                      ;; Drop base string from history elements & special file handling.
                      (when (or (> base-len 0) file-sep)
                        (setq elem (substring elem base-len (and file-sep (1+ file-sep)))))
-                     (unless (gethash elem hash) (puthash elem index hash)))))
-        (cdr (setq vertico-sort--history (cons base hash))))))
+                     (puthash elem (if-let ((n (gethash elem ht))) (- n dup) idx) ht))))
+        (cdr (setq vertico-sort--history (cons base ht))))))
 
 (defun vertico-sort--length-string< (x y)
   "Sorting predicate which compares X and Y first by length then by `string<'."
