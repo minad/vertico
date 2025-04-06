@@ -89,7 +89,7 @@ or the latest completion session is restored."
           (setq vertico-suspend--ov nil))
         (when (eq #'ignore (bound-and-true-p vertico-buffer--restore))
           (setq vertico-buffer--restore nil)
-          (vertico-buffer-mode 1))))
+          (vertico-buffer-mode))))
     (user-error "No Vertico session to suspend or resume")))
 
 (defun vertico-suspend--unselect (&rest _)
