@@ -65,7 +65,8 @@
 
 (defcustom vertico-repeat-transformers
   (list #'vertico-repeat--filter-empty
-        #'vertico-repeat--filter-commands)
+        #'vertico-repeat--filter-commands
+        #'vertico-repeat--remove-long)
   "List of functions to apply to history element before saving."
   :type '(repeat function)
   :group 'vertico)
@@ -85,6 +86,13 @@
 (defun vertico-repeat--filter-empty (session)
   "Filter SESSION if input is empty."
   (and (cadr session) (not (equal (cadr session) "")) session))
+
+(defun vertico-repeat--remove-long (session)
+  "Remove overly long candidate from SESSION."
+  (when-let ((cand (caddr session))
+             ((and (stringp cand) (length> cand 200))))
+    (setf (cddr session) (cdddr session)))
+  session)
 
 (defun vertico-repeat--save-input ()
   "Save current minibuffer input."
