@@ -6,9 +6,9 @@
 
 - =vertico-flat-format=: Customizable =:spacer= string.
 - =vertico-sort=: Extracted sort functions to separate extension.
-- =vertico-sort-history-duplicate=: New customization option to adjust weight of
-  duplicate history elements, such that they appear earlier in the completion
-  list.
+- =vertico-sort-history-duplicate= and =vertico-sort-history-decay=: New
+  customization options to adjust the rank of duplicate history elements, such
+  that they appear earlier in the completion list.
 
 * Version 2.0 (2025-03-11)
 

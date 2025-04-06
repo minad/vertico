@@ -78,13 +78,13 @@ See also `vertico-sort-history-duplicate'."
                      ;; Drop base string from history elements & special file handling.
                      (when (or (> base-len 0) file-sep)
                        (setq elem (substring elem base-len (and file-sep (1+ file-sep)))))
-                     (let ((w (if-let ((w (gethash elem ht)))
-                                  ;; Reduce duplicate weight with exponential decay.
-                                  (- w (round (* vertico-sort-history-duplicate
+                     (let ((r (if-let ((r (gethash elem ht)))
+                                  ;; Reduce duplicate rank with exponential decay.
+                                  (- r (round (* vertico-sort-history-duplicate
                                                  (exp (* -1.0 vertico-sort-history-decay idx)))))
                                 ;; Never outrank the most recent element.
                                 (if (= idx 0) (/ most-negative-fixnum 2) idx))))
-                       (puthash elem w ht)))))
+                       (puthash elem r ht)))))
         (cdr (setq vertico-sort--history (cons base ht))))))
 
 (defun vertico-sort--length-string< (x y)
