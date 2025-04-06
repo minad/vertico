@@ -9,6 +9,9 @@
 - =vertico-sort-history-duplicate= and =vertico-sort-history-decay=: New
   customization options to adjust the rank of duplicate history elements, such
   that they appear earlier in the completion list.
+- =vertico-repeat=: Ensure that the =vertico-repeat-history= is saved if
+  =savehist-mode= is enabled. Automatically add =vertico-repeat-history= to
+  =savehist-minibuffer-history-variables=.
 
 * Version 2.0 (2025-03-11)
 

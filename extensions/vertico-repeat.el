@@ -35,8 +35,7 @@
 ;;
 ;; It is necessary to register a minibuffer setup hook, which saves
 ;; the Vertico state for repetition.  In order to save the history
-;; across Emacs sessions, enable `savehist-mode' and add
-;; `vertico-repeat-history' to `savehist-additional-variables'.
+;; across Emacs sessions, enable `savehist-mode'.
 ;;
 ;; (keymap-global-set "M-R" #'vertico-repeat)
 ;; (keymap-set vertico-map "M-P" #'vertico-repeat-previous)
@@ -110,6 +109,10 @@
         (transform vertico-repeat-transformers))
     (while (and transform (setq session (funcall (pop transform) session))))
     (when session
+      (unless (or (not (bound-and-true-p savehist-mode))
+                  (memq 'vertico-repeat-history (bound-and-true-p savehist-ignored-variables)))
+        (defvar savehist-minibuffer-history-variables)
+        (add-to-list 'savehist-minibuffer-history-variables 'vertico-repeat-history))
       (add-to-history 'vertico-repeat-history session))))
 
 (defun vertico-repeat--restore (session)
