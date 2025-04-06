@@ -26,9 +26,12 @@
 
 ;;; Commentary:
 
-;; This package provides a set of sort functions for Vertico, which
-;; can be used as `vertico-sort-function'.  By default, Vertico uses
-;; the `vertico-sort-history-length-alpha' function.
+;; This package provides a set of sort functions for Vertico, which can be used
+;; as `vertico-sort-function'.  By default, Vertico uses the
+;; `vertico-sort-history-length-alpha' function, which sorts first by history,
+;; then by length and finally by character.  If `history-delete-duplicates' is
+;; nil, duplicate elements are ranked higher with exponential decay.  In order
+;; to save the history across Emacs sessions, enable `savehist-mode'.
 
 ;;; Code:
 
