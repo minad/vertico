@@ -71,7 +71,6 @@
   :type '(repeat function)
   :group 'vertico)
 
-(declare-function vertico-multiform-vertical "ext:vertico-multiform")
 (defvar vertico-multiform--display-modes)
 (defvar vertico-repeat-history nil)
 (defvar-local vertico-repeat--command nil)
@@ -139,6 +138,7 @@
              (mode (seq-find #'symbolp (cddr session)))
              ((bound-and-true-p vertico-multiform-mode))
              ((not (and (boundp mode) (symbol-value mode)))))
+    (declare-function vertico-multiform-vertical "ext:vertico-multiform")
     (vertico-multiform-vertical mode))
   (vertico--exhibit))
 
