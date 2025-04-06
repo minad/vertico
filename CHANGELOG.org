@@ -12,6 +12,8 @@
 - =vertico-repeat=: Add =vertico-repeat-history= to
   =savehist-minibuffer-history-variables= in order to save the history if
   =savehist-mode= is enabled.
+- =vertico-repeat=: Do not store overly long selected candidates in repeat
+  history.
 
 * Version 2.0 (2025-03-11)
 
