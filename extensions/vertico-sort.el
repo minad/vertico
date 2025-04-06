@@ -50,7 +50,7 @@ appears in the completion list.  The shift decays exponentially with
   :type 'number
   :group 'vertico)
 
-(defcustom vertico-sort-history-decay 20
+(defcustom vertico-sort-history-decay 10
   "Exponential decay for the position shift of duplicate elements.
 The shift will decay away after `vertico-sort-history-duplicate' times
 `vertico-sort-history-decay' history elements."
