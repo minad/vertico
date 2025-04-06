@@ -39,11 +39,18 @@
   "History hash table and corresponding base string.")
 
 (defcustom vertico-sort-history-duplicate 10
-  "Number of history positions gained by duplicate history elements.
+  "Maximal number of history positions gained by duplicate history elements.
 The more often a duplicate element occurs in the history, the earlier it
-appears in the completion list.  Note that duplicates occur only if
+appears in the completion list.  The position gain decays exponentially
+with `vertico-sort-history-decay'.  Note that duplicates occur only if
 `history-delete-duplicates' is disabled."
-  :type 'natum
+  :type 'number
+  :group 'vertico)
+
+(defcustom vertico-sort-history-decay 0.005
+  "Exponential decay for the position gain of duplicate elements.
+See also `vertico-sort-history-duplicate'."
+  :type 'float
   :group 'vertico)
 
 (defun vertico-sort--history ()
@@ -68,10 +75,13 @@ appears in the completion list.  Note that duplicates occur only if
                      ;; Drop base string from history elements & special file handling.
                      (when (or (> base-len 0) file-sep)
                        (setq elem (substring elem base-len (and file-sep (1+ file-sep)))))
-                     (puthash elem (if-let ((n (gethash elem ht)))
-                                       (- n vertico-sort-history-duplicate)
-                                     (if (= idx 0) (/ most-negative-fixnum 2) idx))
-                              ht))))
+                     (let ((w (if-let ((w (gethash elem ht)))
+                                  ;; Reduce duplicate weight with exponential decay.
+                                  (- w (round (* vertico-sort-history-duplicate
+                                                 (exp (* -1.0 vertico-sort-history-decay idx)))))
+                                ;; Never outrank the most recent element.
+                                (if (= idx 0) (/ most-negative-fixnum 2) idx))))
+                       (puthash elem w ht)))))
         (cdr (setq vertico-sort--history (cons base ht))))))
 
 (defun vertico-sort--length-string< (x y)
