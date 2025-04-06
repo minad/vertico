@@ -32,7 +32,7 @@ without white space and comments.
 - Prompt shows the current candidate index and the total number of candidates.
 - The current candidate is inserted with =TAB= and selected with =RET=.
 - Non-existing candidates can be submitted with =M-RET= or by moving the point to the prompt.
-- Efficient sorting by history position, length and alphabetically.
+- Efficient sorting by history position, frequency, length and alphabetically.
 - Long candidates with newlines are formatted to take up less space.
 - Lazy completion candidate highlighting for performance.
 - Annotations are displayed next to the candidates (~annotation-~ and ~affixation-function~).
