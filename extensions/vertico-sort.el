@@ -42,18 +42,19 @@
   "History hash table and corresponding base string.")
 
 (defcustom vertico-sort-history-duplicate 10
-  "Maximal number of history positions gained by duplicate history elements.
+  "History position shift for duplicate history elements.
 The more often a duplicate element occurs in the history, the earlier it
-appears in the completion list.  The position gain decays exponentially
-with `vertico-sort-history-decay'.  Note that duplicates occur only if
+appears in the completion list.  The shift decays exponentially with
+`vertico-sort-history-decay'.  Note that duplicates occur only if
 `history-delete-duplicates' is disabled."
   :type 'number
   :group 'vertico)
 
-(defcustom vertico-sort-history-decay 0.005
-  "Exponential decay for the position gain of duplicate elements.
-See also `vertico-sort-history-duplicate'."
-  :type 'float
+(defcustom vertico-sort-history-decay 20
+  "Exponential decay for the position shift of duplicate elements.
+The shift will decay away after `vertico-sort-history-duplicate' times
+`vertico-sort-history-decay' history elements."
+  :type 'number
   :group 'vertico)
 
 (defun vertico-sort--history ()
@@ -68,7 +69,8 @@ See also `vertico-sort-history-duplicate'."
                           (eq minibuffer-history-variable 'file-name-history)))
              (curr-file (when-let ((win (and file-p (minibuffer-selected-window)))
                                    (file (buffer-file-name (window-buffer win))))
-                          (abbreviate-file-name file))))
+                          (abbreviate-file-name file)))
+             (decay (/ -1.0 (* vertico-sort-history-duplicate vertico-sort-history-decay))))
         (cl-loop for elem in hist for idx from 0 do
                  (when (and (not (equal curr-file elem)) ;; Deprioritize current file
                             (or (= base-len 0)
@@ -81,7 +83,7 @@ See also `vertico-sort-history-duplicate'."
                      (let ((r (if-let ((r (gethash elem ht)))
                                   ;; Reduce duplicate rank with exponential decay.
                                   (- r (round (* vertico-sort-history-duplicate
-                                                 (exp (* -1.0 vertico-sort-history-decay idx)))))
+                                                 (exp (* decay idx)))))
                                 ;; Never outrank the most recent element.
                                 (if (= idx 0) (/ most-negative-fixnum 2) idx))))
                        (puthash elem r ht)))))
