@@ -131,7 +131,7 @@ When scrolling beyond this limit, candidates may be truncated."
          (width (- (/ (vertico--window-width) vertico-grid--columns) sep))
          (cands (funcall (if (> vertico-grid-annotate 0) #'vertico--affixate #'identity)
                          (cl-loop repeat count for c in (nthcdr start vertico--candidates)
-                                  collect (funcall vertico--hilit (substring c)))))
+                                  collect (vertico--hilit c))))
          (cands (cl-loop
                  for cand in cands for index from 0 collect
                  (let (prefix suffix)
