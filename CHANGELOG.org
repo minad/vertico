@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 2.1 (2025-04-19)
 
 - =vertico-flat-format=: Customizable =:spacer= string.
 - =vertico-sort=: Extracted sort functions to separate extension.
