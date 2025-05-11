@@ -2,6 +2,11 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- Guard Vertico hooks to automatically print stack traces in order to ease
+  debugging.
+
 * Version 2.1 (2025-04-19)
 
 - =vertico-flat-format=: Customizable =:spacer= string.

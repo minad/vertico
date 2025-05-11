@@ -502,23 +502,9 @@ assignment to the FSF.
 
 * Debugging Vertico
 
-When you observe an error in the =vertico--exhibit= post command hook, you should
-install an advice to enforce debugging. This allows you to obtain a stack trace
-in order to narrow down the location of the error. The reason is that post
-command hooks are automatically disabled (and not debugged) by Emacs. Otherwise
-Emacs would become unusable, given that the hooks are executed after every
-command.
-
-#+begin_src emacs-lisp
-(setq debug-on-error t)
-
-(defun force-debug (func &rest args)
-  (condition-case e
-      (apply func args)
-    ((debug error) (signal (car e) (cdr e)))))
-
-(advice-add #'vertico--exhibit :around #'force-debug)
-#+end_src
+Vertico will automatically print a stack trace to the =*Messages*= buffer when an
+error is detected. The stack trace allows you to narrow down the exact code
+location which caused the error.
 
 * Problematic completion commands
 
