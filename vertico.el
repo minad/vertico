@@ -485,14 +485,10 @@ and the stack trace is shown in the *Messages* buffer."
                  (condition-case nil
                      (progn ,@body nil)
                    ((debug error) t)))))
-     (cond
-      (debug-on-error
-       (let ((debugger #'vertico--debug))
-         (funcall body)))
-      ((funcall body)
+     (when (or debug-on-error (funcall body))
        (let ((debug-on-error t)
              (debugger #'vertico--debug))
-         (funcall body))))))
+         (funcall body)))))
 
 (defun vertico--exhibit ()
   "Exhibit completion UI."
