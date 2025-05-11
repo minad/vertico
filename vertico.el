@@ -478,12 +478,21 @@ The value should lie between 0 and vertico-count/2."
   nil)
 
 (defmacro vertico--guard (&rest body)
-  "Guard BODY showing a stack trace on error."
-  `(condition-case nil
+  "Guard BODY such that errors are caught.
+If an error occurs, the BODY is retried with `debug-on-error' enabled
+and the stack trace is shown in the *Messages* buffer."
+  `(let ((body (lambda ()
+                 (condition-case nil
+                     (progn ,@body nil)
+                   ((debug error) t)))))
+     (cond
+      (debug-on-error
+       (let ((debugger #'vertico--debug))
+         (funcall body)))
+      ((funcall body)
        (let ((debug-on-error t)
              (debugger #'vertico--debug))
-         ,@body)
-     ((debug error) nil)))
+         (funcall body))))))
 
 (defun vertico--exhibit ()
   "Exhibit completion UI."
