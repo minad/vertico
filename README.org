@@ -467,15 +467,11 @@ There are other interactive completion UIs, which follow a similar philosophy:
   has the advantage that you can interact freely with the candidates and jump
   around with Isearch or Avy. On the other hand it necessarily causes a
   slowdown.
-- [[https://github.com/radian-software/selectrum][Selectrum]]: Selectrum is the predecessor of Vertico has been deprecated in
-  favor of Vertico. Read the [[https://github.com/minad/vertico/wiki/Migrating-from-Selectrum-to-Vertico][migration guide]] when migrating from Selectrum.
-  Vertico was designed specifically to address the technical shortcomings of
-  Selectrum. Selectrum is not fully compatible with every Emacs completion
-  command and dynamic completion tables, since it uses its own filtering
-  infrastructure, which deviates from the standard Emacs completion facilities.
 - Icomplete: Emacs comes with the builtin =icomplete-vertical-mode=, which is a
   more bare-bone than Vertico. Vertico offers additional flexibility thanks to
   its [[#extensions][extensions]].
+- [[https://github.com/radian-software/selectrum][Selectrum]]: Selectrum is the predecessor of Vertico has been deprecated in
+  favor of Vertico. Read the [[https://github.com/minad/vertico/wiki/Migrating-from-Selectrum-to-Vertico][migration guide]] when migrating from Selectrum.
 
 * Resources
 
