@@ -464,7 +464,7 @@ The value should lie between 0 and vertico-count/2."
       (setq beg next))))
 
 (defun vertico--debug (&rest _)
-  "Debugger used by `vertico--guard'."
+  "Debugger used by `vertico--protect'."
   (require 'backtrace)
   (declare-function backtrace-to-string "backtrace")
   (declare-function backtrace-get-frames "backtrace")
