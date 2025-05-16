@@ -483,7 +483,7 @@ If an error occurs, the FUN is retried with `debug-on-error' enabled and
 the stack trace is shown in the *Messages* buffer."
   (when (or debug-on-error (condition-case nil
                                (progn (funcall fun) nil)
-                             ((debug error) t)))
+                             (error t)))
     (let ((debug-on-error t)
           (debugger #'vertico--debug))
       (condition-case nil
