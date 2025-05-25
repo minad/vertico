@@ -407,8 +407,8 @@ quick start approach:
    e.g., the buffer switcher ~consult-buffer~ with preview or the line-based
    search ~consult-line~.
 7. Install Embark-Consult for export from =consult-line= to editable =occur-mode=
-   buffers and from =consult-grep= to =grep-mode= buffers. On Emacs 31 =grep-mode=
-   buffers are editable. Use [[https://github.com/mhayashi1120/Emacs-wgrep][wgrep]] on older Emacs.
+   buffers and from =consult-grep= to =grep-mode= buffers. On Emacs 31, use
+   =grep-edit-mode= for editing or [[https://github.com/mhayashi1120/Emacs-wgrep][wgrep]] on older Emacs version.
 8. Fine tune Vertico with [[#extensions][extensions]].
 
 The ecosystem is modular. You don't have to use all of these components. Use
