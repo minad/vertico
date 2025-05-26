@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 2.2 (2025-05-26)
 
 - Guard Vertico hooks to automatically print stack traces in order to ease
   debugging.
