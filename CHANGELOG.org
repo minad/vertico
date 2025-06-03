@@ -7,6 +7,7 @@
 - =vertico-multiform-mode=: Add context menu to change display mode. First enable
   =vertico-multiform-mode= and =context-menu-mode=. The menu will appear with a
   right click in the Vertico minibuffer.
+- Hide fringe line truncation indicators in the minibuffer.
 
 * Version 2.2 (2025-05-26)
 

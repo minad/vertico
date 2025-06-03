@@ -612,6 +612,7 @@ the stack trace is shown in the *Messages* buffer."
               vertico--input t
               completion-auto-help nil
               completion-show-inline-help nil
+              fringe-indicator-alist '((continuation) (truncation))
               vertico--candidates-ov (make-overlay (point-max) (point-max) nil t t)
               vertico--count-ov (make-overlay (point-min) (point-min) nil t t))
   (overlay-put vertico--count-ov 'priority 1) ;; For `minibuffer-depth-indicate-mode'
