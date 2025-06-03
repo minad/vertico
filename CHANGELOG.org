@@ -2,6 +2,12 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- =vertico-multiform-mode=: Add context menu to change display mode. First enable
+  =vertico-multiform-mode= and =context-menu-mode=. The menu will appear with a
+  right click in the Vertico minibuffer.
+
 * Version 2.2 (2025-05-26)
 
 - Guard Vertico hooks to automatically print stack traces in order to ease

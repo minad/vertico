@@ -56,6 +56,7 @@
 (defvar-keymap vertico-mouse-map
   :doc "Additional keymap activated in mouse mode."
   "<mouse-1>" (vertico-mouse--click "RET")
+  "<mouse-2>" (vertico-mouse--click "TAB")
   "<mouse-3>" (vertico-mouse--click "TAB"))
 (fset 'vertico-mouse-map vertico-mouse-map)
 
