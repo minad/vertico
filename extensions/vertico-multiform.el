@@ -122,6 +122,7 @@ The keys in LIST can be symbols or regexps."
                    (vertico-multiform--toggle -1)
                    (pop vertico-multiform--stack))))
     (add-hook 'minibuffer-exit-hook exit)
+    (add-hook 'context-menu-functions #'vertico-multiform--display-menu nil t)
     (dolist (x (cdr (or (vertico-multiform--lookup this-command vertico-multiform-commands)
                         (vertico-multiform--lookup cat vertico-multiform-categories))))
       (pcase x
@@ -150,10 +151,8 @@ The keys in LIST can be symbols or regexps."
   (when vertico-multiform--stack
     (warn "Vertico multiform state is inconsistent")
     (setq vertico-multiform--stack nil))
-  (remove-hook 'context-menu-functions #'vertico-multiform--display-menu)
   (cl-callf2 rassq-delete-all vertico-multiform-map minor-mode-map-alist)
   (when vertico-multiform-mode
-    (add-hook 'context-menu-functions #'vertico-multiform--display-menu)
     (push `(vertico--input . ,vertico-multiform-map) minor-mode-map-alist)))
 
 (defvar vertico-multiform--display-modes nil)
@@ -161,9 +160,8 @@ The keys in LIST can be symbols or regexps."
 
 (defun vertico-multiform--display-menu (menu _event)
   "Add Vertico display modes to MENU."
-  (when vertico--input
-    (define-key menu [vertico-multiform--display-menu]
-                `(menu-item "Vertico Display" ,vertico-multiform-map)))
+  (define-key menu [vertico-multiform--display-menu]
+              `(menu-item "Vertico Display" ,vertico-multiform-map))
   menu)
 
 (cl-defmethod vertico--advice (&context (vertico-multiform-mode (eql t)) &rest app)
