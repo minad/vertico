@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 2.3 (2025-06-10)
 
 - =vertico-multiform-mode=: Add context menu to change display mode. First enable
   =vertico-multiform-mode= and =context-menu-mode=. The menu will appear with a
