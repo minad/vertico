@@ -37,10 +37,11 @@
 ;;    (setq vertico-multiform-commands
 ;;          '((consult-line buffer)
 ;;            (consult-imenu reverse buffer)
-;;            (execute-extended-command flat)))
+;;            (execute-extended-command flat
+;;              (:keymap "X" execute-extended-command-for-buffer))))
 ;;
 ;;    (setq vertico-multiform-categories
-;;          '((file buffer grid)
+;;          '((file buffer grid (:keymap . vertico-directory-map))
 ;;            (imenu (:not indexed mouse))
 ;;            (symbol (vertico-sort-function . vertico-sort-alpha))))
 ;;
