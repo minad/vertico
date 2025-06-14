@@ -114,5 +114,14 @@ Exit with current input if prefix ARG is given."
                  (> (point) (overlay-end ov)))
         (delete-region (overlay-start ov) (overlay-end ov))))))
 
+(defvar-keymap vertico-directory-map
+  :doc "File name editing map."
+  "RET" #'vertico-directory-enter
+  "DEL" #'vertico-directory-delete-char
+  "M-DEL" #'vertico-directory-delete-word)
+
+;;;###autoload (autoload 'vertico-directory-map "vertico-directory-map" nil t 'keymap)
+(defalias 'vertico-directory-map vertico-directory-map)
+
 (provide 'vertico-directory)
 ;;; vertico-directory.el ends here
