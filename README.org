@@ -340,17 +340,32 @@ Furthermore you can tune buffer-local settings per command or category.
 ;; Change the default sorting function.
 ;; See `vertico-sort-function' and `vertico-sort-override-function'.
 (setq vertico-multiform-commands
-      '((describe-symbol (vertico-sort-function . vertico-sort-alpha))))
+      '((describe-symbol (vertico-sort-function . vertico-sort-alpha))
+        (execute-extended-command (:keymap "X" execute-extended-command-for-buffer))))
 
 (setq vertico-multiform-categories
       '((symbol (vertico-sort-function . vertico-sort-alpha))
-        (file (vertico-sort-function . sort-directories-first))))
+        (file (vertico-sort-function . sort-directories-first)
+              (:keymap . vertico-directory-map))))
 
 ;; Sort directories before files
 (defun sort-directories-first (files)
   (setq files (vertico-sort-history-length-alpha files))
   (nconc (seq-filter (lambda (x) (string-suffix-p "/" x)) files)
          (seq-remove (lambda (x) (string-suffix-p "/" x)) files)))
+#+end_src
+
+Key maps or key bindings can be set per command or category.
+
+#+begin_src emacs-lisp
+;; Bind "X" to `execute-extended-command-for-buffer' in M-x.
+(setq vertico-multiform-commands
+      '((execute-extended-command (:keymap "X" execute-extended-command-for-buffer))))
+
+;; Bind directory commands for all commands in file category.
+(setq vertico-multiform-categories
+      '((file (vertico-sort-function . sort-directories-first)
+              (:keymap . vertico-directory-map))))
 #+end_src
 
 Combining these features allows us to fine-tune the completion display even more

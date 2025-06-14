@@ -28,12 +28,21 @@
 
 ;; This package is a Vertico extension, which provides Ido-like
 ;; directory navigation commands.  The commands can be bound in the
-;; `vertico-map'.  Furthermore a cleanup function for shadowed file
-;; paths is provided.
+;; `vertico-map'.
 ;;
 ;; (keymap-set vertico-map "RET" #'vertico-directory-enter)
 ;; (keymap-set vertico-map "DEL" #'vertico-directory-delete-char)
 ;; (keymap-set vertico-map "M-DEL" #'vertico-directory-delete-word)
+;;
+;; Alternatively use `vertico-directory-map' together with
+;; `vertico-multiform-mode'.
+;;
+;; (setq vertico-multiform-categories
+;;       '((file (:keymap . vertico-directory-map)))
+;; (vertico-multiform-mode)
+;;
+;; Furthermore a cleanup function for shadowed file paths is provided.
+;;
 ;; (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 
 ;;; Code:
