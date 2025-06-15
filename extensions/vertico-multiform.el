@@ -172,7 +172,7 @@ The keys in LIST can be symbols or regexps."
 
 (cl-defmethod vertico--advice (&context (vertico-multiform-mode (eql t)) &rest app)
   (unwind-protect
-      (progn
+      (dlet ((completion-eager-display nil)) ;; Available on Emacs 31
         (vertico-multiform--toggle -1)
         (minibuffer-with-setup-hook #'vertico-multiform--setup
           (apply app)))
