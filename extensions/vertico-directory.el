@@ -129,7 +129,7 @@ Exit with current input if prefix ARG is given."
   "DEL" #'vertico-directory-delete-char
   "M-DEL" #'vertico-directory-delete-word)
 
-;;;###autoload (autoload 'vertico-directory-map "vertico-directory-map" nil t 'keymap)
+;;;###autoload (autoload 'vertico-directory-map "vertico-directory" nil t 'keymap)
 (defalias 'vertico-directory-map vertico-directory-map)
 
 (provide 'vertico-directory)
