@@ -345,14 +345,8 @@ Furthermore you can tune buffer-local settings per command or category.
 
 (setq vertico-multiform-categories
       '((symbol (vertico-sort-function . vertico-sort-alpha))
-        (file (vertico-sort-function . sort-directories-first)
+        (file (vertico-sort-function . vertico-sort-directories-first)
               (:keymap . vertico-directory-map))))
-
-;; Sort directories before files
-(defun sort-directories-first (files)
-  (setq files (vertico-sort-history-length-alpha files))
-  (nconc (seq-filter (lambda (x) (string-suffix-p "/" x)) files)
-         (seq-remove (lambda (x) (string-suffix-p "/" x)) files)))
 #+end_src
 
 Key maps or key bindings can be set per command or category.
@@ -364,7 +358,7 @@ Key maps or key bindings can be set per command or category.
 
 ;; Bind directory commands for all commands in file category.
 (setq vertico-multiform-categories
-      '((file (vertico-sort-function . sort-directories-first)
+      '((file (vertico-sort-function . vertico-sort-directories-first)
               (:keymap . vertico-directory-map))))
 #+end_src
 

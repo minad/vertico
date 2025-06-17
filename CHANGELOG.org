@@ -4,6 +4,8 @@
 
 * Development
 
+- New function =vertico-sort-directories-first= which sorts a list of file names,
+  with directories coming first.
 - =vertico-multiform-mode=: Add =:keymap= setting per command or completion
   category. Either specify a list of key bindings or a keymap directly.
 - Disable =completion-eager-display= if Vertico is active.

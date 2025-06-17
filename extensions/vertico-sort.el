@@ -124,5 +124,12 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
 (vertico-sort--define (length alpha) 48 (length %) string< vertico-sort--length-string<)
 (vertico-sort--define (alpha) 32 (if (equal % "") 0 (/ (aref % 0) 4)) string< string<)
 
+;;;###autoload
+(defun vertico-sort-directories-first (list)
+  "Sort directories before files in LIST."
+  (setq list (vertico-sort-history-length-alpha list))
+  (nconc (cl-loop for x in list if (string-suffix-p "/" x) collect x)
+         (cl-loop for x in list if (not (string-suffix-p "/" x)) collect x)))
+
 (provide 'vertico-sort)
 ;;; vertico-sort.el ends here
