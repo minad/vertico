@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 2.4 (2025-06-27)
 
 - New function =vertico-sort-directories-first= which sorts a list of file names,
   with directories coming first.
