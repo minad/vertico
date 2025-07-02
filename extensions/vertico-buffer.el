@@ -98,7 +98,9 @@
              ((eq (window-buffer mbwin) (current-buffer))))
     (unless (eq win mbwin)
       (setq-local truncate-lines (< (window-point win)
-                                    (* 0.8 (window-width win))))
+                                    (* 0.8 (window-width win)))
+                  vertico-count (- (/ (window-pixel-height win)
+                                      (default-line-height)) 2))
       (set-window-point win (point))
       (set-window-hscroll win 0))
     (when vertico-buffer-hide-prompt
