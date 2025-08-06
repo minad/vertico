@@ -92,19 +92,18 @@
 
 (defvar-local vertico-buffer--restore nil)
 
-(defun vertico-buffer--redisplay (win)
-  "Redisplay window WIN."
+(defun vertico-buffer--redisplay (_)
+  "Redisplay buffer window."
   (when-let ((mbwin (active-minibuffer-window))
-             ((and (eq (window-buffer mbwin) (current-buffer))
-                   (overlayp vertico--candidates-ov)
-                   (eq (overlay-get vertico--candidates-ov 'window) win))))
-    (unless (eq win mbwin)
-      (setq-local truncate-lines (< (window-point win)
-                                    (* 0.8 (window-width win)))
-                  vertico-count (- (/ (window-pixel-height win)
-                                      (default-line-height)) 2))
-      (set-window-point win (point))
-      (set-window-hscroll win 0))
+             ((eq (window-buffer mbwin) (current-buffer)))
+             ((overlayp vertico--candidates-ov))
+             (win (overlay-get vertico--candidates-ov 'window)))
+    (setq-local truncate-lines (< (window-point win)
+                                  (* 0.8 (window-width win)))
+                vertico-count (- (/ (window-pixel-height win)
+                                    (default-line-height)) 2))
+    (set-window-point win (point))
+    (set-window-hscroll win 0)
     (when vertico-buffer-hide-prompt
       (window-resize mbwin (- (window-pixel-height mbwin)) nil nil 'pixelwise)
       (set-window-vscroll mbwin 3))
