@@ -95,7 +95,9 @@
 (defun vertico-buffer--redisplay (win)
   "Redisplay window WIN."
   (when-let ((mbwin (active-minibuffer-window))
-             ((eq (window-buffer mbwin) (current-buffer))))
+             ((and (eq (window-buffer mbwin) (current-buffer))
+                   (overlayp vertico--candidates-ov)
+                   (eq (overlay-get vertico--candidates-ov 'window) win))))
     (unless (eq win mbwin)
       (setq-local truncate-lines (< (window-point win)
                                     (* 0.8 (window-width win)))
