@@ -200,7 +200,7 @@ ARG can be nil, t, -1, 1 or toggle."
         (push not-mode (car vertico-multiform--stack))))))
 
 (defun vertico-multiform--toggle-mode (mode)
-  "Toggle to display MODE temporarily in minibuffer."
+  "Toggle display MODE temporarily in minibuffer."
   (let (last)
     (dolist (m vertico-multiform--display-modes)
       (when (and (boundp m) (symbol-value m))
@@ -212,21 +212,16 @@ ARG can be nil, t, -1, 1 or toggle."
       (vertico-multiform--toggle-mode-1 mode 1))
     (setq vertico-multiform--display-last last)))
 
-(defun vertico-multiform-vertical ()
-  "Toggle to vertical display."
-  (interactive)
-  (vertico-multiform--toggle-mode nil))
-
 ;; unobtrusive must come after flat
 (dolist (name '(buffer flat grid reverse unobtrusive vertical))
   (let ((toggle (intern (format "vertico-multiform-%s" name)))
-        (label (capitalize (symbol-name name))))
-    (unless (eq name 'vertical)
-      (let ((mode (intern (format "vertico-%s-mode" name))))
-        (defalias toggle
-          (lambda () (interactive) (vertico-multiform--toggle-mode mode))
-          (format "Toggle the %s display." name))
-        (push mode vertico-multiform--display-modes)))
+        (label (capitalize (symbol-name name)))
+        (mode (and (not (eq name 'vertical)) (intern (format "vertico-%s-mode" name)))))
+    (defalias toggle
+      (lambda () (interactive) (vertico-multiform--toggle-mode mode))
+      (format "Toggle the %s display." name))
+    (when mode
+      (push mode vertico-multiform--display-modes))
     (put toggle 'completion-predicate #'vertico--command-p)
     (define-key vertico-multiform-map (vector toggle) (cons label toggle))
     (keymap-set vertico-multiform-map (format "M-%c" (aref label 0)) toggle)))
