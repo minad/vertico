@@ -138,8 +138,8 @@
              (mode (seq-find #'symbolp (cddr session)))
              ((bound-and-true-p vertico-multiform-mode))
              ((not (and (boundp mode) (symbol-value mode)))))
-    (declare-function vertico-multiform-vertical "ext:vertico-multiform")
-    (vertico-multiform-vertical mode))
+    (declare-function vertico-multiform--toggle-mode "ext:vertico-multiform")
+    (vertico-multiform--toggle-mode mode))
   (vertico--exhibit))
 
 (defun vertico-repeat--run (session)
