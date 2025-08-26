@@ -606,6 +606,11 @@ the stack trace is shown in the *Messages* buffer."
 
 (cl-defgeneric vertico--setup ()
   "Setup completion UI."
+  (let ((display-table (make-display-table)))
+    (set-char-table-parent display-table standard-display-table)
+    (set-display-table-slot display-table 'truncation (make-glyph-code ? ))
+    (set-display-table-slot display-table 'wrap (make-glyph-code ? ))
+    (setq buffer-display-table display-table))
   (when (boundp 'pixel-scroll-precision-mode)
     (setq-local pixel-scroll-precision-mode nil))
   (setq-local scroll-margin 0
