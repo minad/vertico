@@ -144,6 +144,13 @@ The value should lie between 0 and vertico-count/2."
   "TAB" #'vertico-insert
   "<touchscreen-begin>" #'ignore)
 
+(defvar vertico--locals
+  '((scroll-margin . 0)
+    (completion-auto-help . nil)
+    (completion-show-inline-help . nil)
+    (pixel-scroll-precision-mode . nil))
+  "Vertico minibuffer local variables.")
+
 (defvar-local vertico--hilit #'identity
   "Lazy candidate highlighting function.")
 
@@ -606,13 +613,9 @@ the stack trace is shown in the *Messages* buffer."
 
 (cl-defgeneric vertico--setup ()
   "Setup completion UI."
-  (when (boundp 'pixel-scroll-precision-mode)
-    (setq-local pixel-scroll-precision-mode nil))
-  (setq-local scroll-margin 0
-              vertico--input t
-              completion-auto-help nil
-              completion-show-inline-help nil
-              fringe-indicator-alist '((continuation) (truncation))
+  (dolist (var vertico--locals)
+    (set (make-local-variable (car var)) (cdr var)))
+  (setq-local vertico--input t
               vertico--candidates-ov (make-overlay (point-max) (point-max) nil t t)
               vertico--count-ov (make-overlay (point-min) (point-min) nil t t))
   (overlay-put vertico--count-ov 'priority 1) ;; For `minibuffer-depth-indicate-mode'
