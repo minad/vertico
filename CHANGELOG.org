@@ -6,7 +6,9 @@
 
 - Introduce new =vertico--locals= variable for easier customization of
   minibuffer-local variables.
-- Undo fringe settings introduced in Version 2.3. Users can customize this
+- =vertico-mouse=, =vertico-group-format=: Try to avoid overly long candidates such
+  that no truncation markers are shown if the fringe is disabled.
+- Undo fringe settings introduced in version 2.3. Users can customize this
   according to their preference in =vertico--locals=.
 
 * Version 2.4 (2025-06-27)
