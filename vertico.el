@@ -56,7 +56,7 @@
 (defcustom vertico-group-format
   (concat #("    " 0 4 (face vertico-group-separator))
           #(" %s " 0 4 (face vertico-group-title))
-          #(" " 0 1 (face vertico-group-separator display (space :align-to right))))
+          #(" " 0 1 (face vertico-group-separator display (space :align-to (- right 1)))))
   "Format string used for the group title."
   :type '(choice (const :tag "No group titles" nil) string))
 
