@@ -2,6 +2,13 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- Introduce new =vertico--locals= variable for easier customization of
+  minibuffer-local variables.
+- Undo fringe settings introduced in Version 2.3. Users can customize this
+  according to their preference in =vertico--locals=.
+
 * Version 2.4 (2025-06-27)
 
 - New function =vertico-sort-directories-first= which sorts a list of file names,
