@@ -91,7 +91,7 @@
 (cl-defmethod vertico--display-candidates (candidates &context (vertico-flat-mode (eql t)))
   (move-overlay vertico--candidates-ov (point-max) (point-max))
   (overlay-put
-   vertico--candidates-ov 'after-string
+   vertico--candidates-ov 'before-string
    (concat (plist-get vertico-flat-format :spacer)
            (cond
             ((and (not candidates) (plist-get vertico-flat-format :no-match)))

@@ -74,7 +74,6 @@ or the latest completion session is restored."
         (overlay-put vertico-suspend--ov 'invisible t)
         (overlay-put vertico-suspend--ov 'priority 1000)
         (overlay-put vertico--candidates-ov 'before-string nil)
-        (overlay-put vertico--candidates-ov 'after-string nil)
         (set-window-parameter win 'no-other-window t)
         (when (bound-and-true-p vertico-buffer-mode)
           (vertico-buffer-mode -1)

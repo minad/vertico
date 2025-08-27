@@ -72,8 +72,7 @@
     (setq lines (nconc (make-list (max 0 (- vertico-count (length lines))) "\n") lines)))
   (let ((string (apply #'concat lines)))
     (add-face-text-property 0 (length string) 'default 'append string)
-    (overlay-put vertico--candidates-ov 'before-string string)
-    (overlay-put vertico--candidates-ov 'after-string nil)))
+    (overlay-put vertico--candidates-ov 'before-string string)))
 
 (provide 'vertico-reverse)
 ;;; vertico-reverse.el ends here

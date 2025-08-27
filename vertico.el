@@ -589,7 +589,7 @@ the stack trace is shown in the *Messages* buffer."
 (cl-defgeneric vertico--display-candidates (lines)
   "Update candidates overlay `vertico--candidates-ov' with LINES."
   (move-overlay vertico--candidates-ov (point-max) (point-max))
-  (overlay-put vertico--candidates-ov 'after-string
+  (overlay-put vertico--candidates-ov 'before-string
                (apply #'concat #(" " 0 1 (cursor t)) (and lines "\n") lines)))
 
 (cl-defgeneric vertico--resize ()
