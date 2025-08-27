@@ -76,7 +76,7 @@
 (cl-defmethod vertico--format-candidate
   :around (cand prefix suffix index start &context (vertico-mouse-mode (eql t)))
   (setq cand (cl-call-next-method cand prefix
-                                  (concat suffix #(" " 0 1 (display (space :align-to right))))
+                                  (concat suffix #(" " 0 1 (display (space :align-to (- right 1)))))
                                   index start))
   (add-text-properties 0 (1- (length cand))
                        `(vertico-mouse--index ,index
