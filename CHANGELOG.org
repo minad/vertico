@@ -10,6 +10,9 @@
   that no truncation markers are shown if the fringe is disabled.
 - Undo fringe settings introduced in version 2.3. Users can customize this
   according to their preference in =vertico--locals=.
+- Revert to =vertico--resize-window= again (from Vertico 1.9), which takes a
+  minibuffer height argument. Minibuffer resizing is still not correct on Emacs
+  31 if fringes are disabled, i.e., =(set-fringe-mode 0)=.
 
 * Version 2.4 (2025-06-27)
 

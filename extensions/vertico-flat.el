@@ -84,11 +84,9 @@
   (when vertico-flat-mode
     (push `(vertico--input . ,vertico-flat-map) minor-mode-map-alist)))
 
-(cl-defmethod vertico--resize (&context (vertico-flat-mode (eql t)))
-  (setq-local truncate-lines nil
-              resize-mini-windows t))
-
 (cl-defmethod vertico--display-candidates (candidates &context (vertico-flat-mode (eql t)))
+  (setq-local truncate-lines nil
+              resize-mini-windows t)
   (move-overlay vertico--candidates-ov (point-max) (point-max))
   (overlay-put
    vertico--candidates-ov 'before-string
