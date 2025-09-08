@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 2.5 (2025-09-08)
 
 - Introduce new =vertico--locals= variable for easier customization of
   minibuffer-local variables.
