@@ -581,38 +581,6 @@ can be completed separately. Ideally this issue would be fixed in Org.
 (advice-add #'org-agenda-filter :around #'vertico-enforce-basic-completion)
 #+end_src
 
-** ~tmm-menubar~
-
-*NOTE*: I have implemented a fix for this problem upstream in Emacs, see
-[[https://debbugs.gnu.org/cgi/bugreport.cgi?bug=74616][bug#74616]]. From Emacs 31 and newer the workaround is not needed anymore.
-
-The text menu bar works well with Vertico but always shows a =*Completions*=
-buffer, which is unwanted if Vertico is used. Right now the completion buffer
-can be disabled with an advice. If you disabled the standard GUI menu bar and
-prefer the Vertico interface you may also overwrite the default F10 keybinding.
-
-#+begin_src emacs-lisp
-(keymap-global-set "<f10>" #'tmm-menubar)
-(advice-add #'tmm-add-prompt :after #'minibuffer-hide-completions)
-#+end_src
-
-** ~ffap-menu~
-
-*NOTE*: I have implemented a fix for this problem upstream in Emacs, see
-[[https://debbugs.gnu.org/cgi/bugreport.cgi?bug=74616][bug#74616]]. From Emacs 31 and newer the workaround is not needed anymore.
-
-The command ~ffap-menu~ shows the =*Completions*= buffer by default like
-~tmm-menubar~, which is unwanted if Vertico is used. The completions buffer can be
-disabled as follows.
-
-#+begin_src emacs-lisp
-(advice-add #'ffap-menu-ask :around
-            (lambda (&rest args)
-              (cl-letf (((symbol-function #'minibuffer-completion-help)
-                         #'ignore))
-                (apply args))))
-#+end_src
-
 ** ~completion-table-dynamic~
 
 Dynamic completion tables (~completion-table-dynamic~, ~completion-table-in-turn~,
@@ -655,10 +623,42 @@ to exit with the empty string, press =M-RET=. In the second case the explicit
 default value "" is specified and Vertico preselects the prompt, such that
 exiting with the empty string is possible by pressing =RET= only.
 
-** Tramp hostname and username completion
+** ~tmm-menubar~ (Fixed on Emacs 31)
+
+*NOTE*: I have implemented a fix for this problem upstream in Emacs, see
+[[https://debbugs.gnu.org/cgi/bugreport.cgi?bug=74616][bug#74616]]. From Emacs 31 and newer the workaround is not needed anymore.
+
+The text menu bar works well with Vertico but always shows a =*Completions*=
+buffer, which is unwanted if Vertico is used. Right now the completion buffer
+can be disabled with an advice. If you disabled the standard GUI menu bar and
+prefer the Vertico interface you may also overwrite the default F10 keybinding.
+
+#+begin_src emacs-lisp
+(keymap-global-set "<f10>" #'tmm-menubar)
+(advice-add #'tmm-add-prompt :after #'minibuffer-hide-completions)
+#+end_src
+
+** ~ffap-menu~ (Fixed on Emacs 31)
+
+*NOTE*: I have implemented a fix for this problem upstream in Emacs, see
+[[https://debbugs.gnu.org/cgi/bugreport.cgi?bug=74616][bug#74616]]. From Emacs 31 and newer the workaround is not needed anymore.
+
+The command ~ffap-menu~ shows the =*Completions*= buffer by default like
+~tmm-menubar~, which is unwanted if Vertico is used. The completions buffer can be
+disabled as follows.
+
+#+begin_src emacs-lisp
+(advice-add #'ffap-menu-ask :around
+            (lambda (&rest args)
+              (cl-letf (((symbol-function #'minibuffer-completion-help)
+                         #'ignore))
+                (apply args))))
+#+end_src
+
+** Tramp hostname and username completion (Fixed on Emacs 29)
 
 *NOTE:* On Emacs 29.2 and Tramp 2.7 the workarounds described in this section are
-not necessary anymore, since the relevant completion tables have been improved.
+not necessary anymore, since the relevant completion tables have been fixed.
 
 In combination with Orderless or other non-prefix completion styles like
 =substring= or =flex=, host names and user names are not made available for
@@ -671,24 +671,4 @@ the completion style overrides for the file completion category.
 (setq completion-styles '(orderless basic)
       completion-category-defaults nil
       completion-category-overrides '((file (styles basic partial-completion))))
-#+end_src
-
-If you are familiar with the =completion-style= machinery, you may also define a
-custom completion style which activates only for remote files. The custom
-completion style ensures that you can always match substrings within non-remote
-file names, since =orderless= will stay the preferred style for non-remote files.
-
-#+begin_src emacs-lisp
-(defun basic-remote-try-completion (string table pred point)
-  (and (vertico--remote-p string)
-       (completion-basic-try-completion string table pred point)))
-(defun basic-remote-all-completions (string table pred point)
-  (and (vertico--remote-p string)
-       (completion-basic-all-completions string table pred point)))
-(add-to-list
- 'completion-styles-alist
- '(basic-remote basic-remote-try-completion basic-remote-all-completions nil))
-(setq completion-styles '(orderless basic)
-      completion-category-defaults nil
-      completion-category-overrides '((file (styles basic-remote partial-completion))))
 #+end_src
