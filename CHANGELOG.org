@@ -5,6 +5,8 @@
 * Development
 
 - Require Emacs 29.1.
+- =vertico-buffer=: Check if =mode-line-format= is =nil= when computing an appropriate
+  =vertico-count= for the window height.
 
 * Version 2.5 (2025-09-08)
 
