@@ -317,12 +317,14 @@ The different display modes can be toggled temporarily. The
 =vertico-multiform-map= binds the following toggle commands to keys. Depending on
 preference, these bindings can be changed in the =vertico-multiform-map=.
 
-| =M-B= | ~vertico-multiform-buffer~      |
-| =M-F= | ~vertico-multiform-flat~        |
-| =M-G= | ~vertico-multiform-grid~        |
-| =M-R= | ~vertico-multiform-reverse~     |
-| =M-U= | ~vertico-multiform-unobtrusive~ |
-| =M-V= | ~vertico-multiform-vertical~    |
+| Binding | Vertico command               |
+|---------+-------------------------------|
+| =M-B=     | ~vertico-multiform-buffer~      |
+| =M-F=     | ~vertico-multiform-flat~        |
+| =M-G=     | ~vertico-multiform-grid~        |
+| =M-R=     | ~vertico-multiform-reverse~     |
+| =M-U=     | ~vertico-multiform-unobtrusive~ |
+| =M-V=     | ~vertico-multiform-vertical~    |
 
 For special configuration you can use your own functions or even lambdas to
 configure the completion behavior per command or per completion category.
@@ -494,6 +496,7 @@ following resources:
   + [[https://github.com/doomemacs/doomemacs/tree/master/modules/completion/vertico][Doom Emacs Vertico Module]]
   + [[https://github.com/SystemCrafters/crafted-emacs/blob/master/modules/crafted-completion.el][Crafted Emacs Completion Module]]
   + [[https://git.sr.ht/~protesilaos/dotfiles/tree/master/item/emacs/.emacs.d/][Prot's Emacs configuration]]
+  + [[https://codeberg.org/ashton314/emacs-bedrock/src/branch/main/extras/base.el][Bedrock Emacs Base Enhancements]]
 - Videos:
   + [[https://www.youtube.com/watch?v=fnE0lXoe7Y0][Emacs Completion Explained]] (2022-07-19) by Andrew Tropin.
   + [[https://www.youtube.com/watch?v=w9hHMDyF9V4][Emacs Minibuffer Completions]] (2022-02-12) by Greg Yut.
