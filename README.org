@@ -227,7 +227,7 @@ older Emacs versions you can use the following advice:
                 (cons (format "[CRM%s] %s"
                               (string-replace "[ \t]*" "" crm-separator)
                               (car args))
-                      (cdr args))))))
+                      (cdr args)))))
 #+end_src
 
 * Extensions
