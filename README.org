@@ -411,17 +411,19 @@ In order to get accustomed with the package ecosystem, I recommend the following
 quick start approach:
 
 1. Start with plain Emacs (~emacs -Q~).
-2. Install and enable Vertico to get incremental minibuffer completion.
+2. Install Vertico and enable ~vertico-mode~ to get incremental minibuffer
+   completion.
 3. Install Orderless and/or configure the built-in completion styles
    for more flexible minibuffer filtering.
-4. Install Marginalia if you like rich minibuffer annotations.
-5. Install Embark and add two keybindings for ~embark-dwim~ and ~embark-act~.
-   I am using the mnemonic keybindings =M-.= and =C-.= since these commands allow
-   you to act on the object at point or in the minibuffer.
-6. Install Consult if you want additional featureful completion commands,
+4. Install Marginalia and enable ~marginalia-mode~ if you like rich minibuffer
+   annotations.
+5. Install Consult if you want additional featureful completion commands,
    e.g., the buffer switcher ~consult-buffer~ with preview or the line-based
    search ~consult-line~.
-7. Install Embark-Consult for export from =consult-line= to editable =occur-mode=
+6. Install Embark and add two keybindings for ~embark-dwim~ and ~embark-act~.
+   I am using the mnemonic keybindings =M-.= and =C-.= since these commands allow
+   you to act on the object at point or in the minibuffer.
+7. Install Embark-Consult to export from =consult-line= to editable =occur-mode=
    buffers and from =consult-grep= to =grep-mode= buffers. On Emacs 31, use
    =grep-edit-mode= for editing or [[https://github.com/mhayashi1120/Emacs-wgrep][wgrep]] on older Emacs version.
 8. Fine tune Vertico with [[#extensions][extensions]].
