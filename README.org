@@ -366,19 +366,19 @@ Key maps or key bindings can be set per command or category.
 #+end_src
 
 Combining these features allows us to fine-tune the completion display even more
-by adjusting the ~vertico-buffer-display-action~. We can for example reuse the
-current window for commands of the ~consult-grep~ category (~consult-grep~,
-~consult-git-grep~ and ~consult-ripgrep~). Note that this configuration is
-incompatible with Consult preview, since the previewed buffer is usually shown
-in exactly this window. Nevertheless this snippet demonstrates the flexibility
-of the configuration system.
+by adjusting the ~vertico-buffer-display-action~. We can for example reuse a
+window above the current window for commands of the ~consult-grep~ category
+(~consult-grep~, ~consult-git-grep~ and ~consult-ripgrep~). This snippet demonstrates
+the flexibility of the configuration system.
 
 #+begin_src emacs-lisp
 ;; Configure the buffer display and the buffer display action
 (setq vertico-multiform-categories
       '((consult-grep
          buffer
-         (vertico-buffer-display-action . (display-buffer-same-window)))))
+         (vertico-buffer-display-action display-buffer-in-direction
+                                        (direction . above)
+                                        (window-height . 20)))))
 
 ;; Disable preview for consult-grep commands
 (consult-customize consult-ripgrep consult-git-grep consult-grep :preview-key nil)
