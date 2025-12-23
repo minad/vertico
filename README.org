@@ -477,17 +477,14 @@ the users interacts with Emacs.
 There are other interactive completion UIs, which follow a similar philosophy:
 
 - [[https://git.sr.ht/~protesilaos/mct][Mct]]: Minibuffer and Completions in Tandem. Mct reuses the default
-  ~*Completions*~ buffer and enhances it with automatic updates. Since Mct uses a
-  regular buffer you can use the usual movement commands. The main distinction
-  to Vertico's approach is that ~*Completions*~ buffer displays all matching
-  candidates. This has the advantage that you can interact freely with the
-  candidates and jump around with Isearch or Avy. On the other hand it
-  necessarily causes a slowdown.
-- Icomplete: Emacs comes with the builtin =icomplete-vertical-mode=, which is more
+  ~*Completions*~ buffer and enhances it with automatic updates. From Emacs
+  version 31 automatic updates are built-in, see the settings
+  =completions-eager-update= and =completions-eager-display=.
+- Icomplete: Emacs provides the builtin =icomplete-vertical-mode=, which is more
   bare-bone than Vertico. Vertico offers additional flexibility via its
   [[#extensions][extensions]].
-- [[https://github.com/radian-software/selectrum][Selectrum]]: Selectrum is the predecessor of Vertico has been deprecated in
-  favor of Vertico. Read the [[https://github.com/minad/vertico/wiki/Migrating-from-Selectrum-to-Vertico][migration guide]] when migrating from Selectrum.
+- [[https://github.com/radian-software/selectrum][Selectrum]]: Selectrum is the deprecated predecessor of Vertico. Read the
+  [[https://github.com/minad/vertico/wiki/Migrating-from-Selectrum-to-Vertico][migration guide]] when migrating from Selectrum.
 
 * Resources
 
