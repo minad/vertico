@@ -64,9 +64,9 @@ or the latest completion session is restored."
   (unless enable-recursive-minibuffers
     (user-error "Recursive minibuffers must be enabled"))
   (advice-add #'set-minibuffer-message :around #'vertico-suspend--message)
-  (if-let ((win (active-minibuffer-window))
-           (buf (window-buffer win))
-           ((buffer-local-value 'vertico--input buf)))
+  (if-let* ((win (active-minibuffer-window))
+            (buf (window-buffer win))
+            ((buffer-local-value 'vertico--input buf)))
       (cond
        ((minibufferp)
         (add-hook 'pre-redisplay-functions #'vertico-suspend--unselect nil 'local)
@@ -101,8 +101,8 @@ or the latest completion session is restored."
 
 (defun vertico-suspend--message (&rest app)
   "Apply APP in non-suspended minibuffers, otherwise bail out."
-  (when-let ((win (active-minibuffer-window))
-             ((not (buffer-local-value 'vertico-suspend--ov (window-buffer win)))))
+  (when-let* ((win (active-minibuffer-window))
+              ((not (buffer-local-value 'vertico-suspend--ov (window-buffer win)))))
     (apply app)))
 
 (provide 'vertico-suspend)

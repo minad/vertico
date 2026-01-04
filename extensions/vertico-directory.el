@@ -55,23 +55,23 @@
   "Enter directory or exit completion with current candidate.
 Exit with current input if prefix ARG is given."
   (interactive "P")
-  (if-let (((not arg))
-           ((>= vertico--index 0))
-           ((eq 'file (vertico--metadata-get 'category)))
-           ;; Check vertico--base for stepwise file path completion
-           ((not (equal vertico--base "")))
-           (cand (vertico--candidate))
-           ((or (string-suffix-p "/" cand)
-                (and (vertico--remote-p cand)
-                     (string-suffix-p ":" cand))))
-           ;; Handle /./ and /../ manually instead of via `expand-file-name'
-           ;; and `abbreviate-file-name', such that we don't accidentally
-           ;; perform unwanted substitutions in the existing completion.
-           ((progn
-              (setq cand (string-replace "/./" "/" cand))
-              (unless (string-suffix-p "/../../" cand)
-                (setq cand (replace-regexp-in-string "/[^/|:]+/\\.\\./\\'" "/" cand)))
-              (not (equal (minibuffer-contents-no-properties) cand)))))
+  (if-let* (((not arg))
+            ((>= vertico--index 0))
+            ((eq 'file (vertico--metadata-get 'category)))
+            ;; Check vertico--base for stepwise file path completion
+            ((not (equal vertico--base "")))
+            (cand (vertico--candidate))
+            ((or (string-suffix-p "/" cand)
+                 (and (vertico--remote-p cand)
+                      (string-suffix-p ":" cand))))
+            ;; Handle /./ and /../ manually instead of via `expand-file-name'
+            ;; and `abbreviate-file-name', such that we don't accidentally
+            ;; perform unwanted substitutions in the existing completion.
+            ((progn
+               (setq cand (string-replace "/./" "/" cand))
+               (unless (string-suffix-p "/../../" cand)
+                 (setq cand (replace-regexp-in-string "/[^/|:]+/\\.\\./\\'" "/" cand)))
+               (not (equal (minibuffer-contents-no-properties) cand)))))
       (progn
         (delete-minibuffer-contents)
         (insert cand))

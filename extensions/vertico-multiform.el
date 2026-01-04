@@ -84,8 +84,8 @@ category settings have lower precedence than
 
 (defun vertico-multiform--toggle (arg)
   "Toggle modes from stack depending on ARG."
-  (when-let ((win (active-minibuffer-window))
-             (modes (car vertico-multiform--stack)))
+  (when-let* ((win (active-minibuffer-window))
+              (modes (car vertico-multiform--stack)))
     (when (> arg 0) (setq modes (reverse modes)))
     (with-selected-window win
       (dolist (m modes)

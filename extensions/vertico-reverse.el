@@ -59,7 +59,7 @@
   :global t :group 'vertico
   ;; Reset overlays
   (dolist (buf (buffer-list))
-    (when-let ((ov (buffer-local-value 'vertico--candidates-ov buf)))
+    (when-let* ((ov (buffer-local-value 'vertico--candidates-ov buf)))
       (overlay-put ov 'before-string nil)))
   (cl-callf2 rassq-delete-all vertico-reverse-map minor-mode-map-alist)
   (when vertico-reverse-mode

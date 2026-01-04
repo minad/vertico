@@ -67,8 +67,8 @@ The shift will decay away after `vertico-sort-history-duplicate' times
              (ht (make-hash-table :test #'equal :size (length hist)))
              (file-p (and (> base-len 0) ;; Step-wise completion, unlike `project-find-file'
                           (eq minibuffer-history-variable 'file-name-history)))
-             (curr-file (when-let ((win (and file-p (minibuffer-selected-window)))
-                                   (file (buffer-file-name (window-buffer win))))
+             (curr-file (when-let* ((win (and file-p (minibuffer-selected-window)))
+                                    (file (buffer-file-name (window-buffer win))))
                           (abbreviate-file-name file)))
              (decay (/ -1.0 (* vertico-sort-history-duplicate vertico-sort-history-decay))))
         (cl-loop for elem in hist for idx from 0 do
@@ -80,7 +80,7 @@ The shift will decay away after `vertico-sort-history-duplicate' times
                      ;; Drop base string from history elements & special file handling.
                      (when (or (> base-len 0) file-sep)
                        (setq elem (substring elem base-len (and file-sep (1+ file-sep)))))
-                     (let ((r (if-let ((r (gethash elem ht)))
+                     (let ((r (if-let* ((r (gethash elem ht)))
                                   ;; Reduce duplicate rank with exponential decay.
                                   (- r (round (* vertico-sort-history-duplicate
                                                  (exp (* decay idx)))))
@@ -109,7 +109,7 @@ The function is configured by BY, BSIZE, BINDEX, BPRED and PRED."
        (dolist (% candidates)
          ;; Find recent candidate in history or fill bucket
          (,@(if (not (eq (car by) 'history)) `(progn)
-              `(if-let ((idx (gethash % hhash))) (push (cons idx %) hcands)))
+              `(if-let* ((idx (gethash % hhash))) (push (cons idx %) hcands)))
           (let ((i ,bindex)) (if (< i ,bsize) (push % (aref buckets i)) (push % last)))))
        (nconc ,@(and (eq (car by) 'history) '((vertico-sort--decorated hcands)))
               (mapcan (lambda (bucket) (sort bucket #',bpred)) buckets)

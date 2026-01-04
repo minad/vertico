@@ -77,7 +77,7 @@
   "Flat, horizontal display for Vertico."
   :global t :group 'vertico
   ;; Shrink current minibuffer window
-  (when-let ((win (active-minibuffer-window)))
+  (when-let* ((win (active-minibuffer-window)))
     (unless (frame-root-window-p win)
       (window-resize win (- (window-pixel-height win)) nil nil 'pixelwise)))
   (cl-callf2 rassq-delete-all vertico-flat-map minor-mode-map-alist)
@@ -94,7 +94,7 @@
            (cond
             ((and (not candidates) (plist-get vertico-flat-format :no-match)))
             ((and (= vertico--total 1) (= vertico--index 0)
-                  (when-let ((fmt (plist-get vertico-flat-format :single)))
+                  (when-let* ((fmt (plist-get vertico-flat-format :single)))
                     (format fmt (substring-no-properties (car candidates))))))
             (t (format (plist-get vertico-flat-format (if (< vertico--index 0) :prompt :multiple))
                        (string-join candidates (plist-get vertico-flat-format :separator))))))))

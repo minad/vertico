@@ -198,9 +198,9 @@ The value should lie between 0 and vertico-count/2."
 
 (defun vertico--affixate (cands)
   "Annotate CANDS with annotation function."
-  (if-let ((aff (vertico--metadata-get 'affixation-function)))
+  (if-let* ((aff (vertico--metadata-get 'affixation-function)))
       (funcall aff cands)
-    (if-let ((ann (vertico--metadata-get 'annotation-function)))
+    (if-let* ((ann (vertico--metadata-get 'annotation-function)))
         (cl-loop for cand in cands collect
                  (let ((suff (or (funcall ann cand) "")))
                    ;; The default completion UI adds the `completions-annotations'
@@ -212,7 +212,7 @@ The value should lie between 0 and vertico-count/2."
 
 (defun vertico--move-to-front (elem list)
   "Move ELEM to front of LIST."
-  (if-let ((found (member elem list))) ;; No duplicates, compare with Corfu.
+  (if-let* ((found (member elem list))) ;; No duplicates, compare with Corfu.
       (nconc (list (car found)) (delq (setcar found nil) list))
     list))
 
@@ -272,7 +272,7 @@ The value should lie between 0 and vertico-count/2."
                ;; bug#75910: category instead of `minibuffer-completing-file-name'
                (completing-file (eq 'file (vertico--metadata-get 'category)))
                (`(,all . ,hl) (vertico--filter-completions content table pred pt vertico--metadata))
-               (base (or (when-let ((z (last all))) (prog1 (cdr z) (setcdr z nil))) 0))
+               (base (or (when-let* ((z (last all))) (prog1 (cdr z) (setcdr z nil))) 0))
                (vertico--base (substring content 0 base))
                (def (or (car-safe minibuffer-default) minibuffer-default))
                (groups) (def-missing) (lock))
@@ -288,7 +288,7 @@ The value should lie between 0 and vertico-count/2."
     (when (and completing-file (not (string-suffix-p "/" field)))
       (setq all (vertico--move-to-front (concat field "/") all)))
     (setq all (vertico--move-to-front field all))
-    (when-let ((fun (and all (vertico--metadata-get 'group-function))))
+    (when-let* ((fun (and all (vertico--metadata-get 'group-function))))
       (setq groups (vertico--group-by fun all) all (car groups)))
     (setq def-missing (and def (equal content "") (not (member def all)))
           lock (and vertico--lock-candidate ;; Locked position of old candidate.
@@ -329,15 +329,15 @@ The value should lie between 0 and vertico-count/2."
     ;; Build hash table of groups
     (cl-loop for elem on elems
              for title = (funcall fun (car elem) nil) do
-             (if-let ((group (gethash title ht)))
+             (if-let* ((group (gethash title ht)))
                  (setcdr group (setcdr (cdr group) elem)) ;; Append to tail of group
                (puthash title (cons elem elem) ht) ;; New group element (head . tail)
                (push title titles)))
     (setq titles (nreverse titles))
     ;; Cycle groups if `vertico--lock-groups' is set
-    (when-let ((vertico--lock-groups)
-               (group (seq-find (lambda (group) (gethash group ht))
-                                vertico--all-groups)))
+    (when-let* ((vertico--lock-groups)
+                (group (seq-find (lambda (group) (gethash group ht))
+                                 vertico--all-groups)))
       (setq titles (vertico--cycle titles (seq-position titles group))))
     ;; Build group list
     (dolist (title titles)
@@ -466,7 +466,7 @@ The value should lie between 0 and vertico-count/2."
   "Remove FACE between BEG and END from OBJ."
   (while (< beg end)
     (let ((next (next-single-property-change beg 'face obj end)))
-      (when-let ((val (get-text-property beg 'face obj)))
+      (when-let* ((val (get-text-property beg 'face obj)))
         (put-text-property beg next 'face (remq face (ensure-list val)) obj))
       (setq beg next))))
 
@@ -559,7 +559,7 @@ the stack trace is shown in the *Messages* buffer."
              (cl-loop repeat vertico-count for c in (nthcdr index vertico--candidates)
                       collect (vertico--hilit c)))))
       (pcase-dolist ((and cand `(,str . ,_)) candidates)
-        (when-let ((new-title (and group-fun (funcall group-fun str nil))))
+        (when-let* ((new-title (and group-fun (funcall group-fun str nil))))
           (unless (equal title new-title)
             (setq title new-title)
             (push (vertico--format-group-title title str) lines))
@@ -609,9 +609,9 @@ the stack trace is shown in the *Messages* buffer."
 
 (cl-defgeneric vertico--prepare ()
   "Ensure that the state is prepared before running the next command."
-  (when-let ((cmd (and (symbolp this-command) (symbol-name this-command)))
-             ((string-prefix-p "vertico-" cmd))
-             ((not (and vertico--metadata (string-prefix-p "vertico-directory-" cmd)))))
+  (when-let* ((cmd (and (symbolp this-command) (symbol-name this-command)))
+              ((string-prefix-p "vertico-" cmd))
+              ((not (and vertico--metadata (string-prefix-p "vertico-directory-" cmd)))))
     (vertico--update)))
 
 (cl-defgeneric vertico--setup ()
