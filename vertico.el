@@ -187,9 +187,6 @@ The value should lie between 0 and vertico-count/2."
 (defvar-local vertico--lock-groups nil
   "Lock-in current group order.")
 
-(defvar-local vertico--all-groups nil
-  "List of all group titles.")
-
 (defvar-local vertico--groups nil
   "List of current group titles.")
 
@@ -304,8 +301,7 @@ The value should lie between 0 and vertico-count/2."
                                          (memq minibuffer--require-match
                                                '(nil confirm confirm-after-completion)))))
       (vertico--lock-candidate . ,lock)
-      (vertico--groups . ,(cadr groups))
-      (vertico--all-groups . ,(or (caddr groups) vertico--all-groups))
+      (vertico--groups . ,(cdr groups))
       (vertico--index . ,(or lock
                              (if (or def-missing (eq vertico-preselect 'prompt) (not all)
                                      (and completing-file (eq vertico-preselect 'directory)
@@ -335,9 +331,8 @@ The value should lie between 0 and vertico-count/2."
                (push title titles)))
     (setq titles (nreverse titles))
     ;; Cycle groups if `vertico--lock-groups' is set
-    (when-let* ((vertico--lock-groups)
-                (group (seq-find (lambda (group) (gethash group ht))
-                                 vertico--all-groups)))
+    (when-let* ((group (seq-find (lambda (group) (gethash group ht))
+                                 vertico--lock-groups)))
       (setq titles (vertico--cycle titles (seq-position titles group))))
     ;; Build group list
     (dolist (title titles)
@@ -350,11 +345,7 @@ The value should lie between 0 and vertico-count/2."
       (while (cdr link)
         (setcdr (cdar link) (caadr link))
         (pop link)))
-    ;; Check if new groups are found
-    (dolist (group vertico--all-groups)
-      (remhash group ht))
-    (list (caar groups) titles
-          (if (hash-table-empty-p ht) vertico--all-groups titles))))
+    (cons (caar groups) titles)))
 
 (defun vertico--remote-p (path)
   "Return t if PATH is a remote path."
@@ -680,16 +671,12 @@ the stack trace is shown in the *Messages* buffer."
 When the prefix argument is 0, the group order is reset."
   (interactive "p")
   (when (cdr vertico--groups)
-    (if (setq vertico--lock-groups (not (eq n 0)))
-        (setq vertico--groups (vertico--cycle vertico--groups
-                                              (let ((len (length vertico--groups)))
-                                                (- len (mod (- (or n 1)) len))))
-              vertico--all-groups (vertico--cycle vertico--all-groups
-                                                  (seq-position vertico--all-groups
-                                                                (car vertico--groups))))
-      (setq vertico--groups nil
-            vertico--all-groups nil))
-    (setq vertico--lock-candidate nil
+    (setq vertico--groups (and (not (eq n 0))
+                               (vertico--cycle vertico--groups
+                                               (let ((len (length vertico--groups)))
+                                                 (- len (mod (- (or n 1)) len)))))
+          vertico--lock-groups vertico--groups
+          vertico--lock-candidate nil
           vertico--input nil)))
 
 (defun vertico-previous-group (&optional n)
