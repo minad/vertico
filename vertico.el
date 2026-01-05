@@ -253,24 +253,25 @@ The value should lie between 0 and vertico-count/2."
       (vertico--metadata-get 'display-sort-function)
       vertico-sort-function))
 
-(defun vertico--recompute (pt content)
-  "Recompute state given PT and CONTENT."
-  (pcase-let* ((table minibuffer-completion-table)
+(defun vertico--compute (input)
+  "Compute state given INPUT."
+  (pcase-let* ((`(,str . ,pt) input)
+               (table minibuffer-completion-table)
                (pred minibuffer-completion-predicate)
-               (before (substring content 0 pt))
-               (after (substring content pt))
+               (before (substring str 0 pt))
+               (after (substring str pt))
                ;; bug#47678: `completion-boundaries' fails for `partial-completion'
                ;; if the cursor is moved before the slashes of "~//".
                ;; See also corfu.el which has the same issue.
                (bounds (condition-case nil
                            (completion-boundaries before table pred after)
                          (t (cons 0 (length after)))))
-               (field (substring content (car bounds) (+ pt (cdr bounds))))
+               (field (substring str (car bounds) (+ pt (cdr bounds))))
                ;; bug#75910: category instead of `minibuffer-completing-file-name'
                (completing-file (eq 'file (vertico--metadata-get 'category)))
-               (`(,all . ,hl) (vertico--filter-completions content table pred pt vertico--metadata))
+               (`(,all . ,hl) (vertico--filter-completions str table pred pt vertico--metadata))
                (base (or (when-let* ((z (last all))) (prog1 (cdr z) (setcdr z nil))) 0))
-               (vertico--base (substring content 0 base))
+               (vertico--base (substring str 0 base))
                (def (or (car-safe minibuffer-default) minibuffer-default))
                (groups) (def-missing) (lock))
     ;; Filter the ignored file extensions. We cannot use modified predicate for this filtering,
@@ -287,11 +288,12 @@ The value should lie between 0 and vertico-count/2."
     (setq all (vertico--move-to-front field all))
     (when-let* ((fun (and all (vertico--metadata-get 'group-function))))
       (setq groups (vertico--group-by fun all) all (car groups)))
-    (setq def-missing (and def (equal content "") (not (member def all)))
+    (setq def-missing (and def (equal str "") (not (member def all)))
           lock (and vertico--lock-candidate ;; Locked position of old candidate.
                     (if (< vertico--index 0) -1
                       (seq-position all (nth vertico--index vertico--candidates)))))
-    `((vertico--base . ,vertico--base)
+    `((vertico--input . ,input)
+      (vertico--base . ,vertico--base)
       (vertico--metadata . ,vertico--metadata)
       (vertico--candidates . ,all)
       (vertico--total . ,(length all))
@@ -305,8 +307,8 @@ The value should lie between 0 and vertico-count/2."
       (vertico--index . ,(or lock
                              (if (or def-missing (eq vertico-preselect 'prompt) (not all)
                                      (and completing-file (eq vertico-preselect 'directory)
-                                          (= (length vertico--base) (length content))
-                                          (test-completion content table pred)))
+                                          (= (length vertico--base) (length str))
+                                          (test-completion str table pred)))
                                  -1 0))))))
 
 (defun vertico--hilit (cand)
@@ -354,8 +356,8 @@ The value should lie between 0 and vertico-count/2."
 (defun vertico--update (&optional interruptible)
   "Update state, optionally INTERRUPTIBLE."
   (let* ((pt (max 0 (- (point) (minibuffer-prompt-end))))
-         (content (minibuffer-contents-no-properties))
-         (input (cons content pt)))
+         (str (minibuffer-contents-no-properties))
+         (input (cons str pt)))
     (unless (or (and interruptible (input-pending-p)) (equal vertico--input input))
       ;; Redisplay to make input immediately visible before expensive candidate
       ;; recomputation (gh:minad/vertico#89).  No redisplay during init because
@@ -363,7 +365,7 @@ The value should lie between 0 and vertico-count/2."
       (when (and interruptible (consp vertico--input))
         ;; Prevent recursive exhibit from timer (`consult-vertico--refresh').
         (cl-letf (((symbol-function #'vertico--exhibit) #'ignore)) (redisplay)))
-      (pcase (let ((vertico--metadata (completion-metadata (substring content 0 pt)
+      (pcase (let ((vertico--metadata (completion-metadata (substring str 0 pt)
                                                            minibuffer-completion-table
                                                            minibuffer-completion-predicate)))
                ;; If Tramp is used, do not compute the candidates in an
@@ -371,13 +373,12 @@ The value should lie between 0 and vertico-count/2."
                ;; password and user name prompts (See gh:minad/vertico#23).
                (if (or (not interruptible)
                        (and (eq 'file (vertico--metadata-get 'category))
-                            (or (vertico--remote-p content) (vertico--remote-p default-directory))))
-                   (vertico--recompute pt content)
+                            (or (vertico--remote-p str) (vertico--remote-p default-directory))))
+                   (vertico--compute input)
                  (let ((non-essential t))
-                   (while-no-input (vertico--recompute pt content)))))
+                   (while-no-input (vertico--compute input)))))
         ('nil (abort-recursive-edit))
         ((and state (pred consp))
-         (setq vertico--input input)
          (dolist (s state) (set (car s) (cdr s))))))))
 
 (defun vertico--display-string (str)
