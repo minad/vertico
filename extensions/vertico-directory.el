@@ -38,7 +38,7 @@
 ;; `vertico-multiform-mode'.
 ;;
 ;; (setq vertico-multiform-categories
-;;       '((file (:keymap . vertico-directory-map)))
+;;       '((file (:keymap . vertico-directory-map))))
 ;; (vertico-multiform-mode)
 ;;
 ;; Furthermore a cleanup function for shadowed file paths is provided.
