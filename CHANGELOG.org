@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 2.7 (2026-01-18)
 
 - =vertico-multiform-mode=: Check state of modes during minibuffer setup.
 - =vertico-next-group=, =vertico-previous-group=: Simplify group handling.
