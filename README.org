@@ -11,7 +11,7 @@
 #+html: <a href="https://elpa.gnu.org/devel/vertico.html"><img alt="GNU-devel ELPA" src="https://elpa.gnu.org/devel/vertico.svg"/></a>
 #+html: <a href="https://melpa.org/#/vertico"><img alt="MELPA" src="https://melpa.org/packages/vertico-badge.svg"/></a>
 #+html: <a href="https://stable.melpa.org/#/vertico"><img alt="MELPA Stable" src="https://stable.melpa.org/packages/vertico-badge.svg"/></a>
-#+html: <img src="https://github.com/minad/vertico/blob/screenshots/poster.jpg?raw=true" align="right" width="30%">
+#+html: <img src="https://github.com/minad/vertico/blob/screenshots/poster.jpg?raw=true" align="right">
 
 Vertico provides a performant and minimalistic vertical completion UI based on
 the default completion system. The focus of Vertico is to provide a UI which
