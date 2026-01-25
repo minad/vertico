@@ -56,7 +56,7 @@
 (defcustom vertico-group-format
   (concat #("    " 0 4 (face vertico-group-separator))
           #(" %s " 0 4 (face vertico-group-title))
-          #(" " 0 1 (face vertico-group-separator display (space :align-to (- right 1)))))
+          #("\n" 0 1 (face vertico-group-separator)))
   "Format string used for the group title."
   :type '(choice (const :tag "No group titles" nil) string))
 
@@ -118,7 +118,7 @@ The value should lie between 0 and vertico-count/2."
 (defface vertico-group-title '((t :inherit shadow :slant italic))
   "Face used for the title text of the candidate group headlines.")
 
-(defface vertico-group-separator '((t :inherit vertico-group-title :strike-through t))
+(defface vertico-group-separator '((t :inherit vertico-group-title :strike-through t :extend t))
   "Face used for the separator lines of the candidate groups.")
 
 (defface vertico-current '((t :inherit highlight :extend t))
@@ -430,7 +430,7 @@ The value should lie between 0 and vertico-count/2."
     (vertico--remove-face 0 (length title) 'completions-first-difference title))
   (setq title (substring title))
   (add-face-text-property 0 (length title) 'vertico-group-title t title)
-  (format (concat vertico-group-format "\n") title))
+  (format vertico-group-format title))
 
 (defun vertico--format-count ()
   "Format the count string."
