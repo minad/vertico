@@ -147,7 +147,6 @@ The value should lie between 0 and vertico-count/2."
 (defvar vertico--locals
   '((scroll-margin . 0)
     (completion-auto-help . nil)
-    (completion-show-inline-help . nil)
     (pixel-scroll-precision-mode . nil))
   "Vertico minibuffer local variables.")
 
