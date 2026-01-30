@@ -155,12 +155,12 @@ the currently selected candidate.
 
 If you prefer to have the default completion commands available you can add new
 bindings or even replace the Vertico bindings. For example you can use =M-TAB= to
-expand the prefix of candidates (TAB complete) or cycle between candidates if
+expand the prefix of candidates (TAB completion) or cycle between candidates if
 ~completion-cycle-threshold~ is non-nil, with the following configuration.
 
 #+begin_src emacs-lisp
 ;; Option 1: Additional bindings
-(keymap-set vertico-map "?" #'minibuffer-completion-help)
+(keymap-set vertico-map "M-?" #'minibuffer-completion-help)
 (keymap-set vertico-map "M-RET" #'minibuffer-force-complete-and-exit)
 (keymap-set vertico-map "M-TAB" #'minibuffer-complete)
 
