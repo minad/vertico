@@ -493,7 +493,7 @@ following resources:
 
 - Configurations which use Vertico and Corfu for completion:
   + [[https://github.com/doomemacs/doomemacs/tree/master/modules/completion/vertico][Doom Emacs Vertico Module]]
-  + [[https://github.com/SystemCrafters/crafted-emacs/blob/master/modules/crafted-completion.el][Crafted Emacs Completion Module]]
+  + [[https://github.com/SystemCrafters/crafted-emacs/blob/master/modules/crafted-completion-config.el][Crafted Emacs Completion Module]]
   + [[https://git.sr.ht/~protesilaos/dotfiles/tree/master/item/emacs/.emacs.d/][Prot's Emacs configuration]]
   + [[https://codeberg.org/ashton314/emacs-bedrock/src/branch/main/extras/base.el][Bedrock Emacs Base Enhancements]]
 - Videos:
