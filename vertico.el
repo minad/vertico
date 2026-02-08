@@ -713,10 +713,13 @@ When the prefix argument is 0, the group order is reset."
 (define-minor-mode vertico-mode
   "VERTical Interactive COmpletion."
   :global t :group 'vertico
-  (dolist (fun '(completing-read-default completing-read-multiple))
+  (if vertico-mode
+      (advice-add #'completing-read-default :around #'vertico--advice)
+    (advice-remove #'completing-read-default #'vertico--advice))
+  (static-when (< emacs-major-version 31)
     (if vertico-mode
-        (advice-add fun :around #'vertico--advice)
-      (advice-remove fun #'vertico--advice))))
+        (advice-add #'completing-read-multiple :around #'vertico--advice)
+      (advice-remove #'completing-read-multiple #'vertico--advice))))
 
 (defun vertico--command-p (_sym buffer)
   "Return non-nil if Vertico is active in BUFFER."
