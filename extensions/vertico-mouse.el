@@ -62,9 +62,7 @@
 
 (defun vertico-mouse--scroll-up (n)
   "Scroll up by N lines."
-  (vertico--goto (max 0 (+ vertico--index
-                           (if (bound-and-true-p vertico-reverse-mode)
-                               (- n) n)))))
+  (vertico--goto (max 0 (+ vertico--index n))))
 
 (defun vertico-mouse--scroll-down (n)
   "Scroll down by N lines."
@@ -89,8 +87,11 @@
 (cl-defmethod vertico--setup :after (&context (vertico-mouse-mode (eql t)))
   (when (boundp 'mwheel-coalesce-scroll-events)
     (setq-local mwheel-coalesce-scroll-events t))
-  (setq-local mwheel-scroll-up-function #'vertico-mouse--scroll-up
-              mwheel-scroll-down-function #'vertico-mouse--scroll-down))
+  (if (bound-and-true-p vertico-reverse-mode)
+      (setq-local mwheel-scroll-up-function #'vertico-mouse--scroll-down
+                  mwheel-scroll-down-function #'vertico-mouse--scroll-up)
+    (setq-local mwheel-scroll-up-function #'vertico-mouse--scroll-up
+                mwheel-scroll-down-function #'vertico-mouse--scroll-down)))
 
 (provide 'vertico-mouse)
 ;;; vertico-mouse.el ends here
