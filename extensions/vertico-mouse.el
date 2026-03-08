@@ -62,7 +62,9 @@
 
 (defun vertico-mouse--scroll-up (n)
   "Scroll up by N lines."
-  (vertico--goto (max 0 (+ vertico--index n))))
+  (vertico--goto (max 0 (+ vertico--index
+                           (if (bound-and-true-p vertico-reverse-mode)
+                               (- n) n)))))
 
 (defun vertico-mouse--scroll-down (n)
   "Scroll down by N lines."
