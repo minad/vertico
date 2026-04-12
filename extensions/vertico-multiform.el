@@ -125,7 +125,9 @@ The keys in LIST can be symbols or regexps."
                    (pop vertico-multiform--stack))))
     (add-hook 'minibuffer-exit-hook exit)
     (add-hook 'context-menu-functions #'vertico-multiform--display-menu nil t)
-    (dolist (x (cdr (or (vertico-multiform--lookup this-command vertico-multiform-commands)
+    (dolist (x (cdr (or (and (boundp 'current-minibuffer-command)
+			     (vertico-multiform--lookup current-minibuffer-command vertico-multiform-commands))
+                        (vertico-multiform--lookup this-command vertico-multiform-commands)
                         (vertico-multiform--lookup cat vertico-multiform-categories))))
       (pcase x
         (`(:keymap . ,key)
