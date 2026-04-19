@@ -207,9 +207,10 @@ The value should lie between 0 and vertico-count/2."
       (cl-loop for cand in cands collect (list cand "" "")))))
 
 (defun vertico--move-to-front (elem list)
-  "Move ELEM to front of LIST."
-  (if-let* ((found (member elem list))) ;; No duplicates, compare with Corfu.
-      (nconc (list (car found)) (delq (setcar found nil) list))
+  "Move all ELEM (also duplicates) to front of LIST."
+  (if (member elem list)
+      (nconc (cl-loop for x in list if (equal x elem) collect x)
+             (delete elem list))
     list))
 
 (defun vertico--filter-completions (&rest args)
