@@ -278,13 +278,13 @@ The value should lie between 0 and vertico-count/2."
     ;; and `file-directory-p'.
     (when completing-file (setq all (completion-pcm--filename-try-filter all)))
     ;; Sort using the `display-sort-function' or the Vertico sort functions
-    (setq all (delete-consecutive-dups (funcall (or (vertico--sort-function) #'identity) all)))
+    (setq all (funcall (or (vertico--sort-function) #'identity) all))
     ;; Move special candidates: "field" appears at the top, before "field/", before default value
     (when (stringp def)
       (setq all (vertico--move-to-front def all)))
     (when (and completing-file (not (string-suffix-p "/" field)))
       (setq all (vertico--move-to-front (concat field "/") all)))
-    (setq all (vertico--move-to-front field all))
+    (setq all (delete-consecutive-dups (vertico--move-to-front field all)))
     (when-let* ((fun (and all (vertico--metadata-get 'group-function))))
       (setq groups (vertico--group-by fun all) all (car groups)))
     (setq def-missing (and def (equal str "") (not (member def all)))
