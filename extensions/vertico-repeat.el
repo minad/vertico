@@ -6,7 +6,7 @@
 ;; Maintainer: Daniel Mendler <mail@daniel-mendler.de>
 ;; Created: 2021
 ;; Version: 2.8
-;; Package-Requires: ((emacs "29.1") (compat "30") (vertico "2.8"))
+;; Package-Requires: ((emacs "29.1") (compat "31") (vertico "2.8"))
 ;; URL: https://github.com/minad/vertico
 
 ;; This file is part of GNU Emacs.
@@ -186,7 +186,7 @@ selected candidate for the current command."
                             if (eq (car h) vertico-repeat--command) collect h))))
       ((= vertico-repeat--pos 0)
        (setcar vertico-repeat--step (vertico-repeat--current))))
-     (cl-incf n vertico-repeat--pos)
+     (incf n vertico-repeat--pos)
      (when-let* (((>= n 0)) (session (nth n vertico-repeat--step)))
        (setq vertico-repeat--pos n)
        session))))
@@ -230,12 +230,10 @@ previous sessions for the current command."
                   (if current-cmd
                       (format "History of %s: " current-cmd)
                     "Completion history: ")
-                  ;; TODO: Use `completion-table-with-metadata'
-                  (lambda (str pred action)
-                    (if (eq action 'metadata)
-                        '(metadata (display-sort-function . identity)
-                                   (cycle-sort-function . identity))
-                      (complete-with-action action formatted str pred)))
+                  (completion-table-with-metadata
+                   formatted
+                   '((display-sort-function . identity)
+                     (cycle-sort-function . identity)))
                   nil t nil t)
                  formatted)))))
 

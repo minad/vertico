@@ -6,7 +6,7 @@
 ;; Maintainer: Daniel Mendler <mail@daniel-mendler.de>
 ;; Created: 2021
 ;; Version: 2.8
-;; Package-Requires: ((emacs "29.1") (compat "30") (vertico "2.8"))
+;; Package-Requires: ((emacs "29.1") (compat "31") (vertico "2.8"))
 ;; URL: https://github.com/minad/vertico
 
 ;; This file is part of GNU Emacs.
@@ -153,7 +153,7 @@ When scrolling beyond this limit, candidates may be truncated."
                          (aref width col)
                          (string-width (or (nth (+ row (* col vertico-count)) cands) ""))))))
     (dotimes (col (1- vertico-grid--columns))
-      (cl-incf (aref width (1+ col)) (+ (aref width col) sep)))
+      (incf (aref width (1+ col)) (+ (aref width col) sep)))
     (cl-loop for row from 0 to (1- (min vertico-count vertico--total)) collect
              (let ((line (list "\n")))
                (cl-loop for col from (1- vertico-grid--columns) downto 0 do

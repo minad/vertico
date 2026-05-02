@@ -6,7 +6,7 @@
 ;; Maintainer: Daniel Mendler <mail@daniel-mendler.de>
 ;; Created: 2021
 ;; Version: 2.8
-;; Package-Requires: ((emacs "29.1") (compat "30"))
+;; Package-Requires: ((emacs "29.1") (compat "31"))
 ;; URL: https://github.com/minad/vertico
 ;; Keywords: convenience, files, matching, completion
 
@@ -559,7 +559,7 @@ the stack trace is shown in the *Messages* buffer."
         (when (= index vertico--index)
           (setq curr-line (length lines)))
         (push (cons index cand) lines)
-        (cl-incf index)))
+        (incf index)))
     ;; Drop excess lines
     (setq lines (nreverse lines))
     (cl-loop for count from (length lines) above vertico-count do
@@ -609,7 +609,7 @@ the stack trace is shown in the *Messages* buffer."
 (cl-defgeneric vertico--setup ()
   "Setup completion UI."
   (dolist (var vertico--locals)
-    (set (make-local-variable (car var)) (cdr var)))
+    (set-local (car var) (cdr var)))
   (setq-local vertico--input t
               vertico--candidates-ov (make-overlay (point-max) (point-max) nil t t)
               vertico--count-ov (make-overlay (point-min) (point-min) nil t t))
