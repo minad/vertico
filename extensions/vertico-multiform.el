@@ -141,7 +141,7 @@ The keys in LIST can be symbols or regexps."
                 (mode (if (and sym (fboundp sym)) sym x)))
            (when (or (not (symbolp mode)) (not (boundp mode)) (not (symbol-value mode)))
              (push mode modes))))
-        (`(,k . ,v) (set-local k v))
+        (`(,k . ,v) (setq-local k v))
         (_ (error "Invalid multiform setting %S" x))))
     (push modes vertico-multiform--stack)
     (vertico-multiform--toggle 1)

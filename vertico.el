@@ -609,7 +609,7 @@ the stack trace is shown in the *Messages* buffer."
 (cl-defgeneric vertico--setup ()
   "Setup completion UI."
   (dolist (var vertico--locals)
-    (set-local (car var) (cdr var)))
+    (setq-local (car var) (cdr var)))
   (setq-local vertico--input t
               vertico--candidates-ov (make-overlay (point-max) (point-max) nil t t)
               vertico--count-ov (make-overlay (point-min) (point-min) nil t t))
