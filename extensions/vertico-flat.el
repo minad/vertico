@@ -84,29 +84,34 @@
   (when vertico-flat-mode
     (push `(vertico--input . ,vertico-flat-map) minor-mode-map-alist)))
 
+(defun vertico-flat--format (prop)
+  "Lookup PROP in buffer-local or global `vertico-flat-format'."
+  (or (plist-get vertico-flat-format prop)
+      (plist-get (default-value 'vertico-flat-format) prop)))
+
 (cl-defmethod vertico--display-candidates (candidates &context (vertico-flat-mode (eql t)))
   (setq-local truncate-lines nil
               resize-mini-windows t)
   (move-overlay vertico--candidates-ov (point-max) (point-max))
   (overlay-put
    vertico--candidates-ov 'before-string
-   (concat (plist-get vertico-flat-format :spacer)
+   (concat (vertico-flat--format :spacer)
            (cond
-            ((and (not candidates) (plist-get vertico-flat-format :no-match)))
+            ((and (not candidates) (vertico-flat--format :no-match)))
             ((and (= vertico--total 1) (= vertico--index 0)
-                  (when-let* ((fmt (plist-get vertico-flat-format :single)))
+                  (when-let* ((fmt (vertico-flat--format :single)))
                     (format fmt (substring-no-properties (car candidates))))))
-            (t (format (plist-get vertico-flat-format (if (< vertico--index 0) :prompt :multiple))
-                       (string-join candidates (plist-get vertico-flat-format :separator))))))))
+            (t (format (vertico-flat--format (if (< vertico--index 0) :prompt :multiple))
+                       (string-join candidates (vertico-flat--format :separator))))))))
 
 (cl-defmethod vertico--arrange-candidates (&context (vertico-flat-mode (eql t)))
   (let* ((index (max 0 vertico--index)) (count vertico-count)
          (candidates (nthcdr vertico--index vertico--candidates))
          (width (- (* vertico-flat-max-lines (- (vertico--window-width) 4))
-                   (length (plist-get vertico-flat-format :left))
-                   (length (plist-get vertico-flat-format :separator))
-                   (length (plist-get vertico-flat-format :right))
-                   (length (plist-get vertico-flat-format :ellipsis))
+                   (length (vertico-flat--format :left))
+                   (length (vertico-flat--format :separator))
+                   (length (vertico-flat--format :right))
+                   (length (vertico-flat--format :ellipsis))
                    (car (posn-col-row (posn-at-point (1- (point-max)))))))
          (result) (wrapped))
     (while (and candidates (not (eq wrapped (car candidates)))
@@ -124,7 +129,7 @@
                      (vertico--format-candidate cand prefix suffix index vertico--index)))
               index (1+ index)
               count (1- count)
-              width (- width (string-width cand) (length (plist-get vertico-flat-format :separator))))
+              width (- width (string-width cand) (length (vertico-flat--format :separator))))
         (when (or (not result) (> width 0))
           (push cand result))
         (when (and vertico-cycle (not candidates))
@@ -133,7 +138,7 @@
     (when (if wrapped
               (> vertico--total (- vertico-count count))
             (and (/= vertico--total 0) (/= index vertico--total)))
-      (push (plist-get vertico-flat-format :ellipsis) result))
+      (push (vertico-flat--format :ellipsis) result))
     (nreverse result)))
 
 (provide 'vertico-flat)

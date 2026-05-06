@@ -5,6 +5,8 @@
 * Development
 
 - Improve deduplication of candidates.
+- =vertico-flat-format=: Support override via =vertico-multiform-mode=.
+- Require Compat 31.
 
 * Version 2.8 (2026-03-09)
 
