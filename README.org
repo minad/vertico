@@ -7,6 +7,8 @@
 #+texinfo_dir_desc: VERTical Interactive COmpletion.
 
 #+html: <a href="https://www.gnu.org/software/emacs/"><img alt="GNU Emacs" src="https://github.com/minad/corfu/blob/screenshots/emacs.svg?raw=true"/></a>
+#+html: <a href="https://elpa.gnu.org/packages/vertico.html"><img alt="GNU ELPA" src="https://elpa.gnu.org/packages/vertico.svg"/></a>
+#+html: <a href="https://elpa.gnu.org/devel/vertico.html"><img alt="GNU-devel ELPA" src="https://elpa.gnu.org/devel/vertico.svg"/></a>
 #+html: <a href="https://melpa.org/#/vertico"><img alt="MELPA" src="https://melpa.org/packages/vertico-badge.svg"/></a>
 #+html: <a href="https://stable.melpa.org/#/vertico"><img alt="MELPA Stable" src="https://stable.melpa.org/packages/vertico-badge.svg"/></a>
 #+html: <img src="https://github.com/minad/vertico/blob/screenshots/movie.jpg?raw=true" align="right">
@@ -40,7 +42,7 @@ without white space and comments.
 
 * Installation
 
-Vertico is available on MELPA and can be installed via =M-x package-install RET vertico RET=.
+Vertico is available from [[https://elpa.gnu.org/packages/vertico.html][ELPA]] or [[https://melpa.org/#/vertico][MELPA]]. You can install it directly via =M-x package-install RET vertico RET=.
 After installation, activate the global minor mode with =M-x vertico-mode RET=.
 
 * Key bindings
@@ -234,11 +236,11 @@ older Emacs versions you can use the following advice:
 :end:
 
 We maintain small extension packages to Vertico in this repository in the
-subdirectory [[https://github.com/minad/vertico/tree/main/extensions][extensions/]]. The extensions are installed together with Vertico if
-you pull the package from MELPA. The extensions are inactive by default and can
-be enabled manually if desired. Furthermore it is possible to install all of the
-files separately, both ~vertico.el~ and the ~vertico-*.el~ extensions. Currently the
-following extensions come with the Vertico package:
+subdirectory [[https://github.com/minad/vertico/tree/main/extensions][extensions/]]. The extensions are installed together with Vertico.
+The extensions are inactive by default and can be enabled manually if desired.
+Furthermore it is possible to install all of the files separately, both
+~vertico.el~ and the ~vertico-*.el~ extensions. Currently the following extensions
+come with the Vertico package:
 
 - [[https://github.com/minad/vertico/blob/main/extensions/vertico-buffer.el][vertico-buffer]]: =vertico-buffer-mode= to display Vertico like a regular buffer.
 - [[https://github.com/minad/vertico/blob/main/extensions/vertico-directory.el][vertico-directory]]: Commands for Ido-like directory navigation.
