@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 2.9 (2026-05-19)
 
 - Improve deduplication of candidates.
 - =vertico-flat-format=: Support override via =vertico-multiform-mode=.
