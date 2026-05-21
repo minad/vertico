@@ -382,6 +382,7 @@ The value should lie between 0 and vertico-count/2."
          (dolist (s state) (set (car s) (cdr s))))))))
 
 (defun vertico--display-string (str)
+  ;; Note: Keep in sync with embark--display-string
   "Return display STR without display and invisible properties."
   (let ((end (length str)) (pos 0) chunks)
     (while (< pos end)
@@ -390,14 +391,16 @@ The value should lie between 0 and vertico-count/2."
         (if (stringp disp)
             (let ((face (get-text-property pos 'face str)))
               (when face
-                (add-face-text-property 0 (length disp) face t (setq disp (concat disp))))
+                (add-face-text-property
+                 0 (length disp) face t (setq disp (concat disp))))
               (setq pos nextd chunks (cons disp chunks)))
           (pcase disp (`(space :align-to . ,_) (push " " chunks)))
           (while (< pos nextd)
-            (let ((nexti (next-single-property-change pos 'invisible str nextd)))
+            (let ((nexti
+                   (next-single-property-change pos 'invisible str nextd)))
               (unless (or (get-text-property pos 'invisible str)
-                          (and (= pos 0) (= nexti end))) ;; full string -> no allocation
-                  (push (substring str pos nexti) chunks))
+                          (and (= pos 0) (= nexti end))) ;; full=>no allocation
+                (push (substring str pos nexti) chunks))
               (setq pos nexti))))))
     (if chunks (apply #'concat (nreverse chunks)) str)))
 
