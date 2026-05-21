@@ -387,10 +387,8 @@ The value should lie between 0 and vertico-count/2."
     (while (< pos end)
       (let ((nextd (next-single-property-change pos 'display str end))
             (disp (get-text-property pos 'display str)))
-        (if (or (stringp disp) (eq (car-safe disp) 'space))
+        (if (stringp disp)
             (let ((face (get-text-property pos 'face str)))
-              (unless (stringp disp)
-                (setq disp " "))
               (when face
                 (add-face-text-property 0 (length disp) face t (setq disp (concat disp))))
               (setq pos nextd chunks (cons disp chunks)))
