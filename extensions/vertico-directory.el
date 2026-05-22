@@ -75,7 +75,14 @@ Exit with current input if prefix ARG is given."
       (progn
         (delete-minibuffer-contents)
         (insert cand))
-    (vertico-exit arg)))
+    (if (= vertico--total 0)
+        (let ((vertico--index (min 0 vertico--index))
+              (cand (vertico--candidate)))
+          (progn
+            (delete-minibuffer-contents)
+            (mkdir cand)
+            (insert (concat cand "/"))))
+      (vertico-exit arg))))
 
 ;;;###autoload
 (defun vertico-directory-up (&optional n)
