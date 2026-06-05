@@ -2,6 +2,11 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- =vertico--display-string=: Better treatment of computed space in candidate
+  display.
+
 * Version 2.9 (2026-05-19)
 
 - Improve deduplication of candidates.
