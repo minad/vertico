@@ -9,8 +9,8 @@
 #+html: <a href="https://www.gnu.org/software/emacs/"><img alt="GNU Emacs" src="https://github.com/minad/corfu/blob/screenshots/emacs.svg?raw=true"/></a>
 #+html: <a href="https://elpa.gnu.org/packages/vertico.html"><img alt="GNU ELPA" src="https://elpa.gnu.org/packages/vertico.svg"/></a>
 #+html: <a href="https://elpa.gnu.org/devel/vertico.html"><img alt="GNU-devel ELPA" src="https://elpa.gnu.org/devel/vertico.svg"/></a>
-#+html: <a href="https://melpa.org/#/vertico"><img alt="MELPA" src="https://melpa.org/packages/vertico-badge.svg"/></a>
-#+html: <a href="https://stable.melpa.org/#/vertico"><img alt="MELPA Stable" src="https://stable.melpa.org/packages/vertico-badge.svg"/></a>
+#+html: <a href="https://releases.melpa.org/#/vertico"><img alt="MELPA Releases" src="https://releases.melpa.org/packages/vertico-badge.svg"/></a>
+#+html: <a href="https://snapshots.melpa.org/#/vertico"><img alt="MELPA Snapshots" src="https://snapshots.melpa.org/packages/vertico-badge.svg"/></a>
 #+html: <img src="https://github.com/minad/vertico/blob/screenshots/movie.jpg?raw=true" align="right">
 
 Vertico provides a performant and minimalistic vertical completion UI based on
@@ -42,7 +42,7 @@ without white space and comments.
 
 * Installation
 
-Vertico is available from [[https://elpa.gnu.org/packages/vertico.html][ELPA]] or [[https://melpa.org/#/vertico][MELPA]]. You can install it directly via =M-x package-install RET vertico RET=.
+Vertico is available from [[https://elpa.gnu.org/packages/vertico.html][ELPA]] or [[https://releases.melpa.org/#/vertico][MELPA]]. You can install it directly via =M-x package-install RET vertico RET=.
 After installation, activate the global minor mode with =M-x vertico-mode RET=.
 
 * Key bindings
