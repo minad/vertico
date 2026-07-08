@@ -476,7 +476,7 @@ the users interacts with Emacs.
 
 There are other interactive completion UIs, which follow a similar philosophy:
 
-- [[https://git.sr.ht/~protesilaos/mct][Mct]]: Minibuffer and Completions in Tandem. Mct reuses the default
+- [[https://github.com/protesilaos/mct][Mct]]: Minibuffer and Completions in Tandem. Mct reuses the default
   ~*Completions*~ buffer and enhances it with automatic updates. From Emacs
   version 31 automatic updates are built-in, see the settings
   =completions-eager-update= and =completions-eager-display=.
