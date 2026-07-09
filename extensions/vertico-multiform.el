@@ -175,11 +175,13 @@ The keys in LIST can be symbols or regexps."
   menu)
 
 (cl-defmethod vertico--advice (&context (vertico-multiform-mode (eql t)) &rest app)
-  (unwind-protect
-      (dlet ((completion-eager-display nil)) ;; Available on Emacs 31
+  (unwind-protect ;; Do not use `minibuffer-setup-hook' for idempotency.
+      (progn
         (vertico-multiform--toggle -1)
-        (minibuffer-with-setup-hook #'vertico-multiform--setup
+        (add-hook 'minibuffer-setup-hook #'vertico-multiform--setup)
+        (dlet ((completion-eager-display nil)) ;; Available on Emacs 31
           (apply app)))
+    (remove-hook 'minibuffer-setup-hook #'vertico-multiform--setup)
     (vertico-multiform--toggle 1)))
 
 (defun vertico-multiform--toggle-mode-1 (mode arg)
