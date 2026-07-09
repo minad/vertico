@@ -626,10 +626,9 @@ the stack trace is shown in the *Messages* buffer."
 (cl-defgeneric vertico--advice (&rest app)
   "Advice for completion function, apply APP."
   (unwind-protect ;; Do not use `minibuffer-setup-hook' for idempotency.
-      (progn
+      (dlet ((completion-eager-display nil)) ;; Available on Emacs 31
         (add-hook 'minibuffer-setup-hook #'vertico--setup)
-        (dlet ((completion-eager-display nil)) ;; Available on Emacs 31
-          (apply app)))
+        (apply app))
     (remove-hook 'minibuffer-setup-hook #'vertico--setup)))
 
 (defun vertico-first ()
