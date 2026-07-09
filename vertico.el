@@ -612,6 +612,7 @@ the stack trace is shown in the *Messages* buffer."
 
 (cl-defgeneric vertico--setup ()
   "Setup completion UI."
+  (remove-hook 'minibuffer-setup-hook #'vertico--setup)
   (dolist (var vertico--locals)
     (set-local (car var) (cdr var)))
   (setq-local vertico--input t
