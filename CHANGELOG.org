@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 2.11 (2026-07-22)
 
 - Bugfix: Fix double Vertico setup for =completing-read-multiple= on Emacs 31.
 
