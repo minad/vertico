@@ -59,7 +59,9 @@
   "<mouse-2>" (vertico-mouse--click "TAB")
   "<mouse-3>" (vertico-mouse--click "TAB")
   "<wheel-up>" #'vertico-previous
-  "<wheel-down>" #'vertico-next)
+  "<wheel-down>" #'vertico-next
+  "<wheel-left>" #'ignore
+  "<wheel-right>" #'ignore)
 (fset 'vertico-mouse-map vertico-mouse-map)
 
 ;;;###autoload
