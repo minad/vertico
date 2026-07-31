@@ -105,6 +105,11 @@ The keys in LIST can be symbols or regexps."
                       ((string-match-p x (symbol-name key)))))
                    list))))
 
+(defun vertico-multiform--exit ()
+  "Disable modes at minibuffer exit."
+  (vertico-multiform--toggle -1)
+  (pop vertico-multiform--stack))
+
 (defun vertico-multiform--setup ()
   "Enable modes at minibuffer setup."
   (remove-hook 'minibuffer-setup-hook #'vertico-multiform--setup)
@@ -115,16 +120,8 @@ The keys in LIST can be symbols or regexps."
                                    minibuffer-completion-table
                                    minibuffer-completion-predicate)
               'category))
-        (exit (make-symbol "vertico-multiform--exit"))
-        (depth (recursion-depth))
-        (kmaps nil)
-        (modes nil))
-    (fset exit (lambda ()
-                 (when (= depth (recursion-depth))
-                   (remove-hook 'minibuffer-exit-hook exit)
-                   (vertico-multiform--toggle -1)
-                   (pop vertico-multiform--stack))))
-    (add-hook 'minibuffer-exit-hook exit)
+        kmaps modes)
+    (add-hook 'minibuffer-exit-hook #'vertico-multiform--exit nil t)
     (add-hook 'context-menu-functions #'vertico-multiform--display-menu nil t)
     (dolist (x (cdr (or (vertico-multiform--lookup this-command vertico-multiform-commands)
                         (vertico-multiform--lookup cat vertico-multiform-categories))))
