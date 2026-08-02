@@ -174,7 +174,7 @@
                   (with-silent-modifications
                     (vertico--remove-face (point-min) (point-max) 'region)))
                 (remove-hook 'pre-redisplay-functions #'vertico-buffer--redisplay 'local)
-                (remove-hook 'minibuffer-exit-hook vertico-buffer--restore)
+                (remove-hook 'minibuffer-exit-hook vertico-buffer--restore 'local)
                 (fset vertico-buffer--restore nil)
                 (kill-local-variable 'vertico-buffer--restore)
                 (buffer-local-restore-state old-state)
@@ -192,10 +192,7 @@
                   (delete-window win)))
                 (when vertico-buffer-hide-prompt
                   (set-window-vscroll nil 0))))))
-    ;; We cannot use a buffer-local minibuffer-exit-hook here.  The hook will
-    ;; not be called when abnormally exiting the minibuffer from another buffer
-    ;; via `keyboard-escape-quit'.
-    (add-hook 'minibuffer-exit-hook vertico-buffer--restore)
+    (add-hook 'minibuffer-exit-hook vertico-buffer--restore nil 'local)
     (add-hook 'pre-redisplay-functions #'vertico-buffer--redisplay nil 'local)))
 
 ;;;###autoload
