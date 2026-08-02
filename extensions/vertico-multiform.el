@@ -121,8 +121,8 @@ The keys in LIST can be symbols or regexps."
                                    minibuffer-completion-predicate)
               'category))
         kmaps modes)
-    (add-hook 'minibuffer-exit-hook #'vertico-multiform--exit nil t)
-    (add-hook 'context-menu-functions #'vertico-multiform--display-menu nil t)
+    (add-hook 'minibuffer-exit-hook #'vertico-multiform--exit nil 'local)
+    (add-hook 'context-menu-functions #'vertico-multiform--display-menu nil 'local)
     (dolist (x (cdr (or (vertico-multiform--lookup this-command vertico-multiform-commands)
                         (vertico-multiform--lookup cat vertico-multiform-categories))))
       (pcase x
