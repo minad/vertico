@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 2.12 (2026-08-05)
 
 - =vertico-mouse=: Handle =wheel-up= and =wheel-down= events directly.
 - =minibuffer-exit-hook=: Internal refactoring of minibuffer-local hooks.
