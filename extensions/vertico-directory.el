@@ -42,13 +42,21 @@
 ;; (vertico-multiform-mode)
 ;;
 ;; Furthermore a cleanup function for shadowed file paths is provided.
-;;
-;; (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
 
 ;;; Code:
 
 (require 'vertico)
 (eval-when-compile (require 'subr-x))
+
+;;;###autoload
+(defcustom vertico-directory-tidy t
+  "Tidy shadowed file names."
+  :group 'vertico
+  :type 'boolean
+  :set (lambda (sym val)
+         (custom-set-default sym val)
+         (funcall (if val #'add-hook #'remove-hook)
+                  'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)))
 
 ;;;###autoload
 (defun vertico-directory-enter (&optional arg)
@@ -113,8 +121,8 @@ Exit with current input if prefix ARG is given."
 
 ;;;###autoload
 (defun vertico-directory-tidy ()
-  "Tidy shadowed file name, see `rfn-eshadow-overlay'."
-  (when (eq this-command #'self-insert-command)
+  "Tidy shadowed file names, see `rfn-eshadow-overlay'."
+  (when (and vertico-mode (eq this-command #'self-insert-command))
     (dolist (ov '(tramp-rfn-eshadow-overlay rfn-eshadow-overlay))
       (when (and (boundp ov)
                  (setq ov (symbol-value ov))
