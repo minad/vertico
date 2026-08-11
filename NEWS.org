@@ -1,4 +1,4 @@
-#+title: vertico.el - Changelog
+#+title: vertico.el - News
 #+author: Daniel Mendler
 #+language: en
 
