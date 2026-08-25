@@ -39,6 +39,16 @@
 (require 'vertico)
 (eval-when-compile (require 'cl-lib))
 
+(defcustom vertico-reverse-candidates t
+  "Reverse the list of candidates."
+  :group 'vertico
+  :type 'boolean)
+
+(defcustom vertico-reverse-prompt t
+  "Move prompt to the bottom."
+  :group 'vertico
+  :type 'boolean)
+
 (defvar-keymap vertico-reverse-map
   :doc "Additional keymap activated in reverse mode."
   "<remap> <beginning-of-buffer>" #'vertico-last
@@ -62,12 +72,18 @@
     (when-let* ((ov (buffer-local-value 'vertico--candidates-ov buf)))
       (overlay-put ov 'before-string nil)))
   (cl-callf2 rassq-delete-all vertico-reverse-map minor-mode-map-alist)
-  (when vertico-reverse-mode
+  (when (and vertico-reverse-mode vertico-reverse-candidates)
     (push `(vertico--input . ,vertico-reverse-map) minor-mode-map-alist)))
 
-(cl-defmethod vertico--display-candidates (lines &context (vertico-reverse-mode (eql t)))
+(cl-defmethod vertico--arrange-candidates :around (&context
+                                                   (vertico-reverse-mode (eql t))
+                                                   (vertico-reverse-candidates (eql t)))
+  (nreverse (cl-call-next-method)))
+
+(cl-defmethod vertico--display-candidates (lines &context
+                                                 (vertico-reverse-mode (eql t))
+                                                 (vertico-reverse-prompt (eql t)))
   (move-overlay vertico--candidates-ov (point-min) (point-min))
-  (setq lines (nreverse lines))
   (unless (eq vertico-resize t)
     (setq lines (nconc (make-list (max 0 (- vertico-count (length lines))) "\n") lines)))
   (let ((string (apply #'concat lines)))

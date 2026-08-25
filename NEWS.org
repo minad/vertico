@@ -2,6 +2,11 @@
 #+author: Daniel Mendler
 #+language: en
 
+* Development
+
+- =vertico-reverse-candidates=, =vertico-reverse-prompt=: New options to selectively
+  only reverse the list of candidates, and to move the prompt to the bottom.
+
 * Version 2.13 (2026-08-21)
 
 - =vertico-directory-tidy=: New customization variable. Enable by default.
