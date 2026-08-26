@@ -247,14 +247,10 @@ The value should lie between 0 and vertico-count/2."
                (vertico--base (substring str 0 base))
                (def (or (car-safe minibuffer-default) minibuffer-default))
                (groups) (def-missing) (lock))
-    ;; Filter ignored extensions. We cannot use a modified predicate, since this
-    ;; breaks special casing in `completion-file-name-table' for `file-exists-p'
-    ;; and `file-directory-p'. See also `completion-pcm--filename-try-filter'.
-    (when completing-file
-      (cl-loop with i = (regexp-opt completion-ignored-extensions)
-               with r = (concat "\\(?:\\`\\.\\.?/\\|" i "\\)\\'")
-               for x in all if (or (equal field x) (not (string-match-p r x)))
-               collect x into xs finally (when xs (setq all xs))))
+    ;; Filter the ignored file extensions. We cannot use modified predicate for
+    ;; this filtering, since this breaks the special casing in the
+    ;; `completion-file-name-table' for `file-exists-p' and `file-directory-p'.
+    (when completing-file (setq all (completion-pcm--filename-try-filter all)))
     ;; Sort using the `display-sort-function' or the Vertico sort functions
     (setq all (funcall (or (vertico--sort-function) #'identity) all))
     ;; Move special candidates: "field" appears at the top, before "field/", before default value
