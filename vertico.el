@@ -213,36 +213,6 @@ The value should lie between 0 and vertico-count/2."
              (delete elem list))
     list))
 
-(defun vertico--filter-completions (&rest args)
-  "Compute all completions for ARGS with lazy highlighting."
-  (dlet ((completion-lazy-hilit t) (completion-lazy-hilit-fn nil))
-    (static-if (>= emacs-major-version 30)
-        (cons (apply #'completion-all-completions args) completion-lazy-hilit-fn)
-      (cl-letf* ((orig-pcm (symbol-function #'completion-pcm--hilit-commonality))
-                 (orig-flex (symbol-function #'completion-flex-all-completions))
-                 ((symbol-function #'completion-flex-all-completions)
-                  (lambda (&rest args)
-                    ;; Unfortunately for flex we have to undo the lazy highlighting, since flex uses
-                    ;; the completion-score for sorting, which is applied during highlighting.
-                    (cl-letf (((symbol-function #'completion-pcm--hilit-commonality) orig-pcm))
-                      (apply orig-flex args))))
-                 ((symbol-function #'completion-pcm--hilit-commonality)
-                  (lambda (pattern cands)
-                    (setq completion-lazy-hilit-fn
-                          (lambda (x)
-                            ;; `completion-pcm--hilit-commonality' sometimes throws an internal error
-                            ;; for example when entering "/sudo:://u".
-                            (condition-case nil
-                                (car (completion-pcm--hilit-commonality pattern (list x)))
-                              (t x))))
-                    cands))
-                 ((symbol-function #'completion-hilit-commonality)
-                  (lambda (cands prefix &optional base)
-                    (setq completion-lazy-hilit-fn
-                          (lambda (x) (car (completion-hilit-commonality (list x) prefix base))))
-                    (and cands (nconc cands base)))))
-        (cons (apply #'completion-all-completions args) completion-lazy-hilit-fn)))))
-
 (defun vertico--metadata-get (prop)
   "Return PROP from completion metadata."
   (compat-call completion-metadata-get vertico--metadata prop))
@@ -269,7 +239,10 @@ The value should lie between 0 and vertico-count/2."
                (field (substring str (car bounds) (+ pt (cdr bounds))))
                ;; bug#75910: category instead of `minibuffer-completing-file-name'
                (completing-file (eq 'file (vertico--metadata-get 'category)))
-               (`(,all . ,hl) (vertico--filter-completions str table pred pt vertico--metadata))
+               (`(,all . ,hl)
+                (dlet ((completion-lazy-hilit t) (completion-lazy-hilit-fn nil))
+                  (cons (completion-all-completions str table pred pt vertico--metadata)
+                        completion-lazy-hilit-fn)))
                (base (or (when-let* ((z (last all))) (prog1 (cdr z) (setcdr z nil))) 0))
                (vertico--base (substring str 0 base))
                (def (or (car-safe minibuffer-default) minibuffer-default))
