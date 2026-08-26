@@ -259,9 +259,9 @@ The value should lie between 0 and vertico-count/2."
     ;; Move special candidates: "field" appears at the top, before "field/", before default value
     (when (and (stringp def) (not (equal def "")))
       (setq all (vertico--move-to-front def all)))
-    (when (and completing-file (not (string-suffix-p "/" field)))
-      (setq all (vertico--move-to-front (concat field "/") all)))
     (unless (equal field "")
+      (when (and completing-file (not (string-suffix-p "/" field)))
+        (setq all (vertico--move-to-front (concat field "/") all)))
       (setq all (vertico--move-to-front field all)))
     (setq all (delete-consecutive-dups all))
     (when-let* ((fun (and all (vertico--metadata-get 'group-function))))
