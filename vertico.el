@@ -254,7 +254,7 @@ The value should lie between 0 and vertico-count/2."
       (cl-loop with i = (regexp-opt completion-ignored-extensions)
                with r = (concat "\\(?:\\`\\.\\.?/\\|" i "\\)\\'")
                for x in all if (or (equal field x) (not (string-match-p r x)))
-               collect x into xs finally (setq all xs)))
+               collect x into xs finally (when xs (setq all xs))))
     ;; Sort using the `display-sort-function' or the Vertico sort functions
     (setq all (funcall (or (vertico--sort-function) #'identity) all))
     ;; Move special candidates: "field" appears at the top, before "field/", before default value
