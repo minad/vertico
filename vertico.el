@@ -251,17 +251,19 @@ The value should lie between 0 and vertico-count/2."
     ;; this filtering, since this breaks the special casing in the
     ;; `completion-file-name-table' for `file-exists-p' and `file-directory-p'.
     (when completing-file
-      (let ((exact (member field all)))
+      (let ((exact (and (not (equal field "")) (member field all))))
         (setq all (completion-pcm--filename-try-filter all))
         (and exact (not (member field all)) (push field all))))
     ;; Sort using the `display-sort-function' or the Vertico sort functions
     (setq all (funcall (or (vertico--sort-function) #'identity) all))
     ;; Move special candidates: "field" appears at the top, before "field/", before default value
-    (when (stringp def)
+    (when (and (stringp def) (not (equal def "")))
       (setq all (vertico--move-to-front def all)))
     (when (and completing-file (not (string-suffix-p "/" field)))
       (setq all (vertico--move-to-front (concat field "/") all)))
-    (setq all (delete-consecutive-dups (vertico--move-to-front field all)))
+    (unless (equal field "")
+      (setq all (vertico--move-to-front field all)))
+    (setq all (delete-consecutive-dups all))
     (when-let* ((fun (and all (vertico--metadata-get 'group-function))))
       (setq groups (vertico--group-by fun all) all (car groups)))
     (setq def-missing (and def (equal str "") (not (member def all)))
