@@ -251,9 +251,8 @@ The value should lie between 0 and vertico-count/2."
     ;; breaks special casing in `completion-file-name-table' for `file-exists-p'
     ;; and `file-directory-p'. See also `completion-pcm--filename-try-filter'.
     (when completing-file
-      (cl-loop with r = (concat "\\(?:\\`\\.\\.?/\\|"
-                                (regexp-opt completion-ignored-extensions)
-                                "\\)\\'")
+      (cl-loop with i = (regexp-opt completion-ignored-extensions)
+               with r = (concat "\\(?:\\`\\.\\.?/\\|" i "\\)\\'")
                for x in all if (or (equal field x) (not (string-match-p r x)))
                collect x into xs finally (setq all xs)))
     ;; Sort using the `display-sort-function' or the Vertico sort functions
