@@ -246,6 +246,7 @@ The value should lie between 0 and vertico-count/2."
                (base (or (when-let* ((z (last all))) (prog1 (cdr z) (setcdr z nil))) 0))
                (vertico--base (substring str 0 base))
                (def (or (car-safe minibuffer-default) minibuffer-default))
+               (valid (test-completion str table pred))
                (groups) (def-missing) (lock))
     ;; Filter the ignored file extensions. We cannot use modified predicate for
     ;; this filtering, since this breaks the special casing in the
@@ -274,7 +275,7 @@ The value should lie between 0 and vertico-count/2."
       (vertico--total . ,(length all))
       (vertico--hilit . ,(or hl #'identity))
       (vertico--allow-prompt . ,(and (not (eq vertico-preselect 'no-prompt))
-                                     (or def-missing (eq vertico-preselect 'prompt)
+                                     (or valid def-missing (eq vertico-preselect 'prompt)
                                          (memq minibuffer--require-match
                                                '(nil confirm confirm-after-completion)))))
       (vertico--lock-candidate . ,lock)
@@ -282,8 +283,7 @@ The value should lie between 0 and vertico-count/2."
       (vertico--index . ,(or lock
                              (if (or def-missing (eq vertico-preselect 'prompt) (not all)
                                      (and completing-file (eq vertico-preselect 'directory)
-                                          (= (length vertico--base) (length str))
-                                          (test-completion str table pred)))
+                                          valid (= (length vertico--base) (length str))))
                                  -1 0))))))
 
 (defun vertico--hilit (cand)
