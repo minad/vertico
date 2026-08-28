@@ -247,7 +247,7 @@ The value should lie between 0 and vertico-count/2."
                (vertico--base (substring str 0 base))
                (def (or (car-safe minibuffer-default) minibuffer-default))
                (valid (test-completion str table pred))
-               (groups) (def-missing) (lock))
+               (groups) (def-missing) (allow-prompt) (lock))
     ;; Filter the ignored file extensions. We cannot use modified predicate for
     ;; this filtering, since this breaks the special casing in the
     ;; `completion-file-name-table' for `file-exists-p' and `file-directory-p'.
@@ -265,8 +265,12 @@ The value should lie between 0 and vertico-count/2."
     (when-let* ((fun (and all (vertico--metadata-get 'group-function))))
       (setq groups (vertico--group-by fun all) all (car groups)))
     (setq def-missing (and def (equal str "") (not (member def all)))
+          allow-prompt (and (not (eq vertico-preselect 'no-prompt))
+                            (or valid def-missing (eq vertico-preselect 'prompt)
+                                (memq minibuffer--require-match
+                                      '(nil confirm confirm-after-completion))))
           lock (and vertico--lock-candidate ;; Locked position of old candidate.
-                    (if (< vertico--index 0) -1
+                    (if (< vertico--index 0) (and allow-prompt -1)
                       (seq-position all (nth vertico--index vertico--candidates)))))
     `((vertico--input . ,input)
       (vertico--base . ,vertico--base)
@@ -274,10 +278,7 @@ The value should lie between 0 and vertico-count/2."
       (vertico--candidates . ,all)
       (vertico--total . ,(length all))
       (vertico--hilit . ,(or hl #'identity))
-      (vertico--allow-prompt . ,(and (not (eq vertico-preselect 'no-prompt))
-                                     (or valid def-missing (eq vertico-preselect 'prompt)
-                                         (memq minibuffer--require-match
-                                               '(nil confirm confirm-after-completion)))))
+      (vertico--allow-prompt . ,allow-prompt)
       (vertico--lock-candidate . ,lock)
       (vertico--groups . ,(cdr groups))
       (vertico--index . ,(or lock
