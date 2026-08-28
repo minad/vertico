@@ -246,7 +246,9 @@ The value should lie between 0 and vertico-count/2."
                (base (or (when-let* ((z (last all))) (prog1 (cdr z) (setcdr z nil))) 0))
                (vertico--base (substring str 0 base))
                (def (or (car-safe minibuffer-default) minibuffer-default))
-               (valid (test-completion str table pred))
+               (rm minibuffer--require-match)
+               (valid (if (functionp rm) (funcall rm str)
+                        (test-completion str table pred)))
                (groups) (def-missing) (allow-prompt) (lock))
     ;; Filter the ignored file extensions. We cannot use modified predicate for
     ;; this filtering, since this breaks the special casing in the
@@ -267,8 +269,7 @@ The value should lie between 0 and vertico-count/2."
     (setq def-missing (and def (equal str "") (not (member def all)))
           allow-prompt (and (not (eq vertico-preselect 'no-prompt))
                             (or valid def-missing (eq vertico-preselect 'prompt)
-                                (memq minibuffer--require-match
-                                      '(nil confirm confirm-after-completion))))
+                                (memq rm '(nil confirm confirm-after-completion))))
           lock (and vertico--lock-candidate ;; Locked position of old candidate.
                     (if (< vertico--index 0) (and allow-prompt -1)
                       (seq-position all (nth vertico--index vertico--candidates)))))
