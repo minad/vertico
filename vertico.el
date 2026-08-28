@@ -247,8 +247,8 @@ The value should lie between 0 and vertico-count/2."
                (vertico--base (substring str 0 base))
                (def (or (car-safe minibuffer-default) minibuffer-default))
                (rm minibuffer--require-match)
-               (valid (if (functionp rm) (funcall rm str)
-                        (test-completion str table pred)))
+               (valid (and (test-completion str table pred)
+                           (or (not (functionp rm)) (funcall rm str))))
                (groups) (def-missing) (allow-prompt) (lock))
     ;; Filter the ignored file extensions. We cannot use modified predicate for
     ;; this filtering, since this breaks the special casing in the
@@ -511,8 +511,8 @@ the stack trace is shown in the *Messages* buffer."
   (let ((rm minibuffer--require-match))
     (or (memq rm '(nil confirm-after-completion))
         (equal "" input) ;; Null completion, returns default value
-        (if (functionp rm) (funcall rm input) ;; require-match can be a function
-          (test-completion input minibuffer-completion-table minibuffer-completion-predicate))
+        (and (test-completion input minibuffer-completion-table minibuffer-completion-predicate)
+             (or (not (functionp rm)) (funcall rm input))) ;; require-match can be a function
         (if (eq rm 'confirm) (eq (ignore-errors (read-char "Confirm")) 13)
           (minibuffer-message "Match required") nil))))
 
