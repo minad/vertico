@@ -9,6 +9,8 @@
 - Minor optimizations during candidate computation.
 - Improve prompt selection behavior. Always allow prompt selection if the input
   is valid, according to =test-completion= or a =REQUIRE-MATCH= function.
+- Do not remove a file from the candidate list if it matches the input exactly,
+  even if it should be filtered according to =completion-ignored-extensions=.
 
 * Version 2.13 (2026-08-21)
 
