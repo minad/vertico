@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 2.14 (2026-09-03)
 
 - =vertico-reverse-candidates=, =vertico-reverse-prompt=: New options to selectively
   only reverse the list of candidates, and to move the prompt to the bottom.
