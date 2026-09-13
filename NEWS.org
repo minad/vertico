@@ -2,7 +2,7 @@
 #+author: Daniel Mendler
 #+language: en
 
-* Development
+* Version 2.15 (2026-09-13)
 
 - Call =REQUIRE-MATCH= function only on minibuffer exit to avoid performance
   issues.
