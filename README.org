@@ -649,21 +649,3 @@ disabled as follows.
                          #'ignore))
                 (apply args))))
 #+end_src
-
-** Tramp hostname and username completion (Fixed on Emacs 29)
-
-*NOTE:* On Emacs 29.2 and Tramp 2.7 the workarounds described in this section are
-not necessary anymore, since the relevant completion tables have been fixed.
-
-In combination with Orderless or other non-prefix completion styles like
-=substring= or =flex=, host names and user names are not made available for
-completion after entering =/ssh:=. In order to avoid this problem, the =basic=
-completion style should be specified for the file completion category, such that
-=basic= is tried before =orderless=. This can be achieved by putting =basic= first in
-the completion style overrides for the file completion category.
-
-#+begin_src emacs-lisp
-(setq completion-styles '(orderless basic)
-      completion-category-defaults nil
-      completion-category-overrides '((file (styles basic partial-completion))))
-#+end_src
